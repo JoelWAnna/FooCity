@@ -15,7 +15,6 @@ public class NewGame extends JPanel implements ActionListener {
 	private boolean mapLoaded = false;
 	private int[] mapData;
 	
-	
 	public NewGame(){
 		
 		// Create buttons
@@ -26,6 +25,7 @@ public class NewGame extends JPanel implements ActionListener {
 		buttonOK = new JButton("OK");
 		buttonOK.addActionListener(this);
 		buttonOK.setActionCommand("ok");
+		buttonOK.setEnabled(false);
 		
 		buttonCancel = new JButton("Cancel");
 		buttonCancel.addActionListener(this);
@@ -103,6 +103,10 @@ public class NewGame extends JPanel implements ActionListener {
 			// Close this window and show the main menu
 			javax.swing.SwingUtilities.getWindowAncestor(this).dispose();
 			MainMenu.createAndShowGUI();
+		} else if (e.getActionCommand().equals("ok")) {
+			// Show the game UI and close this window
+			GameUI gameUI = new GameUI(mapData);
+			javax.swing.SwingUtilities.getWindowAncestor(this).dispose();
 		}
 		
 	}
@@ -126,6 +130,7 @@ public class NewGame extends JPanel implements ActionListener {
 				}
 				// Force a redraw of the window
 				mapLoaded = true;
+				buttonOK.setEnabled(true);
 				this.paint(getGraphics());
 				
 			} catch (FileNotFoundException e1) {
