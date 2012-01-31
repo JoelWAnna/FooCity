@@ -6,6 +6,7 @@ public class mainMenu extends JPanel implements ActionListener {
 	
 	protected JButton buttonNewGame, buttonLoadGame;
 	
+	
 	public mainMenu(){
 				
 		// Create buttons
@@ -27,9 +28,10 @@ public class mainMenu extends JPanel implements ActionListener {
 		
 	}
 	
-	private static void createAndShowGUI(){
+	public static void createAndShowGUI(){
 		// Create window
-		JFrame frame = new JFrame("Welcome to FooCity");
+		JFrame frame;
+		frame = new JFrame("Welcome to FooCity");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		// Create and set up the content pane.
@@ -46,8 +48,10 @@ public class mainMenu extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if ("newgame".equals(e.getActionCommand())){
+			// Create a new game dialog
 			newGame newgame = new newGame();
-			
+			// Hide this window
+			javax.swing.SwingUtilities.getWindowAncestor(this).dispose();
 		}
 		
 	}

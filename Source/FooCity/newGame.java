@@ -10,9 +10,11 @@ import javax.swing.*;
 public class newGame extends JPanel implements ActionListener {
 	
 	protected JButton buttonLoadMap, buttonOK, buttonCancel;
+	protected JFrame frame;
 	private int panelHeight;
 	private boolean mapLoaded = false;
 	private int[] mapData;
+	
 	
 	public newGame(){
 		
@@ -38,7 +40,7 @@ public class newGame extends JPanel implements ActionListener {
 		// Add the box to the frame
 		this.add(box);
 		
-		JFrame frame = new JFrame("Select a terrain file");
+		frame = new JFrame("Select a terrain file");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		// Create and set up the content pane.
@@ -46,8 +48,8 @@ public class newGame extends JPanel implements ActionListener {
 		frame.pack();
 		
 		// Resize the window to make room for drawing the map
-		panelHeight = frame.getSize().height;
-		frame.setSize(384, panelHeight + 384);
+		panelHeight = this.getSize().height;
+		frame.setSize(392, frame.getSize().height + 384);
 		
 		// Move it to the center of the screen and show it
 		frame.setLocationRelativeTo(null);
@@ -58,12 +60,14 @@ public class newGame extends JPanel implements ActionListener {
 	
 	@Override
 	public void paintComponent(Graphics g){
+		
 		Graphics2D g2d = (Graphics2D)g;
+		
+		// Only draw something if we've loaded a map
 		if (mapLoaded){
-			System.out.print("Displaying map\n");
-			Color color;
-			for (int x = 0; x < 128; x++){
-				for (int y = 0; y < 128; y++){
+			Color color = Color.white;
+			for (int y = 0; y < 128; y++){
+				for (int x = 0; x < 128; x++){
 					switch(mapData[y * 128 + x]){
 						case 'W':
 							color = Color.blue;
@@ -83,7 +87,8 @@ public class newGame extends JPanel implements ActionListener {
 							color.darker();
 							break;
 					}
-					g2d.drawRect(x * 3, y * 3, x * 3 + 2, y * 3 + 2);
+					g2d.setColor(color);
+					g2d.fillRect(x * 3, panelHeight + y * 3, 3, 3);
 				}
 			}
 		}
@@ -93,30 +98,45 @@ public class newGame extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand().equals("loadmap")){
-			// Show the Open File dialog
-			JFileChooser fc = new JFileChooser();
-			fc.setCurrentDirectory(new java.io.File("./terrain"));
-			int returnVal = fc.showOpenDialog(this);
-			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				try {
-					FileReader inputStream = new FileReader(fc.getSelectedFile());
-					mapData = new int[16384];
-					for(int i = 1; i < 16384; i++){
-						mapData[i] = inputStream.read();
-					}
-					mapLoaded = true;
-				} catch (FileNotFoundException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+			LoadMap();
+		} else if (e.getActionCommand().equals("cancel")) {
+			// Close this window and show the main menu
+			javax.swing.SwingUtilities.getWindowAncestor(this).dispose();
+			mainMenu.createAndShowGUI();
+		}
+		
+	}
+	
+	private void LoadMap(){
+		// Show the Open File dialog
+		JFileChooser fc = new JFileChooser();
+		fc.setCurrentDirectory(new java.io.File("./terrain"));
+		int returnVal = fc.showOpenDialog(this);
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			try {
+				FileReader inputStream = new FileReader(fc.getSelectedFile());
+				mapData = new int[16384];
+				// Reach each byte of the file into the mapData array
+				for(int i = 0; i < 16384; i++){
+					// Hastily designed loop to throw out CRs and LFs
+					int tmp = inputStream.read();
+					while (tmp == 13 || tmp == 10)
+						tmp = inputStream.read();
+					mapData[i] = tmp;
 				}
+				// Force a redraw of the window
+				mapLoaded = true;
+				this.paint(getGraphics());
 				
+			} catch (FileNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
 			
 		}
-		
 	}
 
 }
