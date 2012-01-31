@@ -7,7 +7,7 @@ import java.io.IOException;
 
 import javax.swing.*;
 
-public class newGame extends JPanel implements ActionListener {
+public class NewGame extends JPanel implements ActionListener {
 	
 	protected JButton buttonLoadMap, buttonOK, buttonCancel;
 	protected JFrame frame;
@@ -16,7 +16,7 @@ public class newGame extends JPanel implements ActionListener {
 	private int[] mapData;
 	
 	
-	public newGame(){
+	public NewGame(){
 		
 		// Create buttons
 		buttonLoadMap = new JButton("Load Map");
@@ -102,7 +102,7 @@ public class newGame extends JPanel implements ActionListener {
 		} else if (e.getActionCommand().equals("cancel")) {
 			// Close this window and show the main menu
 			javax.swing.SwingUtilities.getWindowAncestor(this).dispose();
-			mainMenu.createAndShowGUI();
+			MainMenu.createAndShowGUI();
 		}
 		
 	}

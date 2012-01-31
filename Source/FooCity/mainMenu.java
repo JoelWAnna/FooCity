@@ -2,12 +2,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
 
-public class mainMenu extends JPanel implements ActionListener {
+public class MainMenu extends JPanel implements ActionListener {
 	
 	protected JButton buttonNewGame, buttonLoadGame;
 	
 	
-	public mainMenu(){
+	public MainMenu(){
 				
 		// Create buttons
 		buttonNewGame = new JButton("New Game");
@@ -35,7 +35,7 @@ public class mainMenu extends JPanel implements ActionListener {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		// Create and set up the content pane.
-		mainMenu newContentPane = new mainMenu();
+		MainMenu newContentPane = new MainMenu();
 		newContentPane.setOpaque(true);
 		frame.setContentPane(newContentPane);
 		
@@ -49,7 +49,7 @@ public class mainMenu extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if ("newgame".equals(e.getActionCommand())){
 			// Create a new game dialog
-			newGame newgame = new newGame();
+			NewGame newgame = new NewGame();
 			// Hide this window
 			javax.swing.SwingUtilities.getWindowAncestor(this).dispose();
 		}
