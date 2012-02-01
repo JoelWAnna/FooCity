@@ -162,6 +162,7 @@ public class FooCityGUI
 
 	public void setM(MapGrid m) {
 		this.m = m;
+		this.rendering_panel.repaint();
 	}
 	private class SwingAction extends AbstractAction {
 		public SwingAction() {
@@ -172,8 +173,7 @@ public class FooCityGUI
 		{
 			if (m == null)
 			{
-				m = new MapGrid();
-				m.FromFile("./terrain/000.txt");
+				NewGame newgame = new NewGame();
 				scrollPane.repaint();
 				rendering_panel.repaint();
 			}
