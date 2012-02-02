@@ -21,6 +21,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 
 class FooCityConstants
 {
@@ -39,15 +40,15 @@ public class FooCityGUI
 	private MapGrid m;
 	public static FooCityGUI window;
 	private JMenuBar menuBar;
-	private final Action NewGame = new SwingAction();
-	private final Action Tile = new SwingAction_1();
+	private final Action NewGame = new NewGameAction();
+	private final Action Tile = new Place_Tile_Action();
 	private char newTile;
 	
-	private final String waterTile = "Water Tile";
-	private final String beachTile = "Beach Tile";
-	private final String grassTile = "Grass Tile";
-	private final String dirtTile  = "Dirt Tile";
-	private final String forrestTile	   = "Forrest Tile";
+	private final String waterTile   = "Water Tile";
+	private final String beachTile   = "Beach Tile";
+	private final String grassTile   = "Grass Tile";
+	private final String dirtTile	 = "Dirt Tile";
+	private final String forrestTile = "Forrest Tile";
 	/**
 	 * Launch the application.
 	 */
@@ -66,7 +67,8 @@ public class FooCityGUI
 	/**
 	 * Create the application.
 	 */
-	public FooCityGUI() {
+	public FooCityGUI()
+	{
 		initialize();
 	}
 
@@ -79,7 +81,8 @@ public class FooCityGUI
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() {
+	private void initialize()
+	{
 		newTile = 0;
 		frame = new JFrame();
 		frame.setVisible(true);
@@ -104,11 +107,25 @@ public class FooCityGUI
 					System.out.print(p + " " + x + " " + y);
 					m.setTile(x,y, newTile);
 					rendering_panel.repaint();
+					rendering_panel.PlacingTile = false;
 					
 					newTile = 0;
 				}
 			});
+		rendering_panel.addMouseMotionListener(new MouseMotionAdapter()
+			{
+				@Override
+				public void mouseMoved(MouseEvent arg0)
+				{
+					if (newTile == 0)
+						return;
+					rendering_panel.setMousePoint(arg0.getPoint(), newTile);
+					
+				}
+			});
+
 		scrollPane = new JScrollPane(rendering_panel);
+
 		scrollPane.setBounds(0, 0, 784, 562);
 		scrollPane.setAutoscrolls(true);
 		scrollPane.setWheelScrollingEnabled(true);
@@ -164,8 +181,10 @@ public class FooCityGUI
 		this.m = m;
 		this.rendering_panel.repaint();
 	}
-	private class SwingAction extends AbstractAction {
-		public SwingAction() {
+	private class NewGameAction extends AbstractAction
+	{
+		public NewGameAction()
+		{
 			putValue(NAME, "New Game");
 			putValue(SHORT_DESCRIPTION, "Select A Map To Load");
 		}
@@ -184,14 +203,15 @@ public class FooCityGUI
 		}
 	}
 
-	private class SwingAction_1 extends AbstractAction {
-		public SwingAction_1() {
+	private class Place_Tile_Action extends AbstractAction
+	{
+		public Place_Tile_Action()
+		{
 			putValue(NAME, "Place Tile");
 			putValue(SHORT_DESCRIPTION, "Some short description");
 		}
 		public void actionPerformed(ActionEvent e)
 		{
-			System.out.println(e.getActionCommand());
 			String command = e.getActionCommand();
 			if (command == waterTile)
 			{
@@ -212,7 +232,8 @@ public class FooCityGUI
 			{
 				newTile = 'D';
 				return;
-			}if (command == forrestTile)
+			}
+			if (command == forrestTile)
 			{
 				newTile = 'T';
 				return;
@@ -275,7 +296,6 @@ public class FooCityGUI
 	
 				Rectangle r = frame.getBounds();
 				r.x = r.y = 0;
-				System.out.println(r);
 				r.width -= 15;
 				r.height -= 60;
 				scrollPane.setBounds(r);
