@@ -97,3 +97,19 @@ class FooPanel extends JPanel
 	}
 
 }
+
+
+class MiniMapPanel extends JPanel
+{
+    public MiniMapPanel(Color faceColor)
+    {
+    	super();
+    	setForeground(faceColor);
+    }
+    @Override
+    public void paint(Graphics g1)
+    {
+    	g1.setColor(Color.black);
+    	g1.fillRect(0, 0,20,20);
+    }
+}

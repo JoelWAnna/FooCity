@@ -22,6 +22,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import javax.swing.JPanel;
 
 class FooCityConstants
 {
@@ -31,7 +32,7 @@ class FooCityConstants
 	public static final int MAP_HEIGHT  = 128;
 	public static final int WINDOW_HEIGHT = 600;
 	public static final int WINDOW_WIDTH = 800;
-	public static final int SIDEBAR_WIDTH = 0;
+	public static final int SIDEBAR_WIDTH = 200;
 	
 	public static final int WATER_TILE = 1;
 	public static final int BEACH_TILE = 2;
@@ -167,6 +168,15 @@ public class FooCityGUI
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane.getVerticalScrollBar().setUnitIncrement(32);
 		scrollPane.getHorizontalScrollBar().setUnitIncrement(32);
+		
+		JPanel panel = new JPanel();
+		panel.setBounds(0, 0, FooCityConstants.SIDEBAR_WIDTH, FooCityConstants.WINDOW_HEIGHT - 38);
+		MiniMapPanel minimap = new MiniMapPanel(Color.BLUE);
+		
+		panel.add(minimap);
+		minimap.setBounds(0,FooCityConstants.WINDOW_HEIGHT - 38, FooCityConstants.SIDEBAR_WIDTH, FooCityConstants.WINDOW_HEIGHT - 38);
+		
+		frame.getContentPane().add(panel);
 		frame.getContentPane().add(scrollPane);
 		
 		menuBar = new JMenuBar();
