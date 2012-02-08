@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Rectangle;
 
@@ -23,6 +25,8 @@ import java.awt.event.ActionEvent;
 import javax.swing.Action;
 
 import java.awt.event.ActionListener;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.awt.event.WindowStateListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.ComponentAdapter;
@@ -63,6 +67,7 @@ class FooCityConstants
 public class FooCityGUI
 {
 
+	private MiniMapPanel minimap;
 	private JFrame frame;
 	private JPanel toolPanel;
 	private JScrollPane scrollPane;
@@ -185,6 +190,19 @@ public class FooCityGUI
 		scrollPane.getVerticalScrollBar().setUnitIncrement(32);
 		scrollPane.getHorizontalScrollBar().setUnitIncrement(32);
 		
+		scrollPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener(){
+			public void adjustmentValueChanged(AdjustmentEvent e){
+				minimap.repaint();
+			}
+		});
+		
+		scrollPane.getHorizontalScrollBar().addAdjustmentListener(new AdjustmentListener(){
+			public void adjustmentValueChanged(AdjustmentEvent e){
+				minimap.repaint();
+			}
+		});
+		
+		
 		// toolPanel contains the entire left toolbar, including minimap.
 		toolPanel = new JPanel(new BorderLayout());
 		// Create a panel to hold the buttons using a grid 3 columns wide
@@ -193,8 +211,8 @@ public class FooCityGUI
 		JPanel buttonGridPanel = new JPanel();
 		buttonGridPanel.setLayout(buttonGridLayout);
 		toolPanel.setBounds(0, 0, FooCityConstants.SIDEBAR_WIDTH, FooCityConstants.WINDOW_HEIGHT - 38);
-		MiniMapPanel minimap = new MiniMapPanel(Color.BLUE);
-		
+		minimap = new MiniMapPanel(Color.BLUE);
+		minimap.repaint();
 		
 		buttonResidential = new JButton("R");
 		buttonResidential.addActionListener(Tile);
@@ -260,6 +278,10 @@ public class FooCityGUI
 		return m;
 	}
 	
+	public void updateMiniMap(){
+		minimap.repaint();
+	}
+	
 	public Rectangle getViewRect(){
 		return (Rectangle) scrollPane.getViewport().getVisibleRect().clone();
 	}
@@ -286,6 +308,7 @@ public class FooCityGUI
 				NewGame newgame = new NewGame();
 				scrollPane.repaint();
 				rendering_panel.repaint();
+				minimap.repaint();
 			}
 			else
 			{
@@ -331,8 +354,56 @@ public class FooCityGUI
 			}
 		}
 	}
+	private class keyDispatcher implements KeyEventDispatcher {
+		@Override
+		public boolean dispatchKeyEvent(KeyEvent e) {
+			if (e.getID() == KeyEvent.KEY_PRESSED){
+				char c = e.getKeyChar();
+				Point p = (Point) scrollPane.getViewport().getViewPosition().clone();
+				Rectangle r = (Rectangle) scrollPane.getViewport().getVisibleRect().clone();
+				int x = p.x;
+				int y = p.y;
+				//System.out.println(c + " " + x + " " + y + " " + r);
+				switch (Character.toUpperCase(c))
+				{
+				case 'W':
+					if (y < FooCityConstants.TILE_HEIGHT)
+						y = 0;
+					else
+						y -= FooCityConstants.TILE_HEIGHT;
+					break;
+				case 'A':
+					if (x < FooCityConstants.TILE_WIDTH)
+						x = 0;
+					else
+						x -= FooCityConstants.TILE_WIDTH;
+					break;
+				case 'S':
+					if (y > FooCityConstants.MAP_HEIGHT * (FooCityConstants.TILE_HEIGHT - 1) - r.height)
+						y = FooCityConstants.MAP_HEIGHT * FooCityConstants.TILE_HEIGHT - r.height;
+					else
+						y += 32;
+					break;
+				case 'D':
+					if (x > FooCityConstants.MAP_WIDTH * (FooCityConstants.TILE_WIDTH - 1) - r.width)
+						x = FooCityConstants.MAP_WIDTH * FooCityConstants.TILE_WIDTH - r.width;
+					else
+						x += 32;
+					break;
+				default:
+					break;
+				}
+				scrollPane.getViewport().setViewPosition(new Point(x, y));
+			}
+			return true;
+		}
+	}
 	
-	private void AddKeyListeners()
+	private void AddKeyListeners(){
+		KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+		manager.addKeyEventDispatcher(new keyDispatcher());
+	}
+	/*private void AddKeyListeners()
 	{
 		frame.addKeyListener(new KeyAdapter()
 		{
@@ -377,7 +448,7 @@ public class FooCityGUI
 				scrollPane.getViewport().setViewPosition(new Point(x, y));
 			}
 		});
-	}
+	}*/
 	
 	private void AddResizeListener()
 	{
@@ -391,7 +462,9 @@ public class FooCityGUI
 				r.width -= FooCityConstants.SIDEBAR_WIDTH + 15;
 				r.height -= 60;
 				scrollPane.setBounds(r);
-				toolPanel.setBounds(0, 0, FooCityConstants.SIDEBAR_WIDTH, FooCityConstants.WINDOW_HEIGHT - 38);
+				scrollPane.revalidate();
+				toolPanel.setBounds(0, 0, FooCityConstants.SIDEBAR_WIDTH, r.height);
+				toolPanel.revalidate();
 			}
 		});
 		
@@ -406,7 +479,9 @@ public class FooCityGUI
 				r.width -= FooCityConstants.SIDEBAR_WIDTH + 15;
 				r.height -= 60;
 				scrollPane.setBounds(r);
+				scrollPane.revalidate();
 				toolPanel.setBounds(0, 0, FooCityConstants.SIDEBAR_WIDTH, r.height);
+				toolPanel.revalidate();
 			}
 		});
 	}
