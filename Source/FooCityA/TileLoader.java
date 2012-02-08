@@ -7,56 +7,75 @@ import javax.imageio.ImageIO;
 class TileLoader
 {
 	private boolean m_valid;
-    private BufferedImage grassImg;
-    private BufferedImage waterImg;
-    private BufferedImage dirtImg;
-    private BufferedImage beachImg;
-    private BufferedImage forrestImg;    
+
+	private String tileNames[];
+	private BufferedImage tiles[];
     private String TileSet;
-    
+
 	public TileLoader()
 	{
+		initStringNames();
+		tiles = new BufferedImage[FooCityConstants.LAST_TILE];
 		m_valid = true;
+
 		TileSet = "images/" + "SolidColors/";
-    	String grassFileName = TileSet + "grass.png";
-		String waterFileName = TileSet + "water.png";
-		String dirtFileName = TileSet + "dirt.png";
-		String beachFileName = TileSet + "beach.png";
-		String forrestFileName = TileSet + "forrest.png";
-		
-        grassImg = null;
-        waterImg = null;
-        dirtImg = null;
-        beachImg = null;
-        try
-        {
-        	grassImg = ImageIO.read(new File(grassFileName));
-            waterImg = ImageIO.read(new File(waterFileName));
-            dirtImg = ImageIO.read(new File(dirtFileName));
-            beachImg = ImageIO.read(new File(beachFileName));
-            forrestImg = ImageIO.read(new File(forrestFileName));
-        }
-        catch (Exception e)
-        {
-        	m_valid = false;
-        }
+		for (int i = 1; i < FooCityConstants.LAST_TILE; ++i)
+		{
+			try
+			{
+				tiles[i] = ImageIO.read(new File(TileSet + tileNames[i]));
+			}
+	        catch (Exception e)
+	        {
+	        //	m_valid = false;
+	        }
+		}
+		m_valid = true;
 	}
-	public BufferedImage GetTitle(char c)
+
+	public BufferedImage GetTitle(int i)
+	{
+		if (i < 0 || i > tiles.length)
+			return null;
+		return tiles[i];
+	}
+	
+    private void initStringNames()
+    {
+    	tileNames = new String[FooCityConstants.LAST_TILE];
+    	tileNames[FooCityConstants.WATER_TILE] = "water.png";
+    	tileNames[FooCityConstants.BEACH_TILE] = "beach.png";
+    	tileNames[FooCityConstants.GRASS_TILE] = "grass.png";
+    	tileNames[FooCityConstants.DIRT_TILE] = "dirt.png";
+    	tileNames[FooCityConstants.FORREST_TILE] = "forrest.png";
+    	tileNames[FooCityConstants.INDUSTRIAL_TILE] = "";
+    	tileNames[FooCityConstants.COMMERCIAL_TILE] = "";
+    	tileNames[FooCityConstants.PARK_TILE] = "";
+    	tileNames[FooCityConstants.SEWAGE_WATER_TREATMENT_TILE] = "";
+    	tileNames[FooCityConstants.POLICESTATION_TILE] = "";
+    	tileNames[FooCityConstants.SOLAR_POWER_PLANT_TILE] = "";
+    	tileNames[FooCityConstants.NATURAL_GAS_PLANT] = "";
+    	tileNames[FooCityConstants.COAL_PLANT] = "";
+    	tileNames[FooCityConstants.WIND_FARM] = "";
+    	tileNames[FooCityConstants.RESIDENTIAL] = "";
+    }
+
+/*	public BufferedImage GetTitle(char c)
 	{
 		if (m_valid)
 		{
 			switch (c)
 			{
 			case 'G':
-				return grassImg;
+				return tiles[FooCityConstants.GRASS_TILE];
 			case 'W':
-				return waterImg;
+				return tiles[FooCityConstants.WATER_TILE];
 			case 'D':
-				return dirtImg;
+				return tiles[FooCityConstants.DIRT_TILE];
 			case 'B':
-				return beachImg;
+				return tiles[FooCityConstants.BEACH_TILE];
 			case 'T':
-				return forrestImg;
+				return tiles[FooCityConstants.FORREST_TILE];
 			default:
 				System.out.print(c + " ");
 				break;        				
@@ -64,4 +83,5 @@ class TileLoader
 		}
 		return null;
 	}
+*/
 }

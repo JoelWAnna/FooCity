@@ -30,6 +30,23 @@ class FooCityConstants
 	public static final int MAP_WIDTH   = 128;
 	public static final int MAP_HEIGHT  = 128;
 	
+	public static final int WATER_TILE = 1;
+	public static final int BEACH_TILE = 2;
+	public static final int GRASS_TILE = 3;
+	public static final int DIRT_TILE = 4;
+	public static final int FORREST_TILE = 5;
+	public static final int INDUSTRIAL_TILE = 6;
+	public static final int COMMERCIAL_TILE = 7;
+	public static final int PARK_TILE = 8;
+	public static final int SEWAGE_WATER_TREATMENT_TILE = 9;
+	public static final int POLICESTATION_TILE = 10;
+	public static final int SOLAR_POWER_PLANT_TILE = 11;
+	public static final int NATURAL_GAS_PLANT = 12;
+	public static final int COAL_PLANT = 13;
+	public static final int WIND_FARM = 14;
+	public static final int RESIDENTIAL = 15;
+	public static final int LAST_TILE = 16;
+	public static final char CHAR_TILES[] = {' ', 'W', 'B', 'G', 'D', 'T'};
 }
 public class FooCityGUI
 {
@@ -42,7 +59,8 @@ public class FooCityGUI
 	private JMenuBar menuBar;
 	private final Action NewGame = new NewGameAction();
 	private final Action Tile = new Place_Tile_Action();
-	private char newTile;
+	private int newTile;
+	
 	
 	private final String waterTile   = "Water Tile";
 	private final String beachTile   = "Beach Tile";
@@ -104,7 +122,7 @@ public class FooCityGUI
 					Point p = e.getPoint();
 					int x = p.x / FooCityConstants.TILE_WIDTH;
 					int y = p.y / FooCityConstants.TILE_HEIGHT;
-					System.out.print(p + " " + x + " " + y);
+					//System.out.print(p + " " + x + " " + y);
 					m.setTile(x,y, newTile);
 					rendering_panel.repaint();
 					rendering_panel.PlacingTile = false;
@@ -215,27 +233,27 @@ public class FooCityGUI
 			String command = e.getActionCommand();
 			if (command == waterTile)
 			{
-				newTile = 'W';
+				newTile = FooCityConstants.WATER_TILE;
 				return;
 			}
 			if (command == beachTile)
 			{
-				newTile = 'B';
+				newTile = FooCityConstants.BEACH_TILE;
 				return;
 			}
 			if (command == grassTile)
 			{
-				newTile = 'G';
+				newTile = FooCityConstants.GRASS_TILE;
 				return;
 			}
 			if (command == dirtTile)
 			{
-				newTile = 'D';
+				newTile = FooCityConstants.DIRT_TILE;
 				return;
 			}
 			if (command == forrestTile)
 			{
-				newTile = 'T';
+				newTile = FooCityConstants.FORREST_TILE;
 				return;
 			}
 		}

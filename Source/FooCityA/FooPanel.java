@@ -19,10 +19,11 @@ class FooPanel extends JPanel
 	private TileLoader tiles;
 	private Point cursor;
 	public boolean PlacingTile;
-	private char mouseTile;
+	private int mouseTile;
     public FooPanel(Color faceColor)
     {
-        setForeground(faceColor);
+    	super();
+    	setForeground(faceColor);
         PlacingTile = false;
         tiles = new TileLoader();
     }
@@ -86,7 +87,7 @@ class FooPanel extends JPanel
     }
 
 
-	public void setMousePoint(Point point, char newTile)
+	public void setMousePoint(Point point, int newTile)
 	{
 		PlacingTile = true;
 		this.cursor = point;
@@ -94,6 +95,5 @@ class FooPanel extends JPanel
 		repaint();
 		
 	}
-
 
 }

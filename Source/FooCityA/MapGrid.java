@@ -34,9 +34,9 @@ public class MapGrid
 		out.print(this.toString());
 	}
 
-	public char GetTileAt(int x,int y)
+	public int GetTileAt(int x,int y)
 	{
-		return this.tileGrid[x + y*FooCityConstants.MAP_HEIGHT].GetTileChar();
+		return this.tileGrid[x + y*FooCityConstants.MAP_HEIGHT].GetTileInt();
 	}
 
 	@Override
@@ -106,19 +106,32 @@ public class MapGrid
 		
 	}
 
+	public void setTile(int x, int y, int i) 
+	{
+		this.tileGrid[y*FooCityConstants.MAP_HEIGHT + x] = Tile.TileFactory(i);
+		
+	}
+
 }
 
 abstract class Tile
 {
 	private char tileChar;
+	protected int tileInt;
 	protected Tile(char tileChar)
 	{
 		this.tileChar = tileChar;
 	}
+	
 	public char GetTileChar()
 	{
 		return tileChar;
 	}
+	public int GetTileInt()
+	{
+		return tileInt;
+	}
+
 	public static Tile TileFactory(char type)
 	{
 		switch (type)
@@ -137,6 +150,11 @@ abstract class Tile
 
 		return new WaterTile(type);
 	}
+
+	public static Tile TileFactory(int type)
+	{
+		return TileFactory(FooCityConstants.CHAR_TILES[type]);
+	}
 }
 
 class GrassTile extends Tile
@@ -144,6 +162,7 @@ class GrassTile extends Tile
 	public GrassTile(char tileChar)
 	{
 		super(tileChar);
+		tileInt = FooCityConstants.GRASS_TILE;
 	}
 }
 
@@ -152,6 +171,7 @@ class WaterTile extends Tile
 	public WaterTile(char tileChar)
 	{
 		super(tileChar);
+		tileInt = FooCityConstants.WATER_TILE;
 	}
 }
 
@@ -160,6 +180,7 @@ class DirtTile extends Tile
 	public DirtTile(char tileChar)
 	{
 		super(tileChar);
+		tileInt = FooCityConstants.DIRT_TILE;
 	}
 }
 
@@ -168,6 +189,7 @@ class BeachTile extends Tile
 	public BeachTile(char tileChar)
 	{
 		super(tileChar);
+		tileInt = FooCityConstants.BEACH_TILE;
 	}
 }
 
@@ -176,5 +198,6 @@ class ForrestTile extends Tile
 	public ForrestTile(char tileChar)
 	{
 		super(tileChar);
+		tileInt = FooCityConstants.FORREST_TILE;
 	}
 }
