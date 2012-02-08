@@ -118,13 +118,53 @@ class MiniMapPanel extends JPanel
     		for (int x = 0; x < FooCityConstants.MAP_WIDTH; x++) {
     			switch(m.GetTileAt(x, y)){
     			case (FooCityConstants.BEACH_TILE):
-					g1.setColor(Color.orange);
+					g1.setColor(new Color(255,225,0));  //A yellowish sandy color
 					break;
     			case (FooCityConstants.WATER_TILE):
-					g1.setColor(Color.blue);
+					g1.setColor(new Color(0,0,180));  // A deep ocean blue
 					break;
     			case (FooCityConstants.GRASS_TILE):
+    				g1.setColor(new Color(0,180,0));  // A somewhat dark green
+					break;
+    			case (FooCityConstants.COAL_PLANT):   
+    				g1.setColor(new Color (50, 50, 50)); // Very dark grey
+					break;
+    			case (FooCityConstants.COMMERCIAL_TILE):
+    				g1.setColor(new Color (0,0,255));   // Vivid blue
+					break;
+    			case (FooCityConstants.DIRT_TILE):
+    				g1.setColor(new Color (140,110,0));  //Brown
+					break;
+    			case (FooCityConstants.FORREST_TILE):
+    				g1.setColor(new Color (0, 75, 0));  // Deep forest green
+					break;
+    			case (FooCityConstants.INDUSTRIAL_TILE):  // Dirty yellow
+    				g1.setColor(new Color (225, 225, 0));
+					break;
+    			case (FooCityConstants.NATURAL_GAS_PLANT):
+    				g1.setColor(new Color (96, 112, 204)); // Pale blue 
+					break;
+    			case (FooCityConstants.PARK_TILE):
+    				g1.setColor(new Color (100, 255, 100));		// Pale green 
+					break;
+    			case (FooCityConstants.POLICESTATION_TILE):
+    				g1.setColor(new Color (0,0,200));		//Deep blue
+					break;
+    			case (FooCityConstants.RESIDENTIAL_TILE):
+    				g1.setColor(new Color (0,255, 0));   // Bright green
+					break;
+    			case (FooCityConstants.SEWAGE_WATER_TREATMENT_TILE):
+    				g1.setColor(new Color (110, 72, 20));   //Dark murkey brown
+					break;
+    			case (FooCityConstants.SOLAR_POWER_PLANT_TILE):
+    				g1.setColor(new Color (255, 244, 128));	// Bright yellow
+					break;
+    			case (FooCityConstants.WIND_FARM):
+    				g1.setColor(new Color (0, 200, 255));	// Sky blue
+					break;
+    			default:
     				g1.setColor(Color.green);
+    				System.err.print("Unknown tile drawn on minimap\n");
 					break;
     			}
     			g1.fillRect(x * 2, y * 2, 2, 2);

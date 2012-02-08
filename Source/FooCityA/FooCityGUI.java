@@ -60,7 +60,7 @@ class FooCityConstants
 	public static final int NATURAL_GAS_PLANT = 12;
 	public static final int COAL_PLANT = 13;
 	public static final int WIND_FARM = 14;
-	public static final int RESIDENTIAL = 15;
+	public static final int RESIDENTIAL_TILE = 15;
 	public static final int LAST_TILE = 16;
 	public static final char CHAR_TILES[] = {' ', 'W', 'B', 'G', 'D', 'T'};
 }
@@ -403,52 +403,6 @@ public class FooCityGUI
 		KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
 		manager.addKeyEventDispatcher(new keyDispatcher());
 	}
-	/*private void AddKeyListeners()
-	{
-		frame.addKeyListener(new KeyAdapter()
-		{
-			@Override
-			public void keyPressed(KeyEvent arg0)
-			{
-				char c = arg0.getKeyChar();
-				Point p = (Point) scrollPane.getViewport().getViewPosition().clone();
-				Rectangle r = (Rectangle) scrollPane.getViewport().getVisibleRect().clone();
-				int x = p.x;
-				int y = p.y;
-				//System.out.println(c + " " + x + " " + y + " " + r);
-				switch (Character.toUpperCase(c))
-				{
-				case 'W':
-					if (y < FooCityConstants.TILE_HEIGHT)
-						y = 0;
-					else
-						y -= FooCityConstants.TILE_HEIGHT;
-					break;
-				case 'A':
-					if (x < FooCityConstants.TILE_WIDTH)
-						x = 0;
-					else
-						x -= FooCityConstants.TILE_WIDTH;
-					break;
-				case 'S':
-					if (y > FooCityConstants.MAP_HEIGHT * (FooCityConstants.TILE_HEIGHT - 1) - r.height)
-						y = FooCityConstants.MAP_HEIGHT * FooCityConstants.TILE_HEIGHT - r.height;
-					else
-						y += 32;
-					break;
-				case 'D':
-					if (x > FooCityConstants.MAP_WIDTH * (FooCityConstants.TILE_WIDTH - 1) - r.width)
-						x = FooCityConstants.MAP_WIDTH * FooCityConstants.TILE_WIDTH - r.width;
-					else
-						x += 32;
-					break;
-				default:
-					break;
-				}
-				scrollPane.getViewport().setViewPosition(new Point(x, y));
-			}
-		});
-	}*/
 	
 	private void AddResizeListener()
 	{

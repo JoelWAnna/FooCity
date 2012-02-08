@@ -57,7 +57,7 @@ class TileLoader
     	tileNames[FooCityConstants.NATURAL_GAS_PLANT] = "";
     	tileNames[FooCityConstants.COAL_PLANT] = "";
     	tileNames[FooCityConstants.WIND_FARM] = "";
-    	tileNames[FooCityConstants.RESIDENTIAL] = "";
+    	tileNames[FooCityConstants.RESIDENTIAL_TILE] = "";
     }
 
 /*	public BufferedImage GetTitle(char c)
