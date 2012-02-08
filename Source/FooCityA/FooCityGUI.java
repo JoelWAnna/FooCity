@@ -29,6 +29,9 @@ class FooCityConstants
 	public static final int TILE_HEIGHT = 32;
 	public static final int MAP_WIDTH   = 128;
 	public static final int MAP_HEIGHT  = 128;
+	public static final int WINDOW_HEIGHT = 600;
+	public static final int WINDOW_WIDTH = 800;
+	public static final int SIDEBAR_WIDTH = 0;
 	
 	public static final int WATER_TILE = 1;
 	public static final int BEACH_TILE = 2;
@@ -106,7 +109,7 @@ public class FooCityGUI
 		frame.setVisible(true);
 		AddResizeListener();
 
-		frame.setBounds(100, 100, 800, 600);
+		frame.setBounds(100, 100, FooCityConstants.WINDOW_WIDTH, FooCityConstants.WINDOW_HEIGHT);
 		frame.setTitle("FooCity V0.1");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
@@ -129,6 +132,20 @@ public class FooCityGUI
 					
 					newTile = 0;
 				}
+			@Override
+			public void mouseExited(MouseEvent arg0)
+			{
+				rendering_panel.PlacingTile = false;
+				rendering_panel.repaint();
+			}
+			@Override
+			public void mouseEntered(MouseEvent e)
+			{
+				if (newTile == 0)
+					return;
+				rendering_panel.PlacingTile = true;
+				rendering_panel.repaint();
+			}
 			});
 		rendering_panel.addMouseMotionListener(new MouseMotionAdapter()
 			{
@@ -144,7 +161,6 @@ public class FooCityGUI
 
 		scrollPane = new JScrollPane(rendering_panel);
 
-		scrollPane.setBounds(0, 0, 784, 562);
 		scrollPane.setAutoscrolls(true);
 		scrollPane.setWheelScrollingEnabled(true);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -308,16 +324,30 @@ public class FooCityGUI
 	
 	private void AddResizeListener()
 	{
-		frame.addComponentListener(new ComponentAdapter() {
+		frame.addWindowStateListener(new WindowStateListener()
+		{
+			public void windowStateChanged(WindowEvent arg0) 
+			{	
+				Rectangle r = frame.getBounds();
+				r.x = FooCityConstants.SIDEBAR_WIDTH; 
+				r.y = 0;
+				r.width -= FooCityConstants.SIDEBAR_WIDTH + 15;
+				r.height -= 60;
+				scrollPane.setBounds(r);
+			}
+		});
+		
+		frame.addComponentListener(new ComponentAdapter()
+		{
 		@Override
 			public void componentResized(ComponentEvent arg0) {
 	
 				Rectangle r = frame.getBounds();
-				r.x = r.y = 0;
-				r.width -= 15;
+				r.x = FooCityConstants.SIDEBAR_WIDTH; 
+				r.y = 0;
+				r.width -= FooCityConstants.SIDEBAR_WIDTH + 15;
 				r.height -= 60;
 				scrollPane.setBounds(r);
-				rendering_panel.setBounds(r);
 			}
 		});
 	}
