@@ -109,7 +109,13 @@ class MiniMapPanel extends JPanel
     @Override
     public void paint(Graphics g1)
     {
-    	g1.setColor(Color.black);
-    	g1.fillRect(0, 0,20,20);
+    	g1.setColor(Color.blue);
+    	g1.fillRect(0, 0, 128, 128);
     }
+    @Override
+    public Dimension getPreferredSize()
+    {
+        return new Dimension(128, 128);
+    }
+    
 }

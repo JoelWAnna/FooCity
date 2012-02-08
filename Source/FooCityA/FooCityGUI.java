@@ -1,5 +1,9 @@
+import java.awt.BorderLayout;
+import java.awt.Canvas;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
 
@@ -9,12 +13,16 @@ import javax.swing.JScrollPane;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+
+import javax.swing.JButton;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.AbstractAction;
 import java.awt.event.ActionEvent;
 import javax.swing.Action;
+
+import java.awt.event.ActionListener;
 import java.awt.event.WindowStateListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.ComponentAdapter;
@@ -56,6 +64,7 @@ public class FooCityGUI
 {
 
 	private JFrame frame;
+	private JPanel toolPanel;
 	private JScrollPane scrollPane;
 	private FooPanel rendering_panel;
 	private MapGrid m;
@@ -65,12 +74,19 @@ public class FooCityGUI
 	private final Action Tile = new Place_Tile_Action();
 	private int newTile;
 	
+	protected JButton buttonResidential, buttonCommercial, buttonIndustrial,
+	buttonPark, buttonSewage, buttonPolice, buttonSolar,
+	buttonGas, buttonCoal, buttonWindFarm;
 	
 	private final String waterTile   = "Water Tile";
 	private final String beachTile   = "Beach Tile";
 	private final String grassTile   = "Grass Tile";
 	private final String dirtTile	 = "Dirt Tile";
 	private final String forrestTile = "Forrest Tile";
+	private final String residentialTile	= "Residential Tile";
+	private final String commercialTile 	= "Commercial Tile";
+	private final String industrialTile		= "Industrial Tile";
+	
 	/**
 	 * Launch the application.
 	 */
@@ -119,7 +135,7 @@ public class FooCityGUI
 		rendering_panel.addMouseListener(new MouseAdapter()
 			{
 				@Override
-				public void mouseClicked(MouseEvent e)
+				public void mousePressed(MouseEvent e)
 				{
 					if (newTile == 0)
 						return;
@@ -131,7 +147,7 @@ public class FooCityGUI
 					rendering_panel.repaint();
 					rendering_panel.PlacingTile = false;
 					
-					newTile = 0;
+					//newTile = 0;
 				}
 			@Override
 			public void mouseExited(MouseEvent arg0)
@@ -169,15 +185,44 @@ public class FooCityGUI
 		scrollPane.getVerticalScrollBar().setUnitIncrement(32);
 		scrollPane.getHorizontalScrollBar().setUnitIncrement(32);
 		
-		JPanel panel = new JPanel();
-		panel.setBounds(0, 0, FooCityConstants.SIDEBAR_WIDTH, FooCityConstants.WINDOW_HEIGHT - 38);
+		// toolPanel contains the entire left toolbar, including minimap.
+		toolPanel = new JPanel(new BorderLayout());
+		// Create a panel to hold the buttons using a grid 3 columns wide
+		// (rows get added automatically by Java as needed)
+		GridLayout buttonGridLayout = new GridLayout(0,3);
+		JPanel buttonGridPanel = new JPanel();
+		buttonGridPanel.setLayout(buttonGridLayout);
+		toolPanel.setBounds(0, 0, FooCityConstants.SIDEBAR_WIDTH, FooCityConstants.WINDOW_HEIGHT - 38);
 		MiniMapPanel minimap = new MiniMapPanel(Color.BLUE);
 		
-		panel.add(minimap);
-		minimap.setBounds(0,FooCityConstants.WINDOW_HEIGHT - 38, FooCityConstants.SIDEBAR_WIDTH, FooCityConstants.WINDOW_HEIGHT - 38);
 		
-		frame.getContentPane().add(panel);
+		buttonResidential = new JButton("R");
+		buttonResidential.addActionListener(Tile);
+		buttonResidential.setActionCommand(residentialTile);
+		
+		buttonCommercial = new JButton("C");
+		buttonCommercial.addActionListener(Tile);
+		buttonCommercial.setActionCommand(commercialTile);
+		
+		buttonIndustrial = new JButton("I");
+		buttonIndustrial.addActionListener(Tile);
+		buttonIndustrial.setActionCommand(industrialTile);
+		
+		buttonGridPanel.add(buttonResidential);
+		buttonGridPanel.add(buttonCommercial);
+		buttonGridPanel.add(buttonIndustrial);
+		
+		toolPanel.add(buttonGridPanel, BorderLayout.PAGE_START);
+		minimap.setBounds(0,0,256,256);
+		minimap.setSize(128, 128);
+		minimap.setMinimumSize(new Dimension(128,128));
+		toolPanel.add(minimap, BorderLayout.PAGE_END);
+		//minimap.setBounds(0,FooCityConstants.WINDOW_HEIGHT - 38, FooCityConstants.SIDEBAR_WIDTH, FooCityConstants.WINDOW_HEIGHT - 38);
+		
+		frame.getContentPane().add(toolPanel);
 		frame.getContentPane().add(scrollPane);
+		frame.validate();
+		frame.repaint();
 		
 		menuBar = new JMenuBar();
 		frame.setJMenuBar(menuBar);
@@ -344,6 +389,7 @@ public class FooCityGUI
 				r.width -= FooCityConstants.SIDEBAR_WIDTH + 15;
 				r.height -= 60;
 				scrollPane.setBounds(r);
+				toolPanel.setBounds(0, 0, FooCityConstants.SIDEBAR_WIDTH, FooCityConstants.WINDOW_HEIGHT - 38);
 			}
 		});
 		
@@ -358,6 +404,7 @@ public class FooCityGUI
 				r.width -= FooCityConstants.SIDEBAR_WIDTH + 15;
 				r.height -= 60;
 				scrollPane.setBounds(r);
+				toolPanel.setBounds(0, 0, FooCityConstants.SIDEBAR_WIDTH, r.height);
 			}
 		});
 	}
