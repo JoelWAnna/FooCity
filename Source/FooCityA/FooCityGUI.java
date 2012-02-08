@@ -40,7 +40,7 @@ class FooCityConstants
 	public static final int MAP_HEIGHT  = 128;
 	public static final int WINDOW_HEIGHT = 600;
 	public static final int WINDOW_WIDTH = 800;
-	public static final int SIDEBAR_WIDTH = 200;
+	public static final int SIDEBAR_WIDTH = 257;
 	
 	public static final int WATER_TILE = 1;
 	public static final int BEACH_TILE = 2;
@@ -213,16 +213,10 @@ public class FooCityGUI
 		buttonGridPanel.add(buttonIndustrial);
 		
 		toolPanel.add(buttonGridPanel, BorderLayout.PAGE_START);
-		minimap.setBounds(0,0,256,256);
-		minimap.setSize(128, 128);
-		minimap.setMinimumSize(new Dimension(128,128));
 		toolPanel.add(minimap, BorderLayout.PAGE_END);
-		//minimap.setBounds(0,FooCityConstants.WINDOW_HEIGHT - 38, FooCityConstants.SIDEBAR_WIDTH, FooCityConstants.WINDOW_HEIGHT - 38);
 		
 		frame.getContentPane().add(toolPanel);
 		frame.getContentPane().add(scrollPane);
-		frame.validate();
-		frame.repaint();
 		
 		menuBar = new JMenuBar();
 		frame.setJMenuBar(menuBar);
@@ -264,6 +258,14 @@ public class FooCityGUI
 	
 	public MapGrid getM() {
 		return m;
+	}
+	
+	public Rectangle getViewRect(){
+		return (Rectangle) scrollPane.getViewport().getVisibleRect().clone();
+	}
+	
+	public Point getViewPoint(){
+		return (Point) scrollPane.getViewport().getViewPosition().clone();
 	}
 
 	public void setM(MapGrid m) {

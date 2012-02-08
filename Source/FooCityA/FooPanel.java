@@ -109,13 +109,42 @@ class MiniMapPanel extends JPanel
     @Override
     public void paint(Graphics g1)
     {
-    	g1.setColor(Color.blue);
-    	g1.fillRect(0, 0, 128, 128);
+    	MapGrid m = null;
+    	if (FooCityGUI.window != null)
+    		m = FooCityGUI.window.getM();
+    	if (m == null)
+    		return;
+    	for (int y = 0; y < FooCityConstants.MAP_HEIGHT; y++){
+    		for (int x = 0; x < FooCityConstants.MAP_WIDTH; x++) {
+    			switch(m.GetTileAt(x, y)){
+    			case (FooCityConstants.BEACH_TILE):
+					g1.setColor(Color.orange);
+					break;
+    			case (FooCityConstants.WATER_TILE):
+					g1.setColor(Color.blue);
+					break;
+    			case (FooCityConstants.GRASS_TILE):
+    				g1.setColor(Color.green);
+					break;
+    			}
+    			g1.fillRect(x * 2, y * 2, 2, 2);
+    		}
+    	}
+    	// Draw the frame around our current view
+    	Rectangle r = FooCityGUI.window.getViewRect();
+    	Point p = FooCityGUI.window.getViewPoint();
+    	System.out.print("visiblerect = " + r +"\n"); 
+    	r.x = 2 * p.x / FooCityConstants.TILE_WIDTH;
+    	r.y = 2 * p.y / FooCityConstants.TILE_HEIGHT;
+    	r.width = 2 * r.width / FooCityConstants.TILE_WIDTH;
+    	r.height = 2 * r.height / FooCityConstants.TILE_HEIGHT;
+    	g1.setColor(Color.black);
+    	g1.drawRect(r.x, r.y, r.width, r.height);
     }
     @Override
     public Dimension getPreferredSize()
     {
-        return new Dimension(128, 128);
+        return new Dimension(256, 256);
     }
     
 }
