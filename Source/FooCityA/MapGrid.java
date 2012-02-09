@@ -3,6 +3,29 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.Scanner;
 
+class MapGridConstants
+{	
+	public static final int MAP_WIDTH   = 128;
+	public static final int MAP_HEIGHT  = 128;
+
+	public static final int WATER_TILE = 1;
+	public static final int BEACH_TILE = 2;
+	public static final int GRASS_TILE = 3;
+	public static final int DIRT_TILE = 4;
+	public static final int FORREST_TILE = 5;
+	public static final int INDUSTRIAL_TILE = 6;
+	public static final int COMMERCIAL_TILE = 7;
+	public static final int PARK_TILE = 8;
+	public static final int SEWAGE_WATER_TREATMENT_TILE = 9;
+	public static final int POLICESTATION_TILE = 10;
+	public static final int SOLAR_POWER_PLANT_TILE = 11;
+	public static final int NATURAL_GAS_PLANT = 12;
+	public static final int COAL_PLANT = 13;
+	public static final int WIND_FARM = 14;
+	public static final int RESIDENTIAL_TILE = 15;
+	public static final int LAST_TILE = 16;
+	public static final char CHAR_TILES[] = {' ', 'W', 'B', 'G', 'D', 'T'};
+}
 /**
  * 
  */
@@ -21,7 +44,7 @@ public class MapGrid
 		MapGrid m = new MapGrid();
 		m.Print();
 	}
-	private final static int AREA =  FooCityConstants.MAP_WIDTH * FooCityConstants.MAP_HEIGHT;
+	private final static int AREA =  MapGridConstants.MAP_WIDTH * MapGridConstants.MAP_HEIGHT;
 
 	public MapGrid()
 	{
@@ -36,17 +59,17 @@ public class MapGrid
 
 	public int GetTileAt(int x,int y)
 	{
-		return this.tileGrid[x + y*FooCityConstants.MAP_HEIGHT].GetTileInt();
+		return this.tileGrid[x + y*MapGridConstants.MAP_HEIGHT].GetTileInt();
 	}
 
 	@Override
 	public String toString()
 	{
 		String s = "";
-		for (int y =0; y < FooCityConstants.MAP_HEIGHT; ++y)
+		for (int y =0; y < MapGridConstants.MAP_HEIGHT; ++y)
 		{
-			for (int x = 0; x < FooCityConstants.MAP_WIDTH; ++x)
-				s += tileGrid[y * FooCityConstants.MAP_HEIGHT + x].GetTileChar();
+			for (int x = 0; x < MapGridConstants.MAP_WIDTH; ++x)
+				s += tileGrid[y * MapGridConstants.MAP_HEIGHT + x].GetTileChar();
 			s += "\n";
 		}
 		return s;
@@ -82,19 +105,19 @@ public class MapGrid
 		}
 		
 		
-		for (int y = 0; y < FooCityConstants.MAP_HEIGHT; ++y)
+		for (int y = 0; y < MapGridConstants.MAP_HEIGHT; ++y)
 		{
 			if (!inScanner.hasNextLine())
 				return false;
 			
 			String currentLine = inScanner.nextLine();
 			
-			if (currentLine.length() <  FooCityConstants.MAP_WIDTH)
+			if (currentLine.length() <  MapGridConstants.MAP_WIDTH)
 				return false;
 
-			for (int x = 0; x <  FooCityConstants.MAP_WIDTH; ++x)
+			for (int x = 0; x <  MapGridConstants.MAP_WIDTH; ++x)
 			{
-				this.tileGrid[y *  FooCityConstants.MAP_HEIGHT + x] = Tile.TileFactory(currentLine.charAt(x));
+				this.tileGrid[y *  MapGridConstants.MAP_HEIGHT + x] = Tile.TileFactory(currentLine.charAt(x));
 			}
 		}
 		return true;
@@ -102,13 +125,13 @@ public class MapGrid
 
 	public void setTile(int x, int y, char c) 
 	{
-		this.tileGrid[y*FooCityConstants.MAP_HEIGHT + x] = Tile.TileFactory(c);
+		this.tileGrid[y*MapGridConstants.MAP_HEIGHT + x] = Tile.TileFactory(c);
 		
 	}
 
 	public void setTile(int x, int y, int i) 
 	{
-		this.tileGrid[y*FooCityConstants.MAP_HEIGHT + x] = Tile.TileFactory(i);
+		this.tileGrid[y*MapGridConstants.MAP_HEIGHT + x] = Tile.TileFactory(i);
 		
 	}
 
@@ -153,7 +176,7 @@ abstract class Tile
 
 	public static Tile TileFactory(int type)
 	{
-		return TileFactory(FooCityConstants.CHAR_TILES[type]);
+		return TileFactory(MapGridConstants.CHAR_TILES[type]);
 	}
 }
 
@@ -162,7 +185,7 @@ class GrassTile extends Tile
 	public GrassTile(char tileChar)
 	{
 		super(tileChar);
-		tileInt = FooCityConstants.GRASS_TILE;
+		tileInt = MapGridConstants.GRASS_TILE;
 	}
 }
 
@@ -171,7 +194,7 @@ class WaterTile extends Tile
 	public WaterTile(char tileChar)
 	{
 		super(tileChar);
-		tileInt = FooCityConstants.WATER_TILE;
+		tileInt = MapGridConstants.WATER_TILE;
 	}
 }
 
@@ -180,7 +203,7 @@ class DirtTile extends Tile
 	public DirtTile(char tileChar)
 	{
 		super(tileChar);
-		tileInt = FooCityConstants.DIRT_TILE;
+		tileInt = MapGridConstants.DIRT_TILE;
 	}
 }
 
@@ -189,7 +212,7 @@ class BeachTile extends Tile
 	public BeachTile(char tileChar)
 	{
 		super(tileChar);
-		tileInt = FooCityConstants.BEACH_TILE;
+		tileInt = MapGridConstants.BEACH_TILE;
 	}
 }
 
@@ -198,6 +221,6 @@ class ForrestTile extends Tile
 	public ForrestTile(char tileChar)
 	{
 		super(tileChar);
-		tileInt = FooCityConstants.FORREST_TILE;
+		tileInt = MapGridConstants.FORREST_TILE;
 	}
 }

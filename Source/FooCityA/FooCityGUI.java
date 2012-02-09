@@ -36,34 +36,15 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import javax.swing.JPanel;
 
-class FooCityConstants
+class FooCityGUIConstants
 {
 	public static final int TILE_WIDTH  = 32;
 	public static final int TILE_HEIGHT = 32;
-	public static final int MAP_WIDTH   = 128;
-	public static final int MAP_HEIGHT  = 128;
 	public static final int WINDOW_HEIGHT = 600;
 	public static final int WINDOW_WIDTH = 800;
 	public static final int SIDEBAR_WIDTH = 257;
-	
-	public static final int WATER_TILE = 1;
-	public static final int BEACH_TILE = 2;
-	public static final int GRASS_TILE = 3;
-	public static final int DIRT_TILE = 4;
-	public static final int FORREST_TILE = 5;
-	public static final int INDUSTRIAL_TILE = 6;
-	public static final int COMMERCIAL_TILE = 7;
-	public static final int PARK_TILE = 8;
-	public static final int SEWAGE_WATER_TREATMENT_TILE = 9;
-	public static final int POLICESTATION_TILE = 10;
-	public static final int SOLAR_POWER_PLANT_TILE = 11;
-	public static final int NATURAL_GAS_PLANT = 12;
-	public static final int COAL_PLANT = 13;
-	public static final int WIND_FARM = 14;
-	public static final int RESIDENTIAL_TILE = 15;
-	public static final int LAST_TILE = 16;
-	public static final char CHAR_TILES[] = {' ', 'W', 'B', 'G', 'D', 'T'};
 }
+
 public class FooCityGUI
 {
 
@@ -131,7 +112,7 @@ public class FooCityGUI
 		frame.setVisible(true);
 		AddResizeListener();
 
-		frame.setBounds(100, 100, FooCityConstants.WINDOW_WIDTH, FooCityConstants.WINDOW_HEIGHT);
+		frame.setBounds(100, 100, FooCityGUIConstants.WINDOW_WIDTH, FooCityGUIConstants.WINDOW_HEIGHT);
 		frame.setTitle("FooCity V0.1");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
@@ -145,8 +126,8 @@ public class FooCityGUI
 					if (newTile == 0)
 						return;
 					Point p = e.getPoint();
-					int x = p.x / FooCityConstants.TILE_WIDTH;
-					int y = p.y / FooCityConstants.TILE_HEIGHT;
+					int x = p.x / FooCityGUIConstants.TILE_WIDTH;
+					int y = p.y / FooCityGUIConstants.TILE_HEIGHT;
 					//System.out.print(p + " " + x + " " + y);
 					m.setTile(x,y, newTile);
 					rendering_panel.repaint();
@@ -210,7 +191,7 @@ public class FooCityGUI
 		GridLayout buttonGridLayout = new GridLayout(0,3);
 		JPanel buttonGridPanel = new JPanel();
 		buttonGridPanel.setLayout(buttonGridLayout);
-		toolPanel.setBounds(0, 0, FooCityConstants.SIDEBAR_WIDTH, FooCityConstants.WINDOW_HEIGHT - 38);
+		toolPanel.setBounds(0, 0, FooCityGUIConstants.SIDEBAR_WIDTH, FooCityGUIConstants.WINDOW_HEIGHT - 38);
 		minimap = new MiniMapPanel(Color.BLUE);
 		minimap.repaint();
 		
@@ -293,6 +274,7 @@ public class FooCityGUI
 	public void setM(MapGrid m) {
 		this.m = m;
 		this.rendering_panel.repaint();
+		this.minimap.repaint();
 	}
 	private class NewGameAction extends AbstractAction
 	{
@@ -329,27 +311,27 @@ public class FooCityGUI
 			String command = e.getActionCommand();
 			if (command == waterTile)
 			{
-				newTile = FooCityConstants.WATER_TILE;
+				newTile = MapGridConstants.WATER_TILE;
 				return;
 			}
 			if (command == beachTile)
 			{
-				newTile = FooCityConstants.BEACH_TILE;
+				newTile = MapGridConstants.BEACH_TILE;
 				return;
 			}
 			if (command == grassTile)
 			{
-				newTile = FooCityConstants.GRASS_TILE;
+				newTile = MapGridConstants.GRASS_TILE;
 				return;
 			}
 			if (command == dirtTile)
 			{
-				newTile = FooCityConstants.DIRT_TILE;
+				newTile = MapGridConstants.DIRT_TILE;
 				return;
 			}
 			if (command == forrestTile)
 			{
-				newTile = FooCityConstants.FORREST_TILE;
+				newTile = MapGridConstants.FORREST_TILE;
 				return;
 			}
 		}
@@ -367,26 +349,26 @@ public class FooCityGUI
 				switch (Character.toUpperCase(c))
 				{
 				case 'W':
-					if (y < FooCityConstants.TILE_HEIGHT)
+					if (y < FooCityGUIConstants.TILE_HEIGHT)
 						y = 0;
 					else
-						y -= FooCityConstants.TILE_HEIGHT;
+						y -= FooCityGUIConstants.TILE_HEIGHT;
 					break;
 				case 'A':
-					if (x < FooCityConstants.TILE_WIDTH)
+					if (x < FooCityGUIConstants.TILE_WIDTH)
 						x = 0;
 					else
-						x -= FooCityConstants.TILE_WIDTH;
+						x -= FooCityGUIConstants.TILE_WIDTH;
 					break;
 				case 'S':
-					if (y > FooCityConstants.MAP_HEIGHT * (FooCityConstants.TILE_HEIGHT - 1) - r.height)
-						y = FooCityConstants.MAP_HEIGHT * FooCityConstants.TILE_HEIGHT - r.height;
+					if (y > MapGridConstants.MAP_HEIGHT * (FooCityGUIConstants.TILE_HEIGHT - 1) - r.height)
+						y = MapGridConstants.MAP_HEIGHT * FooCityGUIConstants.TILE_HEIGHT - r.height;
 					else
 						y += 32;
 					break;
 				case 'D':
-					if (x > FooCityConstants.MAP_WIDTH * (FooCityConstants.TILE_WIDTH - 1) - r.width)
-						x = FooCityConstants.MAP_WIDTH * FooCityConstants.TILE_WIDTH - r.width;
+					if (x > MapGridConstants.MAP_WIDTH * (FooCityGUIConstants.TILE_WIDTH - 1) - r.width)
+						x = MapGridConstants.MAP_WIDTH * FooCityGUIConstants.TILE_WIDTH - r.width;
 					else
 						x += 32;
 					break;
@@ -411,13 +393,13 @@ public class FooCityGUI
 			public void windowStateChanged(WindowEvent arg0) 
 			{	
 				Rectangle r = frame.getBounds();
-				r.x = FooCityConstants.SIDEBAR_WIDTH; 
+				r.x = FooCityGUIConstants.SIDEBAR_WIDTH; 
 				r.y = 0;
-				r.width -= FooCityConstants.SIDEBAR_WIDTH + 15;
+				r.width -= FooCityGUIConstants.SIDEBAR_WIDTH + 15;
 				r.height -= 60;
 				scrollPane.setBounds(r);
 				scrollPane.revalidate();
-				toolPanel.setBounds(0, 0, FooCityConstants.SIDEBAR_WIDTH, r.height);
+				toolPanel.setBounds(0, 0, FooCityGUIConstants.SIDEBAR_WIDTH, r.height);
 				toolPanel.revalidate();
 			}
 		});
@@ -428,13 +410,13 @@ public class FooCityGUI
 			public void componentResized(ComponentEvent arg0) {
 	
 				Rectangle r = frame.getBounds();
-				r.x = FooCityConstants.SIDEBAR_WIDTH; 
+				r.x = FooCityGUIConstants.SIDEBAR_WIDTH; 
 				r.y = 0;
-				r.width -= FooCityConstants.SIDEBAR_WIDTH + 15;
+				r.width -= FooCityGUIConstants.SIDEBAR_WIDTH + 15;
 				r.height -= 60;
 				scrollPane.setBounds(r);
 				scrollPane.revalidate();
-				toolPanel.setBounds(0, 0, FooCityConstants.SIDEBAR_WIDTH, r.height);
+				toolPanel.setBounds(0, 0, FooCityGUIConstants.SIDEBAR_WIDTH, r.height);
 				toolPanel.revalidate();
 			}
 		});

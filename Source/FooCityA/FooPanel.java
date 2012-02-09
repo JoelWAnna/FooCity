@@ -31,8 +31,8 @@ class FooPanel extends JPanel
 
     public Dimension getPreferredSize()
     {
-        return new Dimension(FooCityConstants.MAP_WIDTH * FooCityConstants.TILE_WIDTH,
-        					FooCityConstants.MAP_HEIGHT * FooCityConstants.TILE_HEIGHT);
+        return new Dimension(MapGridConstants.MAP_WIDTH * FooCityGUIConstants.TILE_WIDTH,
+        		MapGridConstants.MAP_HEIGHT * FooCityGUIConstants.TILE_HEIGHT);
     }
 
 
@@ -51,17 +51,17 @@ class FooPanel extends JPanel
 
     	//System.out.print("visiblerect = " + r +"\n"); 
         g.setColor(Color.BLACK);
-    	for (int y = 0; y < FooCityConstants.MAP_HEIGHT; ++y)
+    	for (int y = 0; y < MapGridConstants.MAP_HEIGHT; ++y)
         {
-        	int yCoord = y * FooCityConstants.TILE_HEIGHT;
+        	int yCoord = y * FooCityGUIConstants.TILE_HEIGHT;
         	// render to the entire area plus 1 tile extra to eliminate the tearing when rapidly scrolling
-        	if ((yCoord < r.y - FooCityConstants.TILE_HEIGHT) || (yCoord >= r.y + r.height + FooCityConstants.TILE_HEIGHT))
+        	if ((yCoord < r.y - FooCityGUIConstants.TILE_HEIGHT) || (yCoord >= r.y + r.height + FooCityGUIConstants.TILE_HEIGHT))
         		continue;
-        	for (int x = 0; x < FooCityConstants.MAP_WIDTH; ++x)
+        	for (int x = 0; x < MapGridConstants.MAP_WIDTH; ++x)
         	{
-        		int xCoord = x * FooCityConstants.TILE_WIDTH;
+        		int xCoord = x * FooCityGUIConstants.TILE_WIDTH;
         		// render to the entire area plus 1 tile extra to eliminate the tearing when rapidly scrolling
-            	if ((xCoord < r.x - FooCityConstants.TILE_WIDTH) || (xCoord >= r.x + r.width + FooCityConstants.TILE_WIDTH))
+            	if ((xCoord < r.x - FooCityGUIConstants.TILE_WIDTH) || (xCoord >= r.x + r.width + FooCityGUIConstants.TILE_WIDTH))
             		continue;
         		BufferedImage bI = null;
         		bI = tiles.GetTitle(m.GetTileAt(x, y));
@@ -80,7 +80,7 @@ class FooPanel extends JPanel
     			final float [] scales = {1f, 1f, 1f, 0.5f};
         		final float [] offsets = new float[4];
         		final RescaleOp rop = new RescaleOp(scales, offsets, null);
-        		g.drawImage(mImage, rop, cursor.x & ~(FooCityConstants.TILE_WIDTH-1) , (cursor.y & ~(FooCityConstants.TILE_HEIGHT-1)));
+        		g.drawImage(mImage, rop, cursor.x & ~(FooCityGUIConstants.TILE_WIDTH-1) , (cursor.y & ~(FooCityGUIConstants.TILE_HEIGHT-1)));
     		}
     	}
 		
@@ -114,52 +114,52 @@ class MiniMapPanel extends JPanel
     		m = FooCityGUI.window.getM();
     	if (m == null)
     		return;
-    	for (int y = 0; y < FooCityConstants.MAP_HEIGHT; y++){
-    		for (int x = 0; x < FooCityConstants.MAP_WIDTH; x++) {
+    	for (int y = 0; y < MapGridConstants.MAP_HEIGHT; y++){
+    		for (int x = 0; x < MapGridConstants.MAP_WIDTH; x++) {
     			switch(m.GetTileAt(x, y)){
-    			case (FooCityConstants.BEACH_TILE):
+    			case (MapGridConstants.BEACH_TILE):
 					g1.setColor(new Color(255,225,0));  //A yellowish sandy color
 					break;
-    			case (FooCityConstants.WATER_TILE):
+    			case (MapGridConstants.WATER_TILE):
 					g1.setColor(new Color(0,0,180));  // A deep ocean blue
 					break;
-    			case (FooCityConstants.GRASS_TILE):
+    			case (MapGridConstants.GRASS_TILE):
     				g1.setColor(new Color(0,180,0));  // A somewhat dark green
 					break;
-    			case (FooCityConstants.COAL_PLANT):   
+    			case (MapGridConstants.COAL_PLANT):   
     				g1.setColor(new Color (50, 50, 50)); // Very dark grey
 					break;
-    			case (FooCityConstants.COMMERCIAL_TILE):
+    			case (MapGridConstants.COMMERCIAL_TILE):
     				g1.setColor(new Color (0,0,255));   // Vivid blue
 					break;
-    			case (FooCityConstants.DIRT_TILE):
+    			case (MapGridConstants.DIRT_TILE):
     				g1.setColor(new Color (140,110,0));  //Brown
 					break;
-    			case (FooCityConstants.FORREST_TILE):
+    			case (MapGridConstants.FORREST_TILE):
     				g1.setColor(new Color (0, 75, 0));  // Deep forest green
 					break;
-    			case (FooCityConstants.INDUSTRIAL_TILE):  // Dirty yellow
+    			case (MapGridConstants.INDUSTRIAL_TILE):  // Dirty yellow
     				g1.setColor(new Color (225, 225, 0));
 					break;
-    			case (FooCityConstants.NATURAL_GAS_PLANT):
+    			case (MapGridConstants.NATURAL_GAS_PLANT):
     				g1.setColor(new Color (96, 112, 204)); // Pale blue 
 					break;
-    			case (FooCityConstants.PARK_TILE):
+    			case (MapGridConstants.PARK_TILE):
     				g1.setColor(new Color (100, 255, 100));		// Pale green 
 					break;
-    			case (FooCityConstants.POLICESTATION_TILE):
+    			case (MapGridConstants.POLICESTATION_TILE):
     				g1.setColor(new Color (0,0,200));		//Deep blue
 					break;
-    			case (FooCityConstants.RESIDENTIAL_TILE):
+    			case (MapGridConstants.RESIDENTIAL_TILE):
     				g1.setColor(new Color (0,255, 0));   // Bright green
 					break;
-    			case (FooCityConstants.SEWAGE_WATER_TREATMENT_TILE):
+    			case (MapGridConstants.SEWAGE_WATER_TREATMENT_TILE):
     				g1.setColor(new Color (110, 72, 20));   //Dark murkey brown
 					break;
-    			case (FooCityConstants.SOLAR_POWER_PLANT_TILE):
+    			case (MapGridConstants.SOLAR_POWER_PLANT_TILE):
     				g1.setColor(new Color (255, 244, 128));	// Bright yellow
 					break;
-    			case (FooCityConstants.WIND_FARM):
+    			case (MapGridConstants.WIND_FARM):
     				g1.setColor(new Color (0, 200, 255));	// Sky blue
 					break;
     			default:
@@ -174,10 +174,10 @@ class MiniMapPanel extends JPanel
     	Rectangle r = FooCityGUI.window.getViewRect();
     	Point p = FooCityGUI.window.getViewPoint();
     	System.out.print("visiblerect = " + r +"\n"); 
-    	r.x = 2 * p.x / FooCityConstants.TILE_WIDTH;
-    	r.y = 2 * p.y / FooCityConstants.TILE_HEIGHT;
-    	r.width = 2 * r.width / FooCityConstants.TILE_WIDTH;
-    	r.height = 2 * r.height / FooCityConstants.TILE_HEIGHT;
+    	r.x = 2 * p.x / FooCityGUIConstants.TILE_WIDTH;
+    	r.y = 2 * p.y / FooCityGUIConstants.TILE_HEIGHT;
+    	r.width = 2 * r.width / FooCityGUIConstants.TILE_WIDTH;
+    	r.height = 2 * r.height / FooCityGUIConstants.TILE_HEIGHT;
     	g1.setColor(Color.black);
     	g1.drawRect(r.x, r.y, r.width, r.height);
     }

@@ -71,20 +71,20 @@ public class NewGame extends JPanel implements ActionListener {
 				for (int x = 0; x < 128; x++){
 					switch(mapData.GetTileAt(x, y))
 					{
-						case FooCityConstants.WATER_TILE:
+						case MapGridConstants.WATER_TILE:
 							color = Color.blue;
 							break;
-						case FooCityConstants.BEACH_TILE:
+						case MapGridConstants.BEACH_TILE:
 							color = Color.yellow;
 							break;
-						case FooCityConstants.GRASS_TILE:
+						case MapGridConstants.GRASS_TILE:
 							color = Color.green;
 							break;
-						case FooCityConstants.DIRT_TILE:
+						case MapGridConstants.DIRT_TILE:
 							color = Color.orange;
 							color.darker();
 							break;
-						case FooCityConstants.FORREST_TILE:
+						case MapGridConstants.FORREST_TILE:
 							color = Color.green;
 							color.darker();
 							break;
