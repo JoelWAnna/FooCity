@@ -1,3 +1,8 @@
+// Project FooCity-group2
+// CS300
+// Developers: Joel Anna and David Wiza
+//
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,7 +18,6 @@ public class NewGame extends JPanel implements ActionListener {
 	protected JFrame frame;
 	private int panelHeight;
 	private boolean mapLoaded = false;
-	//private int[] mapData;
 	private MapGrid mapData;
 	public NewGame()
 	{
@@ -114,7 +118,7 @@ public class NewGame extends JPanel implements ActionListener {
 			}
 			else
 			{
-				FooCityGUI.window.setM(mapData);
+				FooCityGUI.window.setMap(mapData);
 			}
 			
 			javax.swing.SwingUtilities.getWindowAncestor(this).dispose();

@@ -1,3 +1,8 @@
+// Project FooCity-group2
+// CS300
+// Developers: Joel Anna and David Wiza
+//
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 

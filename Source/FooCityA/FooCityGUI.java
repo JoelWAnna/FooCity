@@ -1,7 +1,10 @@
+// Project FooCity-group2
+// CS300
+// Developers: Joel Anna and David Wiza
+//
+
 import java.awt.BorderLayout;
-import java.awt.Canvas;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.KeyEventDispatcher;
@@ -13,7 +16,6 @@ import javax.swing.JFrame;
 
 import javax.swing.JScrollPane;
 
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 import javax.swing.JButton;
@@ -24,7 +26,6 @@ import javax.swing.AbstractAction;
 import java.awt.event.ActionEvent;
 import javax.swing.Action;
 
-import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.WindowStateListener;
@@ -53,7 +54,8 @@ public class FooCityGUI
 	private JPanel toolPanel;
 	private JScrollPane scrollPane;
 	private FooPanel rendering_panel;
-	private MapGrid m;
+	//private MapGrid m;
+	private FooCityManager city_manager;
 	public static FooCityGUI window;
 	private JMenuBar menuBar;
 	private final Action NewGame = new NewGameAction();
@@ -93,12 +95,13 @@ public class FooCityGUI
 	 */
 	public FooCityGUI()
 	{
+		city_manager = new FooCityManager();
 		initialize();
 	}
 
-	public FooCityGUI(MapGrid mapData)
+	public FooCityGUI(MapGrid new_map)
 	{
-		m = mapData;
+		city_manager = new FooCityManager(new_map);
 		initialize();
 	}
 
@@ -129,8 +132,11 @@ public class FooCityGUI
 					int x = p.x / FooCityGUIConstants.TILE_WIDTH;
 					int y = p.y / FooCityGUIConstants.TILE_HEIGHT;
 					//System.out.print(p + " " + x + " " + y);
-					m.setTile(x,y, newTile);
+					MapGrid city_map = city_manager.GetMapGrid();
+					if (city_map != null)
+						city_map.setTile(x,y, newTile);
 					rendering_panel.repaint();
+					minimap.repaint();
 					rendering_panel.PlacingTile = false;
 					
 					//newTile = 0;
@@ -255,10 +261,10 @@ public class FooCityGUI
 		AddKeyListeners();
 	}
 	
-	public MapGrid getM() {
-		return m;
+	public MapGrid getMap() {
+		return city_manager.GetMapGrid();
 	}
-	
+
 	public void updateMiniMap(){
 		minimap.repaint();
 	}
@@ -271,10 +277,13 @@ public class FooCityGUI
 		return (Point) scrollPane.getViewport().getViewPosition().clone();
 	}
 
-	public void setM(MapGrid m) {
-		this.m = m;
-		this.rendering_panel.repaint();
-		this.minimap.repaint();
+	public void setMap(MapGrid new_map)
+	{
+		if (city_manager.SetMapGrid(new_map))
+		{
+			this.rendering_panel.repaint();
+			this.minimap.repaint();
+		}
 	}
 	private class NewGameAction extends AbstractAction
 	{
@@ -285,7 +294,7 @@ public class FooCityGUI
 		}
 		public void actionPerformed(ActionEvent e)
 		{
-			if (m == null)
+			if (city_manager == null || city_manager.GetMapGrid() == null)
 			{
 				NewGame newgame = new NewGame();
 				scrollPane.repaint();
@@ -294,6 +303,9 @@ public class FooCityGUI
 			}
 			else
 			{
+				/*
+				city_manager.Quit();
+				 */
 				//TODO verify that the user wants to start a new game
 			}
 		}

@@ -1,3 +1,8 @@
+// Project FooCity-group2
+// CS300
+// Developers: Joel Anna and David Wiza
+//
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;

@@ -1,3 +1,8 @@
+// Project FooCity-group2
+// CS300
+// Developers: Joel Anna and David Wiza
+//
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -5,10 +10,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
 import java.awt.image.RescaleOp;
-import java.awt.image.WritableRaster;
-import java.util.Scanner;
 
 import javax.swing.JPanel;
 
@@ -41,10 +43,10 @@ class FooPanel extends JPanel
     {
     	super.paint(g1);
     	Graphics2D g = (Graphics2D) g1;
-    	MapGrid m = null;
+    	MapGrid current_map = null;
     	if (FooCityGUI.window != null)
-    		m = FooCityGUI.window.getM();
-    	if (m == null)
+    		current_map = FooCityGUI.window.getMap();
+    	if (current_map == null)
     		return;
     	Rectangle r = this.getVisibleRect();
     	g.clearRect(r.x, r.y, r.width, r.height);
@@ -64,7 +66,7 @@ class FooPanel extends JPanel
             	if ((xCoord < r.x - FooCityGUIConstants.TILE_WIDTH) || (xCoord >= r.x + r.width + FooCityGUIConstants.TILE_WIDTH))
             		continue;
         		BufferedImage bI = null;
-        		bI = tiles.GetTitle(m.GetTileAt(x, y));
+        		bI = tiles.GetTitle(current_map.GetTileAt(x, y));
         		if (bI != null)
         			g.drawImage(bI, xCoord, yCoord , null);
         		g.drawLine(xCoord, yCoord, xCoord, yCoord+r.height);
@@ -106,17 +108,20 @@ class MiniMapPanel extends JPanel
     	super();
     	setForeground(faceColor);
     }
+
     @Override
     public void paint(Graphics g1)
     {
-    	MapGrid m = null;
+    	MapGrid current_map = null;
     	if (FooCityGUI.window != null)
-    		m = FooCityGUI.window.getM();
-    	if (m == null)
+    		current_map = FooCityGUI.window.getMap();
+    	if (current_map == null)
     		return;
     	for (int y = 0; y < MapGridConstants.MAP_HEIGHT; y++){
-    		for (int x = 0; x < MapGridConstants.MAP_WIDTH; x++) {
-    			switch(m.GetTileAt(x, y)){
+    		for (int x = 0; x < MapGridConstants.MAP_WIDTH; x++)
+    		{
+    			switch(current_map.GetTileAt(x, y))
+    			{
     			case (MapGridConstants.BEACH_TILE):
 					g1.setColor(new Color(255,225,0));  //A yellowish sandy color
 					break;
