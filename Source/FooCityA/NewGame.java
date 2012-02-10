@@ -73,7 +73,7 @@ public class NewGame extends JPanel implements ActionListener {
 			Color color = Color.white;
 			for (int y = 0; y < 128; y++){
 				for (int x = 0; x < 128; x++){
-					switch(mapData.GetTileAt(x, y))
+					switch(mapData.getTileAt(x, y))
 					{
 						case MapGridConstants.WATER_TILE:
 							color = Color.blue;

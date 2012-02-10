@@ -56,12 +56,12 @@ class TileLoader
     	tileNames[MapGridConstants.INDUSTRIAL_TILE] = "";
     	tileNames[MapGridConstants.COMMERCIAL_TILE] = "";
     	tileNames[MapGridConstants.PARK_TILE] = "";
-    	tileNames[MapGridConstants.SEWAGE_WATER_TREATMENT_TILE] = "";
-    	tileNames[MapGridConstants.POLICESTATION_TILE] = "";
-    	tileNames[MapGridConstants.SOLAR_POWER_PLANT_TILE] = "";
-    	tileNames[MapGridConstants.NATURAL_GAS_PLANT] = "";
-    	tileNames[MapGridConstants.COAL_PLANT] = "";
-    	tileNames[MapGridConstants.WIND_FARM] = "";
+    	tileNames[MapGridConstants.SEWAGE_TILE] = "";
+    	tileNames[MapGridConstants.POLICE_TILE] = "";
+    	tileNames[MapGridConstants.SOLAR_TILE] = "";
+    	tileNames[MapGridConstants.GAS_TILE] = "";
+    	tileNames[MapGridConstants.COAL_TILE] = "";
+    	tileNames[MapGridConstants.WIND_TILE] = "";
     	tileNames[MapGridConstants.RESIDENTIAL_TILE] = "";
     }
 

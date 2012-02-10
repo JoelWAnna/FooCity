@@ -9,6 +9,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
 
@@ -68,7 +70,7 @@ class FooPanel extends JPanel
             	if ((xCoord < r.x - FooCityGUIConstants.TILE_WIDTH) || (xCoord >= r.x + r.width + FooCityGUIConstants.TILE_WIDTH))
             		continue;
         		BufferedImage bI = null;
-        		bI = tiles.GetTitle(current_map.GetTileAt(x, y));
+        		bI = tiles.GetTitle(current_map.getTileAt(x, y));
         		if (bI != null)
         			g.drawImage(bI, xCoord, yCoord , null);
         		g.drawLine(xCoord, yCoord, xCoord, yCoord+r.height);
@@ -107,6 +109,37 @@ class MiniMapPanel extends JPanel
     {
     	super();
     	setForeground(faceColor);
+    	this.addMouseListener(new MouseListener(){
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				Point point = new Point(arg0.getX() / 2, arg0.getY() / 2);
+				FooCityGUI.window.setView(point);
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+    	});
     }
 
     @Override
@@ -120,7 +153,7 @@ class MiniMapPanel extends JPanel
     	for (int y = 0; y < MapGridConstants.MAP_HEIGHT; y++){
     		for (int x = 0; x < MapGridConstants.MAP_WIDTH; x++)
     		{
-    			switch(current_map.GetTileAt(x, y))
+    			switch(current_map.getTileAt(x, y))
     			{
     			case (MapGridConstants.BEACH_TILE):
 					g1.setColor(new Color(255,225,0));  //A yellowish sandy color
@@ -131,7 +164,7 @@ class MiniMapPanel extends JPanel
     			case (MapGridConstants.GRASS_TILE):
     				g1.setColor(new Color(0,180,0));  // A somewhat dark green
 					break;
-    			case (MapGridConstants.COAL_PLANT):   
+    			case (MapGridConstants.COAL_TILE):   
     				g1.setColor(new Color (50, 50, 50)); // Very dark grey
 					break;
     			case (MapGridConstants.COMMERCIAL_TILE):
@@ -146,25 +179,25 @@ class MiniMapPanel extends JPanel
     			case (MapGridConstants.INDUSTRIAL_TILE):  // Dirty yellow
     				g1.setColor(new Color (225, 225, 0));
 					break;
-    			case (MapGridConstants.NATURAL_GAS_PLANT):
+    			case (MapGridConstants.GAS_TILE):
     				g1.setColor(new Color (96, 112, 204)); // Pale blue 
 					break;
     			case (MapGridConstants.PARK_TILE):
     				g1.setColor(new Color (100, 255, 100));		// Pale green 
 					break;
-    			case (MapGridConstants.POLICESTATION_TILE):
+    			case (MapGridConstants.POLICE_TILE):
     				g1.setColor(new Color (0,0,200));		//Deep blue
 					break;
     			case (MapGridConstants.RESIDENTIAL_TILE):
     				g1.setColor(new Color (0,255, 0));   // Bright green
 					break;
-    			case (MapGridConstants.SEWAGE_WATER_TREATMENT_TILE):
+    			case (MapGridConstants.SEWAGE_TILE):
     				g1.setColor(new Color (110, 72, 20));   //Dark murkey brown
 					break;
-    			case (MapGridConstants.SOLAR_POWER_PLANT_TILE):
+    			case (MapGridConstants.SOLAR_TILE):
     				g1.setColor(new Color (255, 244, 128));	// Bright yellow
 					break;
-    			case (MapGridConstants.WIND_FARM):
+    			case (MapGridConstants.WIND_TILE):
     				g1.setColor(new Color (0, 200, 255));	// Sky blue
 					break;
     			default:

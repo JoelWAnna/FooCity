@@ -21,12 +21,12 @@ class MapGridConstants
 	public static final int INDUSTRIAL_TILE = 6;
 	public static final int COMMERCIAL_TILE = 7;
 	public static final int PARK_TILE = 8;
-	public static final int SEWAGE_WATER_TREATMENT_TILE = 9;
-	public static final int POLICESTATION_TILE = 10;
-	public static final int SOLAR_POWER_PLANT_TILE = 11;
-	public static final int NATURAL_GAS_PLANT = 12;
-	public static final int COAL_PLANT = 13;
-	public static final int WIND_FARM = 14;
+	public static final int SEWAGE_TILE = 9;
+	public static final int POLICE_TILE = 10;
+	public static final int SOLAR_TILE = 11;
+	public static final int GAS_TILE = 12;
+	public static final int COAL_TILE = 13;
+	public static final int WIND_TILE = 14;
 	public static final int RESIDENTIAL_TILE = 15;
 	public static final int LAST_TILE = 16;
 	public static final char CHAR_TILES[] = {' ', 'W', 'B', 'G', 'D', 'T'};
@@ -62,7 +62,7 @@ public class MapGrid
 		out.print(this.toString());
 	}
 
-	public int GetTileAt(int x,int y) 
+	public int getTileAt(int x,int y) 
 	{
 		if (tileGrid != null &&
 		   (x >= 0 && y >= 0) &&
@@ -72,7 +72,7 @@ public class MapGrid
 			Tile current_tile = tileGrid[x + y*MapGridConstants.MAP_HEIGHT];
 			if (current_tile != null)
 			{
-				return current_tile.GetTileInt();
+				return current_tile.getTileInt();
 			}
 		}
 		return 0;
@@ -85,7 +85,7 @@ public class MapGrid
 		for (int y =0; y < MapGridConstants.MAP_HEIGHT; ++y)
 		{
 			for (int x = 0; x < MapGridConstants.MAP_WIDTH; ++x)
-				s += tileGrid[y * MapGridConstants.MAP_HEIGHT + x].GetTileChar();
+				s += tileGrid[y * MapGridConstants.MAP_HEIGHT + x].getTileChar();
 			s += "\n";
 		}
 		return s;
@@ -95,7 +95,7 @@ public class MapGrid
 	{
 		for (int i = 0; i < AREA; ++i)
 		{
-			this.tileGrid[i] = Tile.TileFactory('W');
+			this.tileGrid[i] = new Tile('W');
 		}
 	}
 
@@ -133,7 +133,7 @@ public class MapGrid
 
 			for (int x = 0; x <  MapGridConstants.MAP_WIDTH; ++x)
 			{
-				this.tileGrid[y *  MapGridConstants.MAP_HEIGHT + x] = Tile.TileFactory(currentLine.charAt(x));
+				this.tileGrid[y *  MapGridConstants.MAP_HEIGHT + x] = new Tile(currentLine.charAt(x));
 			}
 		}
 		return true;
@@ -146,7 +146,7 @@ public class MapGrid
 			Tile oldTile = this.tileGrid[y*MapGridConstants.MAP_HEIGHT + x];
 			if (oldTile.isReplaceable())
 			{
-				this.tileGrid[y*MapGridConstants.MAP_HEIGHT + x] = Tile.TileFactory(i);//, oldTile.GetTileInt());
+				this.tileGrid[y*MapGridConstants.MAP_HEIGHT + x] = new Tile(i);//, oldTile.GetTileInt());
 				return true;
 			}
 		}
@@ -156,99 +156,5 @@ public class MapGrid
 
 }
 
-abstract class Tile
-{
-	private char tileChar;
-	protected int tileInt;
-	protected boolean replaceable;
-	protected Tile(char tileChar)
-	{
-		this.tileChar = tileChar;
-		replaceable = true;
-	}
 
-	public boolean isReplaceable()
-	{
-		return replaceable;
-	}
 
-	public char GetTileChar()
-	{
-		return tileChar;
-	}
-	
-	public int GetTileInt()
-	{
-		return tileInt;
-	}
-
-	public static Tile TileFactory(char type)
-	{
-		switch (type)
-		{
-		case 'G':
-			return new GrassTile(type);
-		case 'W':
-			return new WaterTile(type);
-		case 'D':
-			return new DirtTile(type);
-		case 'B':
-			return new BeachTile(type);
-		case 'T':
-			return new ForrestTile(type);
-		}
-
-		return new WaterTile(type);
-	}
-
-	public static Tile TileFactory(int type)
-	{
-		return TileFactory(MapGridConstants.CHAR_TILES[type]);
-	}
-}
-
-class GrassTile extends Tile
-{
-	public GrassTile(char tileChar)
-	{
-		super(tileChar);
-		tileInt = MapGridConstants.GRASS_TILE;
-	}
-}
-
-class WaterTile extends Tile
-{
-	public WaterTile(char tileChar)
-	{
-		super(tileChar);
-		tileInt = MapGridConstants.WATER_TILE;
-		replaceable = false;
-	}
-}
-
-class DirtTile extends Tile
-{
-	public DirtTile(char tileChar)
-	{
-		super(tileChar);
-		tileInt = MapGridConstants.DIRT_TILE;
-	}
-}
-
-class BeachTile extends Tile
-{
-	public BeachTile(char tileChar)
-	{
-		super(tileChar);
-		tileInt = MapGridConstants.BEACH_TILE;
-	}
-}
-
-class ForrestTile extends Tile
-{
-	public ForrestTile(char tileChar)
-	{
-		super(tileChar);
-		tileInt = MapGridConstants.FORREST_TILE;
-	}
-}

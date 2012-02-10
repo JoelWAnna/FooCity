@@ -61,19 +61,27 @@ public class FooCityGUI
 	private final Action Tile = new Place_Tile_Action();
 	private int newTile;
 	
-	protected JButton buttonResidential, buttonCommercial, buttonIndustrial,
+	private JButton buttonResidential, buttonCommercial, buttonIndustrial,
 	buttonPark, buttonSewage, buttonPolice, buttonSolar,
-	buttonGas, buttonCoal, buttonWindFarm;
+	buttonGas, buttonCoal, buttonWindFarm, buttonDirt, buttonForrest, buttonGrass;
+	//buttonWater, buttonBeach;
 	
-	private final String waterTile   = "Water Tile";
-	private final String beachTile   = "Beach Tile";
-	private final String grassTile   = "Grass Tile";
-	private final String dirtTile	 = "Dirt Tile";
-	private final String forrestTile = "Forrest Tile";
+	private final String waterTile   		= "Water Tile";
+	private final String beachTile  		= "Beach Tile";
+	private final String grassTile  		= "Grass Tile";
+	private final String dirtTile	 		= "Dirt Tile";
+	private final String forrestTile 		= "Forrest Tile";
 	private final String residentialTile	= "Residential Tile";
 	private final String commercialTile 	= "Commercial Tile";
 	private final String industrialTile		= "Industrial Tile";
-	
+	private final String parkTile			= "Park Tile";
+	private final String sewageTile 		= "Sewage Tile";
+	private final String policeTile			= "Police Tile";
+	private final String solarTile			= "Solar Tile";
+	private final String gasTile			= "Gas Tile";
+	private final String coalTile			= "Coal Tile";
+	private final String windTile			= "Wind Tile";
+
 	/**
 	 * Launch the application.
 	 */
@@ -190,18 +198,77 @@ public class FooCityGUI
 		buttonResidential = new JButton("R");
 		buttonResidential.addActionListener(Tile);
 		buttonResidential.setActionCommand(residentialTile);
+		buttonGridPanel.add(buttonResidential);
 		
 		buttonCommercial = new JButton("C");
 		buttonCommercial.addActionListener(Tile);
 		buttonCommercial.setActionCommand(commercialTile);
+		buttonGridPanel.add(buttonCommercial);
 		
 		buttonIndustrial = new JButton("I");
 		buttonIndustrial.addActionListener(Tile);
 		buttonIndustrial.setActionCommand(industrialTile);
-		
-		buttonGridPanel.add(buttonResidential);
-		buttonGridPanel.add(buttonCommercial);
 		buttonGridPanel.add(buttonIndustrial);
+		
+		buttonPark = new JButton("Park");
+		buttonPark.addActionListener(Tile);
+		buttonPark.setActionCommand(parkTile);
+		buttonGridPanel.add(buttonPark);
+		
+		buttonSewage = new JButton("Sewage");
+		buttonSewage.addActionListener(Tile);
+		buttonSewage.setActionCommand(sewageTile);
+		buttonGridPanel.add(buttonSewage);
+		
+		buttonPolice = new JButton("Police");
+		buttonPolice.addActionListener(Tile);
+		buttonPolice.setActionCommand(policeTile);
+		buttonGridPanel.add(buttonPolice);
+		
+		buttonSolar = new JButton("Solar");
+		buttonSolar.addActionListener(Tile);
+		buttonSolar.setActionCommand(solarTile);
+		buttonGridPanel.add(buttonSolar);
+		
+		buttonGas = new JButton("Gas");
+		buttonGas.addActionListener(Tile);
+		buttonGas.setActionCommand(gasTile);
+		buttonGridPanel.add(buttonGas);
+		
+		buttonCoal = new JButton("Coal");
+		buttonCoal.addActionListener(Tile);
+		buttonCoal.setActionCommand(coalTile);
+		buttonGridPanel.add(buttonCoal);
+		
+		buttonWindFarm = new JButton("Wind");
+		buttonWindFarm.addActionListener(Tile);
+		buttonWindFarm.setActionCommand(windTile);
+		buttonGridPanel.add(buttonWindFarm);
+		
+		buttonDirt = new JButton("Dirt");
+		buttonDirt.addActionListener(Tile);
+		buttonDirt.setActionCommand(dirtTile);
+		buttonGridPanel.add(buttonDirt);
+		
+		/*buttonWater = new JButton("Water");
+		buttonWater.addActionListener(Tile);
+		buttonWater.setActionCommand(waterTile);
+		buttonGridPanel.add(buttonWater);*/
+		
+		buttonGrass = new JButton("Grass");
+		buttonGrass.addActionListener(Tile);
+		buttonGrass.setActionCommand(grassTile);
+		buttonGridPanel.add(buttonGrass);
+		
+		buttonForrest = new JButton("Forrest");
+		buttonForrest.addActionListener(Tile);
+		buttonForrest.setActionCommand(forrestTile);
+		buttonGridPanel.add(buttonForrest);
+		
+		/*buttonBeach = new JButton("Beach");
+		buttonBeach.addActionListener(Tile);
+		buttonBeach.setActionCommand(beachTile);
+		buttonGridPanel.add(buttonBeach);*/
 		
 		toolPanel.add(buttonGridPanel, BorderLayout.PAGE_START);
 		toolPanel.add(minimap_panel, BorderLayout.PAGE_END);
@@ -262,6 +329,12 @@ public class FooCityGUI
 	
 	public Rectangle getViewRect(){
 		return (Rectangle) scrollPane.getViewport().getVisibleRect().clone();
+	}
+	
+	public void setView(Point center){
+		Rectangle rect = getViewRect();
+		scrollPane.getHorizontalScrollBar().setValue(center.x * FooCityGUIConstants.TILE_HEIGHT - (rect.width / 2));
+		scrollPane.getVerticalScrollBar().setValue(center.y * FooCityGUIConstants.TILE_WIDTH - (rect.height / 2));		
 	}
 	
 	public Point getViewPoint(){
