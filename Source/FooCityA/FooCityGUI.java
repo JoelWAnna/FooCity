@@ -62,7 +62,7 @@ public class FooCityGUI
 	private int newTile;
 	
 	private JButton buttonResidential, buttonCommercial, buttonIndustrial,
-	buttonPark, buttonSewage, buttonPolice, buttonSolar,
+	buttonPark, buttonSewage, buttonPolice, buttonSolar, buttonRoad, 
 	buttonGas, buttonCoal, buttonWindFarm, buttonDirt, buttonForrest, buttonGrass;
 	//buttonWater, buttonBeach;
 	
@@ -81,6 +81,7 @@ public class FooCityGUI
 	private final String gasTile			= "Gas Tile";
 	private final String coalTile			= "Coal Tile";
 	private final String windTile			= "Wind Tile";
+	private final String roadTile			= "Road Tile";
 
 	/**
 	 * Launch the application.
@@ -209,6 +210,11 @@ public class FooCityGUI
 		buttonIndustrial.addActionListener(Tile);
 		buttonIndustrial.setActionCommand(industrialTile);
 		buttonGridPanel.add(buttonIndustrial);
+		
+		buttonRoad = new JButton("Road");
+		buttonRoad.addActionListener(Tile);
+		buttonRoad.setActionCommand(roadTile);
+		buttonGridPanel.add(buttonRoad);
 		
 		buttonPark = new JButton("Park");
 		buttonPark.addActionListener(Tile);

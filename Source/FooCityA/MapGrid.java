@@ -28,7 +28,8 @@ class MapGridConstants
 	public static final int COAL_TILE = 13;
 	public static final int WIND_TILE = 14;
 	public static final int RESIDENTIAL_TILE = 15;
-	public static final int LAST_TILE = 16;
+	public static final int ROAD_TILE = 16;
+	public static final int LAST_TILE = 17;
 	public static final char CHAR_TILES[] = {' ', 'W', 'B', 'G', 'D', 'T'};
 }
 /**

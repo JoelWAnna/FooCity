@@ -63,6 +63,7 @@ class TileLoader
     	tileNames[MapGridConstants.COAL_TILE] = "";
     	tileNames[MapGridConstants.WIND_TILE] = "";
     	tileNames[MapGridConstants.RESIDENTIAL_TILE] = "";
+    	tileNames[MapGridConstants.ROAD_TILE] = "";
     }
 
 }
