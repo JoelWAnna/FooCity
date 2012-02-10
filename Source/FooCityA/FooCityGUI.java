@@ -49,12 +49,11 @@ class FooCityGUIConstants
 public class FooCityGUI
 {
 
-	private MiniMapPanel minimap;
+	private MiniMapPanel minimap_panel;
 	private JFrame frame;
 	private JPanel toolPanel;
 	private JScrollPane scrollPane;
-	private FooPanel rendering_panel;
-	//private MapGrid m;
+	private FooPanel map_panel;
 	private FooCityManager city_manager;
 	public static FooCityGUI window;
 	private JMenuBar menuBar;
@@ -110,7 +109,7 @@ public class FooCityGUI
 	 */
 	private void initialize()
 	{
-		newTile = 0;
+		//newTile = 0;
 		frame = new JFrame();
 		frame.setVisible(true);
 		AddResizeListener();
@@ -120,55 +119,42 @@ public class FooCityGUI
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 
-		rendering_panel = new FooPanel(Color.white);
-		rendering_panel.addMouseListener(new MouseAdapter()
+		map_panel = new FooPanel(Color.white);
+		map_panel.addMouseListener(new MouseAdapter()
 			{
 				@Override
 				public void mousePressed(MouseEvent e)
 				{
-					if (newTile == 0)
+					if (city_manager.GetPlacingTile() == 0)
 						return;
 					Point p = e.getPoint();
 					int x = p.x / FooCityGUIConstants.TILE_WIDTH;
 					int y = p.y / FooCityGUIConstants.TILE_HEIGHT;
 					//System.out.print(p + " " + x + " " + y);
-					MapGrid city_map = city_manager.GetMapGrid();
-					if (city_map != null)
-						city_map.setTile(x,y, newTile);
-					rendering_panel.repaint();
-					minimap.repaint();
-					rendering_panel.PlacingTile = false;
-					
-					//newTile = 0;
+					if (city_manager.placeTile(x,y))
+					{
+						map_panel.repaint();
+						minimap_panel.repaint();
+					}
 				}
-			@Override
-			public void mouseExited(MouseEvent arg0)
-			{
-				rendering_panel.PlacingTile = false;
-				rendering_panel.repaint();
-			}
-			@Override
-			public void mouseEntered(MouseEvent e)
-			{
-				if (newTile == 0)
-					return;
-				rendering_panel.PlacingTile = true;
-				rendering_panel.repaint();
-			}
+
+				@Override
+				public void mouseExited(MouseEvent arg0)
+				{
+					map_panel.setMousePoint(null);
+					map_panel.repaint();
+				}
 			});
-		rendering_panel.addMouseMotionListener(new MouseMotionAdapter()
+		map_panel.addMouseMotionListener(new MouseMotionAdapter()
 			{
 				@Override
 				public void mouseMoved(MouseEvent arg0)
 				{
-					if (newTile == 0)
-						return;
-					rendering_panel.setMousePoint(arg0.getPoint(), newTile);
-					
+					map_panel.setMousePoint(arg0.getPoint());
 				}
 			});
 
-		scrollPane = new JScrollPane(rendering_panel);
+		scrollPane = new JScrollPane(map_panel);
 
 		scrollPane.setAutoscrolls(true);
 		scrollPane.setWheelScrollingEnabled(true);
@@ -179,13 +165,13 @@ public class FooCityGUI
 		
 		scrollPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener(){
 			public void adjustmentValueChanged(AdjustmentEvent e){
-				minimap.repaint();
+				minimap_panel.repaint();
 			}
 		});
 		
 		scrollPane.getHorizontalScrollBar().addAdjustmentListener(new AdjustmentListener(){
 			public void adjustmentValueChanged(AdjustmentEvent e){
-				minimap.repaint();
+				minimap_panel.repaint();
 			}
 		});
 		
@@ -198,8 +184,8 @@ public class FooCityGUI
 		JPanel buttonGridPanel = new JPanel();
 		buttonGridPanel.setLayout(buttonGridLayout);
 		toolPanel.setBounds(0, 0, FooCityGUIConstants.SIDEBAR_WIDTH, FooCityGUIConstants.WINDOW_HEIGHT - 38);
-		minimap = new MiniMapPanel(Color.BLUE);
-		minimap.repaint();
+		minimap_panel = new MiniMapPanel(Color.BLUE);
+		minimap_panel.repaint();
 		
 		buttonResidential = new JButton("R");
 		buttonResidential.addActionListener(Tile);
@@ -218,7 +204,7 @@ public class FooCityGUI
 		buttonGridPanel.add(buttonIndustrial);
 		
 		toolPanel.add(buttonGridPanel, BorderLayout.PAGE_START);
-		toolPanel.add(minimap, BorderLayout.PAGE_END);
+		toolPanel.add(minimap_panel, BorderLayout.PAGE_END);
 		
 		frame.getContentPane().add(toolPanel);
 		frame.getContentPane().add(scrollPane);
@@ -264,9 +250,14 @@ public class FooCityGUI
 	public MapGrid getMap() {
 		return city_manager.GetMapGrid();
 	}
+	
+	public FooCityManager getCityManager()
+	{
+		return city_manager;
+	}
 
 	public void updateMiniMap(){
-		minimap.repaint();
+		minimap_panel.repaint();
 	}
 	
 	public Rectangle getViewRect(){
@@ -281,8 +272,8 @@ public class FooCityGUI
 	{
 		if (city_manager.SetMapGrid(new_map))
 		{
-			this.rendering_panel.repaint();
-			this.minimap.repaint();
+			this.map_panel.repaint();
+			this.minimap_panel.repaint();
 		}
 	}
 	private class NewGameAction extends AbstractAction
@@ -298,8 +289,8 @@ public class FooCityGUI
 			{
 				NewGame newgame = new NewGame();
 				scrollPane.repaint();
-				rendering_panel.repaint();
-				minimap.repaint();
+				map_panel.repaint();
+				minimap_panel.repaint();
 			}
 			else
 			{
@@ -323,27 +314,27 @@ public class FooCityGUI
 			String command = e.getActionCommand();
 			if (command == waterTile)
 			{
-				newTile = MapGridConstants.WATER_TILE;
+				city_manager.setPlacingTile(MapGridConstants.WATER_TILE);
 				return;
 			}
 			if (command == beachTile)
 			{
-				newTile = MapGridConstants.BEACH_TILE;
+				city_manager.setPlacingTile(MapGridConstants.BEACH_TILE);
 				return;
 			}
 			if (command == grassTile)
 			{
-				newTile = MapGridConstants.GRASS_TILE;
+				city_manager.setPlacingTile(MapGridConstants.GRASS_TILE);
 				return;
 			}
 			if (command == dirtTile)
 			{
-				newTile = MapGridConstants.DIRT_TILE;
+				city_manager.setPlacingTile(MapGridConstants.DIRT_TILE);
 				return;
 			}
 			if (command == forrestTile)
 			{
-				newTile = MapGridConstants.FORREST_TILE;
+				city_manager.setPlacingTile(MapGridConstants.FORREST_TILE);
 				return;
 			}
 		}

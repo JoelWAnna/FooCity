@@ -40,7 +40,7 @@ class TileLoader
 
 	public BufferedImage GetTitle(int i)
 	{
-		if (i < 0 || i > tiles.length)
+		if (!m_valid && (i < 0 || i > tiles.length))
 			return null;
 		return tiles[i];
 	}
@@ -65,28 +65,4 @@ class TileLoader
     	tileNames[MapGridConstants.RESIDENTIAL_TILE] = "";
     }
 
-/*	public BufferedImage GetTitle(char c)
-	{
-		if (m_valid)
-		{
-			switch (c)
-			{
-			case 'G':
-				return tiles[MapGridConstants.GRASS_TILE];
-			case 'W':
-				return tiles[MapGridConstants.WATER_TILE];
-			case 'D':
-				return tiles[MapGridConstants.DIRT_TILE];
-			case 'B':
-				return tiles[MapGridConstants.BEACH_TILE];
-			case 'T':
-				return tiles[MapGridConstants.FORREST_TILE];
-			default:
-				System.out.print(c + " ");
-				break;
-			}
-		}
-		return null;
-	}
-*/
 }

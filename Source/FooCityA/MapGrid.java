@@ -62,9 +62,20 @@ public class MapGrid
 		out.print(this.toString());
 	}
 
-	public int GetTileAt(int x,int y)
+	public int GetTileAt(int x,int y) 
 	{
-		return this.tileGrid[x + y*MapGridConstants.MAP_HEIGHT].GetTileInt();
+		if (tileGrid != null &&
+		   (x >= 0 && y >= 0) &&
+		   (x < MapGridConstants.MAP_WIDTH) &&
+		   (y < MapGridConstants.MAP_HEIGHT))
+		{
+			Tile current_tile = tileGrid[x + y*MapGridConstants.MAP_HEIGHT];
+			if (current_tile != null)
+			{
+				return current_tile.GetTileInt();
+			}
+		}
+		return 0;
 	}
 
 	@Override
@@ -128,16 +139,19 @@ public class MapGrid
 		return true;
 	}
 
-	public void setTile(int x, int y, char c) 
+	public boolean setTile(int x, int y, int i) 
 	{
-		this.tileGrid[y*MapGridConstants.MAP_HEIGHT + x] = Tile.TileFactory(c);
-		
-	}
+		if (i >= MapGridConstants.WATER_TILE || i < MapGridConstants.LAST_TILE)
+		{
+			Tile oldTile = this.tileGrid[y*MapGridConstants.MAP_HEIGHT + x];
+			if (oldTile.isReplaceable())
+			{
+				this.tileGrid[y*MapGridConstants.MAP_HEIGHT + x] = Tile.TileFactory(i);//, oldTile.GetTileInt());
+				return true;
+			}
+		}
 
-	public void setTile(int x, int y, int i) 
-	{
-		this.tileGrid[y*MapGridConstants.MAP_HEIGHT + x] = Tile.TileFactory(i);
-		
+		return false;
 	}
 
 }
@@ -146,15 +160,23 @@ abstract class Tile
 {
 	private char tileChar;
 	protected int tileInt;
+	protected boolean replaceable;
 	protected Tile(char tileChar)
 	{
 		this.tileChar = tileChar;
+		replaceable = true;
 	}
-	
+
+	public boolean isReplaceable()
+	{
+		return replaceable;
+	}
+
 	public char GetTileChar()
 	{
 		return tileChar;
 	}
+	
 	public int GetTileInt()
 	{
 		return tileInt;
@@ -200,6 +222,7 @@ class WaterTile extends Tile
 	{
 		super(tileChar);
 		tileInt = MapGridConstants.WATER_TILE;
+		replaceable = false;
 	}
 }
 

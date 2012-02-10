@@ -6,7 +6,7 @@
 public class FooCityManager
 {
 	private MapGrid current_map;
-	
+	private int tile_to_place;
 	public static void main(String[] args)
 	{
 	}
@@ -14,6 +14,7 @@ public class FooCityManager
 	public FooCityManager()
 	{
 		current_map = null;
+		tile_to_place = 0;
 	}
 	
 	public FooCityManager(MapGrid new_map)
@@ -49,5 +50,32 @@ public class FooCityManager
 	public void Quit()
 	{
 		current_map = null;
+	}
+
+	public boolean setPlacingTile(int i)
+	{
+		if (i >= MapGridConstants.WATER_TILE || i < MapGridConstants.LAST_TILE)
+		{
+			this.tile_to_place = i;
+			return true;
+		}
+		tile_to_place = 0;
+		return false;
+	}
+	
+	public int GetPlacingTile()
+	{
+		return tile_to_place;
+	}
+
+	public boolean placeTile(int x, int y)
+	{
+		if (current_map != null && tile_to_place > 0)
+		{
+			// CheckFundsAvailable
+			return current_map.setTile(x, y, tile_to_place);
+			
+		}
+		return false;
 	}
 }

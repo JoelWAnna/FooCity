@@ -20,14 +20,12 @@ class FooPanel extends JPanel
 
 	private TileLoader tiles;
 	private Point cursor;
-	public boolean PlacingTile;
-	private int mouseTile;
     public FooPanel(Color faceColor)
     {
     	super();
     	setForeground(faceColor);
-        PlacingTile = false;
         tiles = new TileLoader();
+        cursor = null;
     }
 	
 
@@ -43,9 +41,13 @@ class FooPanel extends JPanel
     {
     	super.paint(g1);
     	Graphics2D g = (Graphics2D) g1;
+    	FooCityManager city_manager = null;
     	MapGrid current_map = null;
     	if (FooCityGUI.window != null)
-    		current_map = FooCityGUI.window.getMap();
+    		city_manager = FooCityGUI.window.getCityManager();
+    	if (city_manager == null)
+    		return;
+    	current_map = city_manager.GetMapGrid();
     	if (current_map == null)
     		return;
     	Rectangle r = this.getVisibleRect();
@@ -74,9 +76,10 @@ class FooPanel extends JPanel
     		g.drawLine(r.x, yCoord, r.x + r.width, yCoord);
         }
     	
-    	if (PlacingTile)
+    	int mouse_tile = city_manager.GetPlacingTile();
+    	if (cursor != null && mouse_tile > 0)
     	{
-    		BufferedImage mImage = tiles.GetTitle(mouseTile);
+    		BufferedImage mImage = tiles.GetTitle(mouse_tile);
     		if (mImage != null)
     		{
     			final float [] scales = {1f, 1f, 1f, 0.5f};
@@ -89,13 +92,10 @@ class FooPanel extends JPanel
     }
 
 
-	public void setMousePoint(Point point, int newTile)
+	public void setMousePoint(Point point)
 	{
-		PlacingTile = true;
 		this.cursor = point;
-		this.mouseTile = newTile;
 		repaint();
-		
 	}
 
 }
@@ -178,7 +178,7 @@ class MiniMapPanel extends JPanel
     	// Draw the frame around our current view
     	Rectangle r = FooCityGUI.window.getViewRect();
     	Point p = FooCityGUI.window.getViewPoint();
-    	System.out.print("visiblerect = " + r +"\n"); 
+    	//System.out.print("visiblerect = " + r +"\n"); 
     	r.x = 2 * p.x / FooCityGUIConstants.TILE_WIDTH;
     	r.y = 2 * p.y / FooCityGUIConstants.TILE_HEIGHT;
     	r.width = 2 * r.width / FooCityGUIConstants.TILE_WIDTH;
