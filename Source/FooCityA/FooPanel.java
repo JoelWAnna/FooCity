@@ -78,7 +78,7 @@ class FooPanel extends JPanel
     		g.drawLine(r.x, yCoord, r.x + r.width, yCoord);
         }
     	
-    	int mouse_tile = city_manager.GetPlacingTile();
+    	int mouse_tile = city_manager.getPlacingTile();
     	if (cursor != null && mouse_tile > 0)
     	{
     		BufferedImage mImage = tiles.GetTitle(mouse_tile);
@@ -205,6 +205,10 @@ class MiniMapPanel extends JPanel
     				System.err.print("Unknown tile drawn on minimap\n");
 					break;
     			}
+    			/*
+    			int c = current_map.getTile(x, y).crimeActual * 10 ;
+    			if (c > 255) c = 255;
+    			g1.setColor(new Color(c,c,c));*/
     			g1.fillRect(x * 2, y * 2, 2, 2);
     		}
     	}

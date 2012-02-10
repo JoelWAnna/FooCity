@@ -30,7 +30,7 @@ class MapGridConstants
 	public static final int RESIDENTIAL_TILE = 15;
 	public static final int ROAD_TILE = 16;
 	public static final int LAST_TILE = 17;
-	public static final char CHAR_TILES[] = {' ', 'W', 'B', 'G', 'D', 'T'};
+	public static final char CHAR_TILES[] = {' ', 'W', 'B', 'G', 'D', 'T', 'I'};
 }
 /**
  * 
@@ -42,20 +42,15 @@ class MapGridConstants
  */
 public class MapGrid
 {
-	private Tile[] tileGrid;
+	private Tile[][] tileGrid;
 	public static PrintStream out = new PrintStream(System.out);
 
-	public static void main(String[] args)
-	{
-		MapGrid m = new MapGrid();
-		m.Print();
-	}
 	private final static int AREA =  MapGridConstants.MAP_WIDTH * MapGridConstants.MAP_HEIGHT;
 
 	public MapGrid()
 	{
-		this.tileGrid = new Tile[MapGrid.AREA];
-		init();		
+		this.tileGrid = new Tile[MapGridConstants.MAP_WIDTH][MapGridConstants.MAP_HEIGHT];
+
 	}
 
 	public void Print()
@@ -70,13 +65,23 @@ public class MapGrid
 		   (x < MapGridConstants.MAP_WIDTH) &&
 		   (y < MapGridConstants.MAP_HEIGHT))
 		{
-			Tile current_tile = tileGrid[x + y*MapGridConstants.MAP_HEIGHT];
+			Tile current_tile = tileGrid[x][y];
 			if (current_tile != null)
 			{
 				return current_tile.getTileInt();
 			}
 		}
 		return 0;
+	}
+	
+	public Tile getTile(int x, int y){
+		if (tileGrid != null &&
+		   (x >= 0 && y >= 0) &&
+		   (x < MapGridConstants.MAP_WIDTH) &&
+		   (y < MapGridConstants.MAP_HEIGHT))
+				return tileGrid[x][y];
+		return null;
+	
 	}
 
 	@Override
@@ -86,18 +91,10 @@ public class MapGrid
 		for (int y =0; y < MapGridConstants.MAP_HEIGHT; ++y)
 		{
 			for (int x = 0; x < MapGridConstants.MAP_WIDTH; ++x)
-				s += tileGrid[y * MapGridConstants.MAP_HEIGHT + x].getTileChar();
+				s += tileGrid[x][y].getTileChar();
 			s += "\n";
 		}
 		return s;
-	}
-
-	private void init()
-	{
-		for (int i = 0; i < AREA; ++i)
-		{
-			this.tileGrid[i] = new Tile('W');
-		}
 	}
 
 	public boolean FromFile(String filename)
@@ -134,7 +131,7 @@ public class MapGrid
 
 			for (int x = 0; x <  MapGridConstants.MAP_WIDTH; ++x)
 			{
-				this.tileGrid[y *  MapGridConstants.MAP_HEIGHT + x] = new Tile(currentLine.charAt(x));
+				this.tileGrid[x][y] = new Tile(currentLine.charAt(x));
 			}
 		}
 		return true;
@@ -142,12 +139,12 @@ public class MapGrid
 
 	public boolean setTile(int x, int y, int i) 
 	{
-		if (i >= MapGridConstants.WATER_TILE || i < MapGridConstants.LAST_TILE)
+		if (i < MapGridConstants.LAST_TILE)
 		{
-			Tile oldTile = this.tileGrid[y*MapGridConstants.MAP_HEIGHT + x];
+			Tile oldTile = this.tileGrid[x][y];
 			if (oldTile.isReplaceable())
 			{
-				this.tileGrid[y*MapGridConstants.MAP_HEIGHT + x] = new Tile(i);//, oldTile.GetTileInt());
+				this.tileGrid[x][y] = new Tile(i);//, oldTile.GetTileInt());
 				return true;
 			}
 		}

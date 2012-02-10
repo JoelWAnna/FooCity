@@ -134,7 +134,7 @@ public class FooCityGUI
 				@Override
 				public void mousePressed(MouseEvent e)
 				{
-					if (city_manager.GetPlacingTile() == 0)
+					if (city_manager.getPlacingTile() == 0)
 						return;
 					Point p = e.getPoint();
 					int x = p.x / FooCityGUIConstants.TILE_WIDTH;
@@ -144,6 +144,7 @@ public class FooCityGUI
 					{
 						map_panel.repaint();
 						minimap_panel.repaint();
+						city_manager.propagateMetrics();
 					}
 				}
 
@@ -414,6 +415,11 @@ public class FooCityGUI
 			if (command == forrestTile)
 			{
 				city_manager.setPlacingTile(MapGridConstants.FORREST_TILE);
+				return;
+			}
+			if (command == industrialTile)
+			{
+				city_manager.setPlacingTile(MapGridConstants.INDUSTRIAL_TILE);
 				return;
 			}
 		}
