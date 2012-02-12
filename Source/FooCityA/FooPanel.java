@@ -11,6 +11,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
 
@@ -112,7 +113,6 @@ class MiniMapPanel extends JPanel
     	this.addMouseListener(new MouseListener(){
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				// TODO Auto-generated method stub
 			}
 
 			@Override
@@ -129,7 +129,6 @@ class MiniMapPanel extends JPanel
 
 			@Override
 			public void mousePressed(MouseEvent arg0) {
-				// TODO Auto-generated method stub
 				Point point = new Point(arg0.getX() / 2, arg0.getY() / 2);
 				FooCityGUI.window.setView(point);
 			}
@@ -139,6 +138,16 @@ class MiniMapPanel extends JPanel
 				// TODO Auto-generated method stub
 				
 			}
+    	});
+    	
+    	this.addMouseMotionListener(new MouseMotionAdapter()
+    	{
+    		@Override
+    		public void mouseDragged(MouseEvent arg0)
+    		{
+    			Point point = new Point(arg0.getX() / 2, arg0.getY() / 2);
+    			FooCityGUI.window.setView(point);
+    		}
     	});
     }
 
