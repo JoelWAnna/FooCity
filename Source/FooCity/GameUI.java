@@ -78,7 +78,8 @@ public class GameUI extends JFrame implements ActionListener, MouseListener, Key
 	class GameCanvas extends Canvas {
 		@Override
 		public void paint(Graphics g) {
-			g.drawLine(5, 5, getWidth() - 5, getHeight() - 5);
+			// Draw a line to show the size of the canvas
+			//g.drawLine(5, 5, getWidth() - 5, getHeight() - 5);
 			for (int x = 0; x < 128; x++){
 				for (int y = 0; y < 128; y++){
 					switch(city.getTile(x, y).getTileType()){

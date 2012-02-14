@@ -18,7 +18,9 @@ import javax.swing.JScrollPane;
 
 import java.awt.event.KeyEvent;
 
+import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -26,6 +28,7 @@ import javax.swing.AbstractAction;
 import java.awt.event.ActionEvent;
 import javax.swing.Action;
 
+import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.WindowStateListener;
@@ -199,62 +202,62 @@ public class FooCityGUI
 		
 		buttonResidential = new JButton("R");
 		buttonResidential.addActionListener(Tile);
-		buttonResidential.setActionCommand(residentialTile);
+		buttonResidential.setActionCommand(Integer.toString(MapGridConstants.RESIDENTIAL_TILE));
 		buttonGridPanel.add(buttonResidential);
 		
 		buttonCommercial = new JButton("C");
 		buttonCommercial.addActionListener(Tile);
-		buttonCommercial.setActionCommand(commercialTile);
+		buttonCommercial.setActionCommand(Integer.toString(MapGridConstants.COMMERCIAL_TILE));
 		buttonGridPanel.add(buttonCommercial);
 		
 		buttonIndustrial = new JButton("I");
 		buttonIndustrial.addActionListener(Tile);
-		buttonIndustrial.setActionCommand(industrialTile);
+		buttonIndustrial.setActionCommand(Integer.toString(MapGridConstants.INDUSTRIAL_TILE));
 		buttonGridPanel.add(buttonIndustrial);
 		
 		buttonRoad = new JButton("Road");
 		buttonRoad.addActionListener(Tile);
-		buttonRoad.setActionCommand(roadTile);
+		buttonRoad.setActionCommand(Integer.toString(MapGridConstants.ROAD_TILE));
 		buttonGridPanel.add(buttonRoad);
 		
 		buttonPark = new JButton("Park");
 		buttonPark.addActionListener(Tile);
-		buttonPark.setActionCommand(parkTile);
+		buttonPark.setActionCommand(Integer.toString(MapGridConstants.PARK_TILE));
 		buttonGridPanel.add(buttonPark);
 		
 		buttonSewage = new JButton("Sewage");
 		buttonSewage.addActionListener(Tile);
-		buttonSewage.setActionCommand(sewageTile);
+		buttonSewage.setActionCommand(Integer.toString(MapGridConstants.SEWAGE_TILE));
 		buttonGridPanel.add(buttonSewage);
 		
 		buttonPolice = new JButton("Police");
 		buttonPolice.addActionListener(Tile);
-		buttonPolice.setActionCommand(policeTile);
+		buttonPolice.setActionCommand(Integer.toString(MapGridConstants.POLICE_TILE));
 		buttonGridPanel.add(buttonPolice);
 		
 		buttonSolar = new JButton("Solar");
 		buttonSolar.addActionListener(Tile);
-		buttonSolar.setActionCommand(solarTile);
+		buttonSolar.setActionCommand(Integer.toString(MapGridConstants.SOLAR_TILE));
 		buttonGridPanel.add(buttonSolar);
 		
 		buttonGas = new JButton("Gas");
 		buttonGas.addActionListener(Tile);
-		buttonGas.setActionCommand(gasTile);
+		buttonGas.setActionCommand(Integer.toString(MapGridConstants.GAS_TILE));
 		buttonGridPanel.add(buttonGas);
 		
 		buttonCoal = new JButton("Coal");
 		buttonCoal.addActionListener(Tile);
-		buttonCoal.setActionCommand(coalTile);
+		buttonCoal.setActionCommand(Integer.toString(MapGridConstants.COAL_TILE));
 		buttonGridPanel.add(buttonCoal);
 		
 		buttonWindFarm = new JButton("Wind");
 		buttonWindFarm.addActionListener(Tile);
-		buttonWindFarm.setActionCommand(windTile);
+		buttonWindFarm.setActionCommand(Integer.toString(MapGridConstants.WIND_TILE));
 		buttonGridPanel.add(buttonWindFarm);
 		
 		buttonDirt = new JButton("Dirt");
 		buttonDirt.addActionListener(Tile);
-		buttonDirt.setActionCommand(dirtTile);
+		buttonDirt.setActionCommand(Integer.toString(MapGridConstants.DIRT_TILE));
 		buttonGridPanel.add(buttonDirt);
 		
 		/*buttonWater = new JButton("Water");
@@ -264,12 +267,12 @@ public class FooCityGUI
 		
 		buttonGrass = new JButton("Grass");
 		buttonGrass.addActionListener(Tile);
-		buttonGrass.setActionCommand(grassTile);
+		buttonGrass.setActionCommand(Integer.toString(MapGridConstants.GRASS_TILE));
 		buttonGridPanel.add(buttonGrass);
 		
 		buttonForrest = new JButton("Forrest");
 		buttonForrest.addActionListener(Tile);
-		buttonForrest.setActionCommand(forrestTile);
+		buttonForrest.setActionCommand(Integer.toString(MapGridConstants.FORREST_TILE));
 		buttonGridPanel.add(buttonForrest);
 		
 		/*buttonBeach = new JButton("Beach");
@@ -277,8 +280,26 @@ public class FooCityGUI
 		buttonBeach.setActionCommand(beachTile);
 		buttonGridPanel.add(buttonBeach);*/
 		
+		//JPanel miniMapGroup = new JPanel();
+		Box miniMapGroupBox = Box.createVerticalBox();
+		String[] viewModes = { "Normal", "Pollution", "Crime", "Happiness" };
+		JComboBox miniMapViewList = new JComboBox(viewModes);
+		miniMapViewList.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JComboBox cb = (JComboBox)e.getSource();
+				minimap_panel.setViewMode(cb.getSelectedIndex());				
+			}
+			
+		});
+		miniMapViewList.setSelectedIndex(0);
+		
+		miniMapGroupBox.add(miniMapViewList);
+		miniMapGroupBox.add(minimap_panel);
+		
 		toolPanel.add(buttonGridPanel, BorderLayout.PAGE_START);
-		toolPanel.add(minimap_panel, BorderLayout.PAGE_END);
+		toolPanel.add(miniMapGroupBox, BorderLayout.PAGE_END);
 		
 		frame.getContentPane().add(toolPanel);
 		frame.getContentPane().add(scrollPane);
@@ -381,6 +402,16 @@ public class FooCityGUI
 			}
 		}
 	}
+	
+	private class miniMapListActionListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	}
 
 	private class Place_Tile_Action extends AbstractAction
 	{
@@ -392,36 +423,8 @@ public class FooCityGUI
 		public void actionPerformed(ActionEvent e)
 		{
 			String command = e.getActionCommand();
-			if (command == waterTile)
-			{
-				city_manager.setPlacingTile(MapGridConstants.WATER_TILE);
-				return;
-			}
-			if (command == beachTile)
-			{
-				city_manager.setPlacingTile(MapGridConstants.BEACH_TILE);
-				return;
-			}
-			if (command == grassTile)
-			{
-				city_manager.setPlacingTile(MapGridConstants.GRASS_TILE);
-				return;
-			}
-			if (command == dirtTile)
-			{
-				city_manager.setPlacingTile(MapGridConstants.DIRT_TILE);
-				return;
-			}
-			if (command == forrestTile)
-			{
-				city_manager.setPlacingTile(MapGridConstants.FORREST_TILE);
-				return;
-			}
-			if (command == industrialTile)
-			{
-				city_manager.setPlacingTile(MapGridConstants.INDUSTRIAL_TILE);
-				return;
-			}
+			city_manager.setPlacingTile(Integer.parseInt(command));
+			return;
 		}
 	}
 	private class keyDispatcher implements KeyEventDispatcher {

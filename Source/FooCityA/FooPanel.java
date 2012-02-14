@@ -20,7 +20,7 @@ import javax.swing.JPanel;
 
 class FooPanel extends JPanel
 {
-
+	
 	private TileLoader tiles;
 	private Point cursor;
     public FooPanel(Color faceColor)
@@ -30,7 +30,7 @@ class FooPanel extends JPanel
         tiles = new TileLoader();
         cursor = null;
     }
-	
+    
 
     public Dimension getPreferredSize()
     {
@@ -106,6 +106,7 @@ class FooPanel extends JPanel
 
 class MiniMapPanel extends JPanel
 {
+	private int viewMode;
     public MiniMapPanel(Color faceColor)
     {
     	super();
@@ -150,6 +151,12 @@ class MiniMapPanel extends JPanel
     		}
     	});
     }
+    
+    public void setViewMode(int newMode){
+    	this.viewMode = newMode;
+    	this.repaint();
+    }
+	
 
     @Override
     public void paint(Graphics g1)
@@ -159,68 +166,96 @@ class MiniMapPanel extends JPanel
     		current_map = FooCityGUI.window.getMap();
     	if (current_map == null)
     		return;
-    	for (int y = 0; y < MapGridConstants.MAP_HEIGHT; y++){
-    		for (int x = 0; x < MapGridConstants.MAP_WIDTH; x++)
-    		{
-    			switch(current_map.getTileAt(x, y))
-    			{
-    			case (MapGridConstants.BEACH_TILE):
-					g1.setColor(new Color(255,225,0));  //A yellowish sandy color
-					break;
-    			case (MapGridConstants.WATER_TILE):
-					g1.setColor(new Color(0,0,180));  // A deep ocean blue
-					break;
-    			case (MapGridConstants.GRASS_TILE):
-    				g1.setColor(new Color(0,180,0));  // A somewhat dark green
-					break;
-    			case (MapGridConstants.COAL_TILE):   
-    				g1.setColor(new Color (50, 50, 50)); // Very dark grey
-					break;
-    			case (MapGridConstants.COMMERCIAL_TILE):
-    				g1.setColor(new Color (0,0,255));   // Vivid blue
-					break;
-    			case (MapGridConstants.DIRT_TILE):
-    				g1.setColor(new Color (140,110,0));  //Brown
-					break;
-    			case (MapGridConstants.FORREST_TILE):
-    				g1.setColor(new Color (0, 75, 0));  // Deep forest green
-					break;
-    			case (MapGridConstants.INDUSTRIAL_TILE):  // Dirty yellow
-    				g1.setColor(new Color (225, 225, 0));
-					break;
-    			case (MapGridConstants.GAS_TILE):
-    				g1.setColor(new Color (96, 112, 204)); // Pale blue 
-					break;
-    			case (MapGridConstants.PARK_TILE):
-    				g1.setColor(new Color (100, 255, 100));		// Pale green 
-					break;
-    			case (MapGridConstants.POLICE_TILE):
-    				g1.setColor(new Color (0,0,200));		//Deep blue
-					break;
-    			case (MapGridConstants.RESIDENTIAL_TILE):
-    				g1.setColor(new Color (0,255, 0));   // Bright green
-					break;
-    			case (MapGridConstants.SEWAGE_TILE):
-    				g1.setColor(new Color (110, 72, 20));   //Dark murkey brown
-					break;
-    			case (MapGridConstants.SOLAR_TILE):
-    				g1.setColor(new Color (255, 244, 128));	// Bright yellow
-					break;
-    			case (MapGridConstants.WIND_TILE):
-    				g1.setColor(new Color (0, 200, 255));	// Sky blue
-					break;
-    			default:
-    				g1.setColor(Color.green);
-    				System.err.print("Unknown tile drawn on minimap\n");
-					break;
-    			}
-    			/*
-    			int c = current_map.getTile(x, y).crimeActual * 10 ;
-    			if (c > 255) c = 255;
-    			g1.setColor(new Color(c,c,c));*/
-    			g1.fillRect(x * 2, y * 2, 2, 2);
-    		}
-    	}
+    	if (viewMode == 0){ //Normal view
+	    	for (int y = 0; y < MapGridConstants.MAP_HEIGHT; y++){
+	    		for (int x = 0; x < MapGridConstants.MAP_WIDTH; x++)
+	    		{
+	    			switch(current_map.getTileAt(x, y))
+	    			{
+	    			case (MapGridConstants.BEACH_TILE):
+						g1.setColor(new Color(255,225,0));  //A yellowish sandy color
+						break;
+	    			case (MapGridConstants.WATER_TILE):
+						g1.setColor(new Color(0,0,180));  // A deep ocean blue
+						break;
+	    			case (MapGridConstants.GRASS_TILE):
+	    				g1.setColor(new Color(0,180,0));  // A somewhat dark green
+						break;
+	    			case (MapGridConstants.COAL_TILE):   
+	    				g1.setColor(new Color (50, 50, 50)); // Very dark grey
+						break;
+	    			case (MapGridConstants.COMMERCIAL_TILE):
+	    				g1.setColor(new Color (0,0,255));   // Vivid blue
+						break;
+	    			case (MapGridConstants.DIRT_TILE):
+	    				g1.setColor(new Color (140,110,0));  //Brown
+						break;
+	    			case (MapGridConstants.FORREST_TILE):
+	    				g1.setColor(new Color (0, 75, 0));  // Deep forest green
+						break;
+	    			case (MapGridConstants.INDUSTRIAL_TILE):  // Dirty yellow
+	    				g1.setColor(new Color (225, 225, 0));
+						break;
+	    			case (MapGridConstants.GAS_TILE):
+	    				g1.setColor(new Color (96, 112, 204)); // Pale blue 
+						break;
+	    			case (MapGridConstants.PARK_TILE):
+	    				g1.setColor(new Color (100, 255, 100));		// Pale green 
+						break;
+	    			case (MapGridConstants.POLICE_TILE):
+	    				g1.setColor(new Color (0,0,200));		//Deep blue
+						break;
+	    			case (MapGridConstants.RESIDENTIAL_TILE):
+	    				g1.setColor(new Color (0,255, 0));   // Bright green
+						break;
+	    			case (MapGridConstants.SEWAGE_TILE):
+	    				g1.setColor(new Color (110, 72, 20));   //Dark murkey brown
+						break;
+	    			case (MapGridConstants.SOLAR_TILE):
+	    				g1.setColor(new Color (255, 244, 128));	// Bright yellow
+						break;
+	    			case (MapGridConstants.WIND_TILE):
+	    				g1.setColor(new Color (0, 200, 255));	// Sky blue
+						break;
+	    			default:
+	    				g1.setColor(Color.green);
+	    				System.err.print("Unknown tile drawn on minimap\n");
+						break;
+	    			}
+	    			g1.fillRect(x * 2, y * 2, 2, 2);
+	    		}
+	    	}
+	    } else if (viewMode == 1) { // Pollution
+	    	for (int y = 0; y < MapGridConstants.MAP_HEIGHT; y++){
+	    		for (int x = 0; x < MapGridConstants.MAP_WIDTH; x++){
+	    			int c = current_map.getTile(x, y).pollutionActual * 10 ;
+	    			if (c > 255) c = 255;
+	    			if (c < 0) c = 0;
+	    			g1.setColor(new Color(c,c,c));
+	    			g1.fillRect(x * 2, y * 2, 2, 2);
+	    		}
+	    	}
+	    } else if (viewMode == 2) { // Crime
+	    	for (int y = 0; y < MapGridConstants.MAP_HEIGHT; y++){
+	    		for (int x = 0; x < MapGridConstants.MAP_WIDTH; x++) {
+	    			int c = current_map.getTile(x, y).crimeActual * 10 ;
+	    			if (c > 255) c = 255;
+	    			if (c < 0) c = 0;
+	    			g1.setColor(new Color(c,c,c));
+	    			g1.fillRect(x * 2, y * 2, 2, 2);
+	    		}
+	    	}
+	    } else if (viewMode == 3) { // Happiness
+	    	for (int y = 0; y < MapGridConstants.MAP_HEIGHT; y++){
+	    		for (int x = 0; x < MapGridConstants.MAP_WIDTH; x++) {
+	    			int c = current_map.getTile(x, y).happinessActual;
+	    			if (c > 255) c = 255;
+	    			if (c < 0) c = 0;
+	    			g1.setColor(new Color(c,c,c));
+	    			g1.fillRect(x * 2, y * 2, 2, 2);
+	    		}
+	    	}
+		}
     	// Draw the frame around our current view
     	Rectangle r = FooCityGUI.window.getViewRect();
     	Point p = FooCityGUI.window.getViewPoint();
