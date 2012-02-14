@@ -6,9 +6,6 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 
 import javax.swing.*;
 
@@ -65,7 +62,7 @@ public class NewGame extends JPanel implements ActionListener {
 	
 	@Override
 	public void paintComponent(Graphics g){
-		
+		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D)g;
 		
 		// Only draw something if we've loaded a map

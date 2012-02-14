@@ -5,40 +5,38 @@
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Rectangle;
-
-import javax.swing.JFrame;
-
-import javax.swing.JScrollPane;
-
-import java.awt.event.KeyEvent;
-
 import javax.swing.Box;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.AbstractAction;
 import java.awt.event.ActionEvent;
-import javax.swing.Action;
-
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
-import java.awt.event.WindowStateListener;
-import java.awt.event.WindowEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 
 class FooCityGUIConstants
 {
@@ -49,20 +47,19 @@ class FooCityGUIConstants
 	public static final int SIDEBAR_WIDTH = 257;
 }
 
-public class FooCityGUI
+public class FooCityGUI implements FooCityGUIInterface
 {
 
 	private MiniMapPanel minimap_panel;
 	private JFrame frame;
 	private JPanel toolPanel;
-	private JScrollPane scrollPane;
-	private FooPanel map_panel;
+	private FooCityScrollPane scrollPane;
+	private CityViewport map_panel;
 	private FooCityManager city_manager;
 	public static FooCityGUI window;
 	private JMenuBar menuBar;
 	private final Action NewGame = new NewGameAction();
 	private final Action Tile = new Place_Tile_Action();
-	private int newTile;
 	
 	private JButton buttonResidential, buttonCommercial, buttonIndustrial,
 	buttonPark, buttonSewage, buttonPolice, buttonSolar, buttonRoad, 
@@ -116,12 +113,37 @@ public class FooCityGUI
 		initialize();
 	}
 
+	@Override
+	public void updateDisplayCenter(Point center)
+	{
+		Rectangle rect = getViewRect();
+		scrollPane.getHorizontalScrollBar().setValue(center.x * FooCityGUIConstants.TILE_HEIGHT - (rect.width / 2));
+		scrollPane.getVerticalScrollBar().setValue(center.y * FooCityGUIConstants.TILE_WIDTH - (rect.height / 2));		
+		updateDisplay();
+	}
+	
+	@Override
+	public void updateDisplay(Point NEpoint)
+	{
+
+		scrollPane.getViewport().setViewPosition(NEpoint);
+		updateDisplay();
+	}
+
+	@Override
+	public void updateDisplay()
+	{
+		map_panel.repaint();
+		minimap_panel.repaint();
+		//city_manager.propagateMetrics(); //This should not be called by the GUI
+	}
+
+
 	/**
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize()
 	{
-		//newTile = 0;
 		frame = new JFrame();
 		frame.setVisible(true);
 		AddResizeListener();
@@ -131,63 +153,8 @@ public class FooCityGUI
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 
-		map_panel = new FooPanel(Color.white);
-		map_panel.addMouseListener(new MouseAdapter()
-			{
-				@Override
-				public void mousePressed(MouseEvent e)
-				{
-					if (city_manager.getPlacingTile() == 0)
-						return;
-					Point p = e.getPoint();
-					int x = p.x / FooCityGUIConstants.TILE_WIDTH;
-					int y = p.y / FooCityGUIConstants.TILE_HEIGHT;
-					//System.out.print(p + " " + x + " " + y);
-					if (city_manager.placeTile(x,y))
-					{
-						map_panel.repaint();
-						minimap_panel.repaint();
-						city_manager.propagateMetrics();
-					}
-				}
-
-				@Override
-				public void mouseExited(MouseEvent arg0)
-				{
-					map_panel.setMousePoint(null);
-					map_panel.repaint();
-				}
-			});
-		map_panel.addMouseMotionListener(new MouseMotionAdapter()
-			{
-				@Override
-				public void mouseMoved(MouseEvent arg0)
-				{
-					map_panel.setMousePoint(arg0.getPoint());
-				}
-			});
-
-		scrollPane = new JScrollPane(map_panel);
-
-		scrollPane.setAutoscrolls(true);
-		scrollPane.setWheelScrollingEnabled(true);
-		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane.getVerticalScrollBar().setUnitIncrement(32);
-		scrollPane.getHorizontalScrollBar().setUnitIncrement(32);
-		
-		scrollPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener(){
-			public void adjustmentValueChanged(AdjustmentEvent e){
-				minimap_panel.repaint();
-			}
-		});
-		
-		scrollPane.getHorizontalScrollBar().addAdjustmentListener(new AdjustmentListener(){
-			public void adjustmentValueChanged(AdjustmentEvent e){
-				minimap_panel.repaint();
-			}
-		});
-		
+		map_panel = new CityViewport(this);
+		scrollPane = new FooCityScrollPane(map_panel, this);
 		
 		// toolPanel contains the entire left toolbar, including minimap.
 		toolPanel = new JPanel(new BorderLayout());
@@ -197,7 +164,7 @@ public class FooCityGUI
 		JPanel buttonGridPanel = new JPanel();
 		buttonGridPanel.setLayout(buttonGridLayout);
 		toolPanel.setBounds(0, 0, FooCityGUIConstants.SIDEBAR_WIDTH, FooCityGUIConstants.WINDOW_HEIGHT - 38);
-		minimap_panel = new MiniMapPanel(Color.BLUE);
+		minimap_panel = new MiniMapPanel(this);
 		minimap_panel.repaint();
 		
 		buttonResidential = new JButton("R");
@@ -342,29 +309,22 @@ public class FooCityGUI
 		AddKeyListeners();
 	}
 	
-	public MapGrid getMap() {
+/*	public MapGrid getMap() {
 		return city_manager.GetMapGrid();
 	}
-	
+	*/
+	@Override
 	public FooCityManager getCityManager()
 	{
 		return city_manager;
 	}
 
-	public void updateMiniMap(){
-		minimap_panel.repaint();
-	}
-	
+	@Override
 	public Rectangle getViewRect(){
 		return (Rectangle) scrollPane.getViewport().getVisibleRect().clone();
 	}
 	
-	public void setView(Point center){
-		Rectangle rect = getViewRect();
-		scrollPane.getHorizontalScrollBar().setValue(center.x * FooCityGUIConstants.TILE_HEIGHT - (rect.width / 2));
-		scrollPane.getVerticalScrollBar().setValue(center.y * FooCityGUIConstants.TILE_WIDTH - (rect.height / 2));		
-	}
-	
+	@Override
 	public Point getViewPoint(){
 		return (Point) scrollPane.getViewport().getViewPosition().clone();
 	}
@@ -373,8 +333,8 @@ public class FooCityGUI
 	{
 		if (city_manager.SetMapGrid(new_map))
 		{
-			this.map_panel.repaint();
-			this.minimap_panel.repaint();
+			city_manager.startGame();
+			updateDisplay();
 		}
 	}
 	private class NewGameAction extends AbstractAction
@@ -389,9 +349,7 @@ public class FooCityGUI
 			if (city_manager == null || city_manager.GetMapGrid() == null)
 			{
 				NewGame newgame = new NewGame();
-				scrollPane.repaint();
-				map_panel.repaint();
-				minimap_panel.repaint();
+				updateDisplay();
 			}
 			else
 			{
@@ -401,16 +359,6 @@ public class FooCityGUI
 				//TODO verify that the user wants to start a new game
 			}
 		}
-	}
-	
-	private class miniMapListActionListener implements ActionListener {
-
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			// TODO Auto-generated method stub
-			
-		}
-		
 	}
 
 	private class Place_Tile_Action extends AbstractAction
@@ -427,6 +375,7 @@ public class FooCityGUI
 			return;
 		}
 	}
+
 	private class keyDispatcher implements KeyEventDispatcher {
 		@Override
 		public boolean dispatchKeyEvent(KeyEvent e) {
@@ -466,7 +415,7 @@ public class FooCityGUI
 				default:
 					break;
 				}
-				scrollPane.getViewport().setViewPosition(new Point(x, y));
+				updateDisplay(new Point(x, y));
 			}
 			return true;
 		}
@@ -481,35 +430,90 @@ public class FooCityGUI
 	{
 		frame.addWindowStateListener(new WindowStateListener()
 		{
+			@Override
 			public void windowStateChanged(WindowEvent arg0) 
 			{	
-				Rectangle r = frame.getBounds();
-				r.x = FooCityGUIConstants.SIDEBAR_WIDTH; 
-				r.y = 0;
-				r.width -= FooCityGUIConstants.SIDEBAR_WIDTH + 15;
-				r.height -= 60;
-				scrollPane.setBounds(r);
-				scrollPane.revalidate();
-				toolPanel.setBounds(0, 0, FooCityGUIConstants.SIDEBAR_WIDTH, r.height);
-				toolPanel.revalidate();
+				ResizePanes();
 			}
 		});
 		
 		frame.addComponentListener(new ComponentAdapter()
 		{
-		@Override
-			public void componentResized(ComponentEvent arg0) {
-	
-				Rectangle r = frame.getBounds();
-				r.x = FooCityGUIConstants.SIDEBAR_WIDTH; 
-				r.y = 0;
-				r.width -= FooCityGUIConstants.SIDEBAR_WIDTH + 15;
-				r.height -= 60;
-				scrollPane.setBounds(r);
-				scrollPane.revalidate();
-				toolPanel.setBounds(0, 0, FooCityGUIConstants.SIDEBAR_WIDTH, r.height);
-				toolPanel.revalidate();
+			@Override
+			public void componentResized(ComponentEvent arg0)
+			{
+					ResizePanes();
 			}
 		});
 	}
+	
+	private void ResizePanes()
+	{
+		Rectangle r = frame.getBounds();
+		r.x = FooCityGUIConstants.SIDEBAR_WIDTH; 
+		r.y = 0;
+		r.width -= FooCityGUIConstants.SIDEBAR_WIDTH + 15;
+		r.height -= 60;
+		scrollPane.setBounds(r);
+		scrollPane.revalidate();
+		toolPanel.setBounds(0, 0, FooCityGUIConstants.SIDEBAR_WIDTH, r.height);
+		toolPanel.revalidate();
+	}
 }
+
+interface FooCityGUIInterface
+{
+
+	Point getViewPoint();
+
+	Rectangle getViewRect();
+
+	public void updateDisplayCenter(Point center);
+
+	public void updateDisplay(Point NEpoint);
+
+	public void updateDisplay();
+	
+	public FooCityManager getCityManager();
+}
+
+class FooCityScrollPane extends JScrollPane
+{
+	FooCityGUIInterface Interface;
+	FooCityScrollPane(Component viewport, FooCityGUIInterface i)
+	{
+		super(viewport);
+		Interface = i;
+		setAutoscrolls(true);
+		setWheelScrollingEnabled(true);
+		setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		
+		JScrollBar verticalScrollBar = getVerticalScrollBar();
+		JScrollBar horizontalScrollBar = getHorizontalScrollBar();
+		verticalScrollBar.setUnitIncrement(32);
+		horizontalScrollBar.setUnitIncrement(32);
+
+
+		if (Interface != null)
+		{
+			verticalScrollBar.addAdjustmentListener(new AdjustmentListener()
+				{
+					public void adjustmentValueChanged(AdjustmentEvent e)
+					{
+						
+						Interface.updateDisplay();
+					}
+				});
+		
+			horizontalScrollBar.addAdjustmentListener(new AdjustmentListener()
+				{
+					public void adjustmentValueChanged(AdjustmentEvent e)
+					{
+						Interface.updateDisplay();
+					}
+				});
+		}
+	}
+}
+

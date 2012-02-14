@@ -9,8 +9,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
@@ -18,19 +18,55 @@ import java.awt.image.RescaleOp;
 import javax.swing.JPanel;
 
 
-class FooPanel extends JPanel
+class CityViewport extends JPanel
 {
-	
+	FooCityGUIInterface Interface;
 	private TileLoader tiles;
 	private Point cursor;
-    public FooPanel(Color faceColor)
+	
+    public CityViewport(FooCityGUIInterface i)
     {
     	super();
-    	setForeground(faceColor);
+    	Interface = i;
         tiles = new TileLoader();
         cursor = null;
+        if (Interface != null)
+        {
+	        addMouseListener(new MouseAdapter()
+			{
+	        	
+				@Override
+				public void mousePressed(MouseEvent e)
+				{
+					
+					if (Interface.getCityManager().getPlacingTile() == 0)
+						return;
+					Point p = e.getPoint();
+					int x = p.x / FooCityGUIConstants.TILE_WIDTH;
+					int y = p.y / FooCityGUIConstants.TILE_HEIGHT;
+					//System.out.print(p + " " + x + " " + y);
+					if (Interface.getCityManager().placeTile(x,y))
+					{
+						Interface.updateDisplay();
+					}
+				}
+	
+				@Override
+				public void mouseExited(MouseEvent arg0)
+				{
+					setMousePoint(null);
+				}
+			});
+			addMouseMotionListener(new MouseMotionAdapter()
+			{
+				@Override
+				public void mouseMoved(MouseEvent arg0)
+				{
+					setMousePoint(arg0.getPoint());
+				}
+			});
+	    }
     }
-    
 
     public Dimension getPreferredSize()
     {
@@ -43,14 +79,13 @@ class FooPanel extends JPanel
     public void paint(Graphics g1)
     {
     	super.paint(g1);
+    	if (Interface == null || tiles == null)
+    		return;
     	Graphics2D g = (Graphics2D) g1;
-    	FooCityManager city_manager = null;
-    	MapGrid current_map = null;
-    	if (FooCityGUI.window != null)
-    		city_manager = FooCityGUI.window.getCityManager();
+    	FooCityManager city_manager = Interface.getCityManager();
     	if (city_manager == null)
     		return;
-    	current_map = city_manager.GetMapGrid();
+    	MapGrid current_map = city_manager.GetMapGrid();
     	if (current_map == null)
     		return;
     	Rectangle r = this.getVisibleRect();
@@ -95,7 +130,7 @@ class FooPanel extends JPanel
     }
 
 
-	public void setMousePoint(Point point)
+	private void setMousePoint(Point point)
 	{
 		this.cursor = point;
 		repaint();
@@ -107,51 +142,34 @@ class FooPanel extends JPanel
 class MiniMapPanel extends JPanel
 {
 	private int viewMode;
-    public MiniMapPanel(Color faceColor)
+	FooCityGUIInterface Interface;
+    public MiniMapPanel(FooCityGUIInterface i)
     {
     	super();
-    	setForeground(faceColor);
-    	this.addMouseListener(new MouseListener(){
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseExited(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mousePressed(MouseEvent arg0) {
-				Point point = new Point(arg0.getX() / 2, arg0.getY() / 2);
-				FooCityGUI.window.setView(point);
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-    	});
-    	
-    	this.addMouseMotionListener(new MouseMotionAdapter()
+    	Interface = i;
+    	if (Interface != null)
     	{
-    		@Override
-    		public void mouseDragged(MouseEvent arg0)
-    		{
-    			Point point = new Point(arg0.getX() / 2, arg0.getY() / 2);
-    			FooCityGUI.window.setView(point);
-    		}
-    	});
+	    	this.addMouseListener(new MouseAdapter()
+	    	{
+				@Override
+				public void mousePressed(MouseEvent arg0) {
+					Point point = new Point(arg0.getX() / 2, arg0.getY() / 2);
+					Interface.updateDisplayCenter(point);
+				}
+	    	});
+	    	
+	    	this.addMouseMotionListener(new MouseMotionAdapter()
+	    	{
+	    		@Override
+	    		public void mouseDragged(MouseEvent arg0)
+	    		{
+	    			Point point = new Point(arg0.getX() / 2, arg0.getY() / 2);
+	    			Interface.updateDisplayCenter(point);
+	    		}
+	    	});
+    	}
     }
-    
+
     public void setViewMode(int newMode){
     	this.viewMode = newMode;
     	this.repaint();
@@ -161,9 +179,14 @@ class MiniMapPanel extends JPanel
     @Override
     public void paint(Graphics g1)
     {
-    	MapGrid current_map = null;
-    	if (FooCityGUI.window != null)
-    		current_map = FooCityGUI.window.getMap();
+    	super.paint(g1);
+    	if (Interface == null)
+    		return;
+    	FooCityManager city_manager = Interface.getCityManager();
+    	
+    	if (city_manager == null)
+    		return;    	
+    	MapGrid current_map = city_manager.GetMapGrid();
     	if (current_map == null)
     		return;
     	if (viewMode == 0){ //Normal view
@@ -257,14 +280,14 @@ class MiniMapPanel extends JPanel
 	    	}
 		}
     	// Draw the frame around our current view
-    	Rectangle r = FooCityGUI.window.getViewRect();
-    	Point p = FooCityGUI.window.getViewPoint();
+    	Rectangle r = Interface.getViewRect();
+    	Point p = Interface.getViewPoint();
     	//System.out.print("visiblerect = " + r +"\n"); 
     	r.x = 2 * p.x / FooCityGUIConstants.TILE_WIDTH;
     	r.y = 2 * p.y / FooCityGUIConstants.TILE_HEIGHT;
     	r.width = 2 * r.width / FooCityGUIConstants.TILE_WIDTH;
     	r.height = 2 * r.height / FooCityGUIConstants.TILE_HEIGHT;
-    	g1.setColor(Color.black);
+    	g1.setColor(Color.black);    	
     	g1.drawRect(r.x, r.y, r.width, r.height);
     }
     @Override

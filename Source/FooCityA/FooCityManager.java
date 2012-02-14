@@ -7,6 +7,7 @@ public class FooCityManager
 {
 	private MapGrid current_map;
 	private int tile_to_place;
+	private int turn;
 	public static void main(String[] args)
 	{
 	}
@@ -15,24 +16,31 @@ public class FooCityManager
 	{
 		current_map = null;
 		tile_to_place = 0;
+		turn = 0;
 	}
 	
 	public FooCityManager(MapGrid new_map)
 	{
-		current_map = new_map;
+		this();
+		SetMapGrid(new_map);
 	}
 
 	public MapGrid GetMapGrid()
 	{
-		return current_map;
+		if (turn > 0)
+			return current_map;
+		return null;
 	}
 
 	public boolean SetMapGrid(MapGrid new_map)
 	{
-		if (current_map == null)
+		if (new_map != null)
 		{
-			current_map = new_map;
-			return true;
+			if (current_map == null)
+			{
+				current_map = new_map;
+				return true;
+			}
 		}
 		return false;
 	}
@@ -50,6 +58,19 @@ public class FooCityManager
 	public void Quit()
 	{
 		current_map = null;
+	}
+
+	public void startGame()
+	{
+		advanceTurn();		
+	}
+
+	public int getCurrentTurn() {
+		return turn;
+	}
+
+	public void advanceTurn() {
+		this.turn++;
 	}
 
 	public boolean setPlacingTile(int i)
@@ -73,6 +94,7 @@ public class FooCityManager
 		if (current_map != null && tile_to_place > 0)
 		{
 			// CheckFundsAvailable
+			// propagateMetrics()
 			return current_map.setTile(x, y, tile_to_place);
 			
 		}
