@@ -4,7 +4,6 @@
 //
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
@@ -12,8 +11,6 @@ import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Rectangle;
-import javax.swing.Box;
-import javax.swing.JComboBox;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
@@ -21,22 +18,26 @@ import java.awt.event.AdjustmentListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 class FooCityGUIConstants
 {
@@ -45,6 +46,11 @@ class FooCityGUIConstants
 	public static final int WINDOW_HEIGHT = 600;
 	public static final int WINDOW_WIDTH = 800;
 	public static final int SIDEBAR_WIDTH = 257;
+	
+	public static final int NEW_GAME = 0;
+	public static final int SAVE_GAME = 1;
+	public static final int LOAD_GAME = 2;
+	public static final int QUIT = 3;
 }
 
 public class FooCityGUI implements FooCityGUIInterface
@@ -58,7 +64,7 @@ public class FooCityGUI implements FooCityGUIInterface
 	private FooCityManager city_manager;
 	public static FooCityGUI window;
 	private JMenuBar menuBar;
-	private final Action NewGame = new NewGameAction();
+	private final Action NewGame = new MainMenuAction();
 	private final Action Tile = new Place_Tile_Action();
 	
 	private JButton buttonResidential, buttonCommercial, buttonIndustrial,
@@ -271,16 +277,40 @@ public class FooCityGUI implements FooCityGUIInterface
 		frame.getContentPane().add(toolPanel);
 		frame.getContentPane().add(scrollPane);
 		
+		initializeMenuBar();
+		
+		AddKeyListeners();
+	}
+	
+	private void initializeMenuBar()
+	{
 		menuBar = new JMenuBar();
 		frame.setJMenuBar(menuBar);
-
+	
 		JMenu file_menu = new JMenu("File");
 		menuBar.add(file_menu);
 		
 		JMenuItem menuItem_NewGame = new JMenuItem("New Game");
-		menuItem_NewGame.setAction(NewGame);
+		menuItem_NewGame.addActionListener(NewGame);
+		menuItem_NewGame.setActionCommand(Integer.toString(FooCityGUIConstants.NEW_GAME));
 		file_menu.add(menuItem_NewGame);
 
+		JMenuItem menuItem_SaveGame = new JMenuItem("Save Game");
+		menuItem_SaveGame.addActionListener(NewGame);
+		menuItem_SaveGame.setActionCommand(Integer.toString(FooCityGUIConstants.SAVE_GAME));
+		file_menu.add(menuItem_SaveGame);
+
+		JMenuItem menuItem_LoadGame = new JMenuItem("Load Game");
+		menuItem_LoadGame.addActionListener(NewGame);
+		menuItem_LoadGame.setActionCommand(Integer.toString(FooCityGUIConstants.LOAD_GAME));
+		file_menu.add(menuItem_LoadGame);
+		
+		JMenuItem menuItem_Quit = new JMenuItem("Quit");
+		menuItem_Quit.addActionListener(NewGame);
+		menuItem_Quit.setActionCommand(Integer.toString(FooCityGUIConstants.QUIT));
+		file_menu.add(menuItem_Quit);
+		
+		
 		JMenu mnBuild = new JMenu("Build");
 		menuBar.add(mnBuild);
 		
@@ -304,11 +334,9 @@ public class FooCityGUI implements FooCityGUIInterface
 		JMenuItem forrestTile_menuItem = new JMenuItem("Place " + forrestTile);
 		forrestTile_menuItem.addActionListener(Tile);
 		forrestTile_menuItem.setActionCommand(forrestTile);
-		mnBuild.add(forrestTile_menuItem);
-		
-		AddKeyListeners();
+		mnBuild.add(forrestTile_menuItem);	
 	}
-	
+
 /*	public MapGrid getMap() {
 		return city_manager.GetMapGrid();
 	}
@@ -337,27 +365,101 @@ public class FooCityGUI implements FooCityGUIInterface
 			updateDisplay();
 		}
 	}
-	private class NewGameAction extends AbstractAction
+
+	private class MainMenuAction extends AbstractAction
 	{
-		public NewGameAction()
+		private FileFilter FooCitySaveFilter;
+		public MainMenuAction()
 		{
+			FooCitySaveFilter = new FileNameExtensionFilter("FooCity Save files (fcs)", "fcs");
 			putValue(NAME, "New Game");
 			putValue(SHORT_DESCRIPTION, "Select A Map To Load");
 		}
+
 		public void actionPerformed(ActionEvent e)
 		{
-			if (city_manager == null || city_manager.GetMapGrid() == null)
+			String command = e.getActionCommand();
+			int command_int = Integer.parseInt(command);
+			switch (command_int)
 			{
+			case FooCityGUIConstants.NEW_GAME:
+				if (city_manager != null && city_manager.GetMapGrid() != null)
+				{
+					final JOptionPane pane = new JOptionPane();
+
+					switch (JOptionPane.showInternalConfirmDialog(frame.getContentPane(),
+							"Save current game before starting a new game?", "New game",
+							JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE))
+					{
+					case JOptionPane.CANCEL_OPTION:
+						return;
+					case JOptionPane.YES_OPTION:
+						if (!saveGame())
+							return;
+					default:
+					}
+					city_manager.Quit();
+				}
+				
 				NewGame newgame = new NewGame();
 				updateDisplay();
+				break;
+			case FooCityGUIConstants.LOAD_GAME:
+				if (city_manager != null && city_manager.GetMapGrid() != null) 
+				{
+					switch (JOptionPane.showInternalConfirmDialog(frame.getContentPane(),
+							"Save current game before loading?", "Load game",
+							JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE))
+					{
+					case JOptionPane.CANCEL_OPTION:
+						return;
+					case JOptionPane.YES_OPTION:
+						if (!saveGame())
+							return;
+					default:
+					}
+					city_manager.Quit();
+				}
+				//LoadGame
+				break;
+			case FooCityGUIConstants.SAVE_GAME:
+				saveGame();
+				break;
+			case FooCityGUIConstants.QUIT:
+				if (city_manager != null && city_manager.GetMapGrid() != null) 
+				{
+					switch (JOptionPane.showInternalConfirmDialog(frame.getContentPane(),
+							"Save game before exiting?", "Quit",
+							JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE))
+					{
+					case JOptionPane.CANCEL_OPTION:
+						return;
+					case JOptionPane.YES_OPTION:
+						if (!saveGame())
+							return;
+					default:
+					}
+				}
+				System.exit(0);
 			}
-			else
+			
+		}
+		
+		private boolean saveGame()
+		{
+			if (city_manager.getCurrentTurn() > 0)
 			{
-				/*
-				city_manager.Quit();
-				 */
-				//TODO verify that the user wants to start a new game
+				JFileChooser fc = new JFileChooser();
+				fc.setCurrentDirectory(new java.io.File("./save"));
+				fc.setDialogTitle("Save file as...");
+				fc.setDialogType(JFileChooser.FILES_ONLY);
+				fc.setFileFilter(FooCitySaveFilter);
+				fc.setAcceptAllFileFilterUsed(false);
+				int returnVal = fc.showOpenDialog(null);
+				if (returnVal == JFileChooser.APPROVE_OPTION)
+					return true;
 			}
+			return false;
 		}
 	}
 

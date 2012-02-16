@@ -64,33 +64,64 @@ public class NewGame extends JPanel implements ActionListener {
 	public void paintComponent(Graphics g){
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D)g;
-		
+
 		// Only draw something if we've loaded a map
-		if (mapLoaded){
-			Color color = Color.white;
+		if (mapLoaded)
+		{
 			for (int y = 0; y < 128; y++){
 				for (int x = 0; x < 128; x++){
 					switch(mapData.getTileAt(x, y))
 					{
-						case MapGridConstants.WATER_TILE:
-							color = Color.blue;
-							break;
-						case MapGridConstants.BEACH_TILE:
-							color = Color.yellow;
-							break;
-						case MapGridConstants.GRASS_TILE:
-							color = Color.green;
-							break;
-						case MapGridConstants.DIRT_TILE:
-							color = Color.orange;
-							color.darker();
-							break;
-						case MapGridConstants.FORREST_TILE:
-							color = Color.green;
-							color.darker();
-							break;
+					case (MapGridConstants.BEACH_TILE):
+						g2d.setColor(new Color(255,225,0));  //A yellowish sandy color
+						break;
+					case (MapGridConstants.WATER_TILE):
+						g2d.setColor(new Color(0,0,180));  // A deep ocean blue
+						break;
+					case (MapGridConstants.GRASS_TILE):
+						g2d.setColor(new Color(0,180,0));  // A somewhat dark green
+						break;
+					case (MapGridConstants.COAL_TILE):   
+						g2d.setColor(new Color (50, 50, 50)); // Very dark grey
+						break;
+					case (MapGridConstants.COMMERCIAL_TILE):
+						g2d.setColor(new Color (0,0,255));   // Vivid blue
+						break;
+					case (MapGridConstants.DIRT_TILE):
+						g2d.setColor(new Color (140,110,0));  //Brown
+						break;
+					case (MapGridConstants.FORREST_TILE):
+						g2d.setColor(new Color (0, 75, 0));  // Deep forest green
+						break;
+					case (MapGridConstants.INDUSTRIAL_TILE):  // Dirty yellow
+						g2d.setColor(new Color (225, 225, 0));
+						break;
+					case (MapGridConstants.GAS_TILE):
+						g2d.setColor(new Color (96, 112, 204)); // Pale blue 
+						break;
+					case (MapGridConstants.PARK_TILE):
+						g2d.setColor(new Color (100, 255, 100));		// Pale green 
+						break;
+					case (MapGridConstants.POLICE_TILE):
+						g2d.setColor(new Color (0,0,200));		//Deep blue
+						break;
+					case (MapGridConstants.RESIDENTIAL_TILE):
+						g2d.setColor(new Color (0,255, 0));   // Bright green
+						break;
+					case (MapGridConstants.SEWAGE_TILE):
+						g2d.setColor(new Color (110, 72, 20));   //Dark murkey brown
+						break;
+					case (MapGridConstants.SOLAR_TILE):
+						g2d.setColor(new Color (255, 244, 128));	// Bright yellow
+						break;
+					case (MapGridConstants.WIND_TILE):
+						g2d.setColor(new Color (0, 200, 255));	// Sky blue
+						break;
+					default:
+						g2d.setColor(Color.green);
+						System.err.print("Unknown tile drawn on minimap\n");
+						break;
 					}
-					g2d.setColor(color);
 					g2d.fillRect(x * 3, panelHeight + y * 3, 3, 3);
 				}
 			}
@@ -105,7 +136,8 @@ public class NewGame extends JPanel implements ActionListener {
 		} else if (e.getActionCommand().equals("cancel")) {
 			// Close this window and show the main menu
 			javax.swing.SwingUtilities.getWindowAncestor(this).dispose();
-			MainMenu.createAndShowGUI();
+			if (FooCityGUI.window == null)
+				MainMenu.createAndShowGUI();
 		} else if (e.getActionCommand().equals("ok"))
 		{
 			if (FooCityGUI.window == null)
@@ -131,12 +163,10 @@ public class NewGame extends JPanel implements ActionListener {
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			mapData = new MapGrid();
 			mapLoaded = mapData.FromFile(fc.getSelectedFile().getAbsolutePath());
-	
-			// Force a redraw of the window
-			buttonOK.setEnabled(true);
-			this.repaint();
-			//this.paint(getGraphics());
 			
+			buttonOK.setEnabled(mapLoaded);
+			// Force a redraw of the window
+			this.repaint();
 		}
 	}
 
