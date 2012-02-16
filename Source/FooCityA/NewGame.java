@@ -66,10 +66,12 @@ public class NewGame extends JPanel implements ActionListener {
 		Graphics2D g2d = (Graphics2D)g;
 
 		// Only draw something if we've loaded a map
-		if (mapLoaded)
-		{
-			for (int y = 0; y < 128; y++){
-				for (int x = 0; x < 128; x++){
+		if (mapLoaded){
+			Dimension map_area = mapData.getMapArea();
+			if (map_area == null)
+				return;
+			for (int y = 0; y < map_area.getHeight(); y++){
+				for (int x = 0; x < map_area.getWidth(); x++){
 					switch(mapData.getTileAt(x, y))
 					{
 					case (MapGridConstants.BEACH_TILE):

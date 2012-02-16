@@ -1,3 +1,5 @@
+import java.awt.Dimension;
+
 // Project FooCity-group2
 // CS300
 // Developers: Joel Anna and David Wiza
@@ -23,6 +25,13 @@ public class FooCityManager
 	{
 		this();
 		SetMapGrid(new_map);
+	}
+
+	public Dimension getMapArea()
+	{
+		if (current_map != null)
+			return current_map.getMapArea();
+		return null;
 	}
 
 	public MapGrid GetMapGrid()
@@ -102,9 +111,16 @@ public class FooCityManager
 	}
 	
 	public void propagateMetrics(){
+		if (current_map == null)
+			return;
 		// First, clear all the metrics
-		for (int y = 0; y < MapGridConstants.MAP_HEIGHT; y++){
-			for (int x = 0; x < MapGridConstants.MAP_WIDTH; x++){
+		Dimension map_area = current_map.getMapArea();
+		if (map_area == null)
+			return;
+		int map_width = (int) map_area.getHeight();
+		int map_height = (int) map_area.getWidth();
+		for (int y = 0; y < map_height; y++){
+			for (int x = 0; x < map_width; x++){
 				current_map.getTile(x, y).crimeActual = 0;
 				current_map.getTile(x, y).happinessActual = 0;
 				current_map.getTile(x, y).pollutionActual = 0;
@@ -113,15 +129,15 @@ public class FooCityManager
 		}
 		
 		// Propagate crime
-		for (int y = 0; y < MapGridConstants.MAP_HEIGHT; y++){
-			for (int x = 0; x < MapGridConstants.MAP_WIDTH; x++){
+		for (int y = 0; y < map_height; y++){
+			for (int x = 0; x < map_width; x++){
 				int c = current_map.getTile(x, y).crimeContributed;
 				// If we're ADDING crime...
 				if (c > 0){
 					// Branch to the right
 					for (int xx = 0; xx < c; xx++){
 						// Make sure we haven't gone past the right edge
-						if (x + xx < MapGridConstants.MAP_WIDTH) {
+						if (x + xx < map_width) {
 							// Set the current value
 							current_map.getTile(x + xx, y).crimeActual += (c - xx);
 							// Branch up/down, start 1 unit past the horizontal branch
@@ -130,7 +146,7 @@ public class FooCityManager
 								if (y - yy >= 0)
 									current_map.getTile(xx + x, y - yy).crimeActual += (c - xx - yy);
 								// Don't go below the map
-								if (y + yy < MapGridConstants.MAP_HEIGHT)
+								if (y + yy < map_height)
 									current_map.getTile(xx + x, yy + y).crimeActual += (c - xx - yy);
 							}
 						}
@@ -149,7 +165,7 @@ public class FooCityManager
 								if (y - yy >= 0)
 									current_map.getTile(x + xx, y - yy).crimeActual += (c + xx - yy);
 								// Don't go below the map
-								if (y + yy < MapGridConstants.MAP_HEIGHT)
+								if (y + yy < map_height)
 									current_map.getTile(x + xx, yy + y).crimeActual += (c + xx - yy);
 							}
 						}
@@ -160,7 +176,7 @@ public class FooCityManager
 					// Branch to the right
 					for (int xx = 0; xx < c; xx++){
 						// Make sure we haven't gone past the right edge
-						if (x + xx < MapGridConstants.MAP_WIDTH) {
+						if (x + xx < map_width) {
 							// Set the current value
 							current_map.getTile(x + xx, y).crimeActual -= (c - xx);
 							// Branch up/down, start 1 unit past the horizontal branch
@@ -169,7 +185,7 @@ public class FooCityManager
 								if (y - yy >= 0)
 									current_map.getTile(xx + x, y - yy).crimeActual -= (c - xx - yy);
 								// Don't go below the map
-								if (y + yy < MapGridConstants.MAP_HEIGHT)
+								if (y + yy < map_height)
 									current_map.getTile(xx + x, yy + y).crimeActual -= (c - xx - yy);
 							}
 						}
@@ -188,7 +204,7 @@ public class FooCityManager
 								if (y - yy >= 0)
 									current_map.getTile(x + xx, y - yy).crimeActual -= (c + xx - yy);
 								// Don't go below the map
-								if (y + yy < MapGridConstants.MAP_HEIGHT)
+								if (y + yy < map_height)
 									current_map.getTile(x + xx, yy + y).crimeActual -= (c + xx - yy);
 							}
 						}
@@ -198,15 +214,15 @@ public class FooCityManager
 		}
 		
 		// Propagate pollution
-		for (int y = 0; y < MapGridConstants.MAP_HEIGHT; y++){
-			for (int x = 0; x < MapGridConstants.MAP_WIDTH; x++){
+		for (int y = 0; y < map_height; y++){
+			for (int x = 0; x < map_width; x++){
 				int c = current_map.getTile(x, y).pollutionContributed;
 				// If we're ADDING crime...
 				if (c > 0){
 					// Branch to the right
 					for (int xx = 0; xx < c; xx++){
 						// Make sure we haven't gone past the right edge
-						if (x + xx < MapGridConstants.MAP_WIDTH) {
+						if (x + xx < map_width) {
 							// Set the current value
 							current_map.getTile(x + xx, y).pollutionActual += (c - xx);
 							// Branch up/down, start 1 unit past the horizontal branch
@@ -215,7 +231,7 @@ public class FooCityManager
 								if (y - yy >= 0)
 									current_map.getTile(xx + x, y - yy).pollutionActual += (c - xx - yy);
 								// Don't go below the map
-								if (y + yy < MapGridConstants.MAP_HEIGHT)
+								if (y + yy < map_height)
 									current_map.getTile(xx + x, yy + y).pollutionActual += (c - xx - yy);
 							}
 						}
@@ -234,7 +250,7 @@ public class FooCityManager
 								if (y - yy >= 0)
 									current_map.getTile(x + xx, y - yy).pollutionActual += (c + xx - yy);
 								// Don't go below the map
-								if (y + yy < MapGridConstants.MAP_HEIGHT)
+								if (y + yy < map_height)
 									current_map.getTile(x + xx, yy + y).pollutionActual += (c + xx - yy);
 							}
 						}
@@ -245,7 +261,7 @@ public class FooCityManager
 					// Branch to the right
 					for (int xx = 0; xx < c; xx++){
 						// Make sure we haven't gone past the right edge
-						if (x + xx < MapGridConstants.MAP_WIDTH) {
+						if (x + xx < map_width) {
 							// Set the current value
 							current_map.getTile(x + xx, y).pollutionActual -= (c - xx);
 							// Branch up/down, start 1 unit past the horizontal branch
@@ -254,7 +270,7 @@ public class FooCityManager
 								if (y - yy >= 0)
 									current_map.getTile(xx + x, y - yy).pollutionActual -= (c - xx - yy);
 								// Don't go below the map
-								if (y + yy < MapGridConstants.MAP_HEIGHT)
+								if (y + yy < map_height)
 									current_map.getTile(xx + x, yy + y).pollutionActual -= (c - xx - yy);
 							}
 						}
@@ -273,7 +289,7 @@ public class FooCityManager
 								if (y - yy >= 0)
 									current_map.getTile(x + xx, y - yy).pollutionActual -= (c + xx - yy);
 								// Don't go below the map
-								if (y + yy < MapGridConstants.MAP_HEIGHT)
+								if (y + yy < map_height)
 									current_map.getTile(x + xx, yy + y).pollutionActual -= (c + xx - yy);
 							}
 						}
@@ -283,15 +299,15 @@ public class FooCityManager
 		}
 		
 		// Propagate happiness
-		for (int y = 0; y < MapGridConstants.MAP_HEIGHT; y++){
-			for (int x = 0; x < MapGridConstants.MAP_WIDTH; x++){
+		for (int y = 0; y < map_height; y++){
+			for (int x = 0; x < map_width; x++){
 				int c = current_map.getTile(x, y).happinessContributed;
 				// If we're ADDING crime...
 				if (c > 0){
 					// Branch to the right
 					for (int xx = 0; xx < c; xx++){
 						// Make sure we haven't gone past the right edge
-						if (x + xx < MapGridConstants.MAP_WIDTH) {
+						if (x + xx < map_width) {
 							// Set the current value
 							current_map.getTile(x + xx, y).happinessActual += (c - xx);
 							// Branch up/down, start 1 unit past the horizontal branch
@@ -300,7 +316,7 @@ public class FooCityManager
 								if (y - yy >= 0)
 									current_map.getTile(xx + x, y - yy).happinessActual += (c - xx - yy);
 								// Don't go below the map
-								if (y + yy < MapGridConstants.MAP_HEIGHT)
+								if (y + yy < map_height)
 									current_map.getTile(xx + x, yy + y).happinessActual += (c - xx - yy);
 							}
 						}
@@ -319,7 +335,7 @@ public class FooCityManager
 								if (y - yy >= 0)
 									current_map.getTile(x + xx, y - yy).happinessActual += (c + xx - yy);
 								// Don't go below the map
-								if (y + yy < MapGridConstants.MAP_HEIGHT)
+								if (y + yy < map_height)
 									current_map.getTile(x + xx, yy + y).happinessActual += (c + xx - yy);
 							}
 						}
@@ -330,7 +346,7 @@ public class FooCityManager
 					// Branch to the right
 					for (int xx = 0; xx < c; xx++){
 						// Make sure we haven't gone past the right edge
-						if (x + xx < MapGridConstants.MAP_WIDTH) {
+						if (x + xx < map_width) {
 							// Set the current value
 							current_map.getTile(x + xx, y).happinessActual -= (c - xx);
 							// Branch up/down, start 1 unit past the horizontal branch
@@ -339,7 +355,7 @@ public class FooCityManager
 								if (y - yy >= 0)
 									current_map.getTile(xx + x, y - yy).happinessActual -= (c - xx - yy);
 								// Don't go below the map
-								if (y + yy < MapGridConstants.MAP_HEIGHT)
+								if (y + yy < map_height)
 									current_map.getTile(xx + x, yy + y).happinessActual -= (c - xx - yy);
 							}
 						}
@@ -358,7 +374,7 @@ public class FooCityManager
 								if (y - yy >= 0)
 									current_map.getTile(x + xx, y - yy).happinessActual -= (c + xx - yy);
 								// Don't go below the map
-								if (y + yy < MapGridConstants.MAP_HEIGHT)
+								if (y + yy < map_height)
 									current_map.getTile(x + xx, yy + y).happinessActual -= (c + xx - yy);
 							}
 						}

@@ -28,10 +28,11 @@ class TileLoader
 		{
 			try
 			{
-				tiles[i] = ImageIO.read(new File(TileSet + tileNames[i]));
+				tiles[i] = ImageIO.read(new File(TileSet + tileNames[i] + ".png"));
 			}
 	        catch (Exception e)
 	        {
+	        	System.out.println(TileSet + tileNames[i] + ".png");
 	        //	m_valid = false;
 	        }
 		}
@@ -48,22 +49,22 @@ class TileLoader
     private void initStringNames()
     {
     	tileNames = new String[MapGridConstants.LAST_TILE];
-    	tileNames[MapGridConstants.WATER_TILE] = "water.png";
-    	tileNames[MapGridConstants.BEACH_TILE] = "beach.png";
-    	tileNames[MapGridConstants.GRASS_TILE] = "grass.png";
-    	tileNames[MapGridConstants.DIRT_TILE] = "dirt.png";
-    	tileNames[MapGridConstants.FORREST_TILE] = "forrest.png";
-    	tileNames[MapGridConstants.INDUSTRIAL_TILE] = "";
-    	tileNames[MapGridConstants.COMMERCIAL_TILE] = "";
-    	tileNames[MapGridConstants.PARK_TILE] = "";
-    	tileNames[MapGridConstants.SEWAGE_TILE] = "";
-    	tileNames[MapGridConstants.POLICE_TILE] = "";
-    	tileNames[MapGridConstants.SOLAR_TILE] = "";
-    	tileNames[MapGridConstants.GAS_TILE] = "";
-    	tileNames[MapGridConstants.COAL_TILE] = "";
-    	tileNames[MapGridConstants.WIND_TILE] = "";
-    	tileNames[MapGridConstants.RESIDENTIAL_TILE] = "";
-    	tileNames[MapGridConstants.ROAD_TILE] = "";
+    	tileNames[MapGridConstants.WATER_TILE] = "water";
+    	tileNames[MapGridConstants.BEACH_TILE] = "beach";
+    	tileNames[MapGridConstants.GRASS_TILE] = "grass";
+    	tileNames[MapGridConstants.DIRT_TILE] = "dirt";
+    	tileNames[MapGridConstants.FORREST_TILE] = "forrest";
+    	tileNames[MapGridConstants.INDUSTRIAL_TILE] = "industrial";
+    	tileNames[MapGridConstants.COMMERCIAL_TILE] = "commercial";
+    	tileNames[MapGridConstants.PARK_TILE] = "park";
+    	tileNames[MapGridConstants.SEWAGE_TILE] = "sewage";
+    	tileNames[MapGridConstants.POLICE_TILE] = "police";
+    	tileNames[MapGridConstants.SOLAR_TILE] = "solar";
+    	tileNames[MapGridConstants.GAS_TILE] = "gas";
+    	tileNames[MapGridConstants.COAL_TILE] = "coal";
+    	tileNames[MapGridConstants.WIND_TILE] = "wind";
+    	tileNames[MapGridConstants.RESIDENTIAL_TILE] = "residential";
+    	tileNames[MapGridConstants.ROAD_TILE] = "road";
     }
 
 }

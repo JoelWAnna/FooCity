@@ -5,6 +5,7 @@
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.KeyEventDispatcher;
@@ -26,7 +27,6 @@ import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -485,6 +485,12 @@ public class FooCityGUI implements FooCityGUIInterface
 				char c = e.getKeyChar();
 				Point p = (Point) scrollPane.getViewport().getViewPosition().clone();
 				Rectangle r = (Rectangle) scrollPane.getViewport().getVisibleRect().clone();
+				if (city_manager == null)
+					return true;
+				Dimension map_area = city_manager.getMapArea();
+				if (map_area == null)
+					return true;
+				
 				int x = p.x;
 				int y = p.y;
 				//System.out.println(c + " " + x + " " + y + " " + r);
@@ -503,14 +509,14 @@ public class FooCityGUI implements FooCityGUIInterface
 						x -= FooCityGUIConstants.TILE_WIDTH;
 					break;
 				case 'S':
-					if (y > MapGridConstants.MAP_HEIGHT * (FooCityGUIConstants.TILE_HEIGHT - 1) - r.height)
-						y = MapGridConstants.MAP_HEIGHT * FooCityGUIConstants.TILE_HEIGHT - r.height;
+					if (y > (int)map_area.getHeight() * (FooCityGUIConstants.TILE_HEIGHT - 1) - r.height)
+						y = (int)map_area.getHeight() * FooCityGUIConstants.TILE_HEIGHT - r.height;
 					else
 						y += 32;
 					break;
 				case 'D':
-					if (x > MapGridConstants.MAP_WIDTH * (FooCityGUIConstants.TILE_WIDTH - 1) - r.width)
-						x = MapGridConstants.MAP_WIDTH * FooCityGUIConstants.TILE_WIDTH - r.width;
+					if (x > (int)map_area.getWidth() * (FooCityGUIConstants.TILE_WIDTH - 1) - r.width)
+						x = (int)map_area.getWidth() * FooCityGUIConstants.TILE_WIDTH - r.width;
 					else
 						x += 32;
 					break;

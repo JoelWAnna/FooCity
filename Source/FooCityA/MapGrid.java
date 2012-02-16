@@ -3,6 +3,7 @@
 // Developers: Joel Anna and David Wiza
 //
 
+import java.awt.Dimension;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
@@ -44,14 +45,32 @@ class MapGridConstants
 public class MapGrid
 {
 	private Tile[][] tileGrid;
-	public static PrintStream out = new PrintStream(System.out);
+	private Dimension map_area;
+	private int map_size;
+	
+	public Dimension getMapArea() {
+		return (Dimension)map_area.clone();
+	}
 
-	private final static int AREA =  MapGridConstants.MAP_WIDTH * MapGridConstants.MAP_HEIGHT;
+	public static PrintStream out = new PrintStream(System.out);
 
 	public MapGrid()
 	{
-		this.tileGrid = new Tile[MapGridConstants.MAP_WIDTH][MapGridConstants.MAP_HEIGHT];
-
+		this(MapGridConstants.MAP_WIDTH, MapGridConstants.MAP_HEIGHT);
+	}
+	
+	public MapGrid(int width, int height)
+	{
+		if (width < 5 || height < 5)
+		{
+			width = MapGridConstants.MAP_WIDTH;
+			height = MapGridConstants.MAP_HEIGHT;
+		}
+		if (width != height)
+			System.out.println("width != height");
+		map_area = new Dimension(width, height);
+		this.tileGrid = new Tile[(int) map_area.getWidth()][(int) map_area.getHeight()];
+		map_size = width * height;
 	}
 
 	public void Print()
@@ -59,12 +78,17 @@ public class MapGrid
 		out.print(this.toString());
 	}
 
+	private boolean tileInRange(int x, int y)
+	{
+		return (tileGrid != null &&
+				   (x >= 0 && y >= 0) &&
+				   (x < map_area.getHeight()) &&
+				   (y < map_area.getWidth()));
+	}
+
 	public int getTileAt(int x,int y) 
 	{
-		if (tileGrid != null &&
-		   (x >= 0 && y >= 0) &&
-		   (x < MapGridConstants.MAP_WIDTH) &&
-		   (y < MapGridConstants.MAP_HEIGHT))
+		if (tileInRange(x, y))
 		{
 			Tile current_tile = tileGrid[x][y];
 			if (current_tile != null)
@@ -75,23 +99,20 @@ public class MapGrid
 		return 0;
 	}
 	
-	public Tile getTile(int x, int y){
-		if (tileGrid != null &&
-		   (x >= 0 && y >= 0) &&
-		   (x < MapGridConstants.MAP_WIDTH) &&
-		   (y < MapGridConstants.MAP_HEIGHT))
-				return tileGrid[x][y];
+	public Tile getTile(int x, int y)
+	{
+		if (tileInRange(x, y))
+			return tileGrid[x][y];
 		return null;
-	
 	}
 
 	@Override
 	public String toString()
 	{
 		String s = "";
-		for (int y =0; y < MapGridConstants.MAP_HEIGHT; ++y)
+		for (int y =0; y < map_area.getHeight(); ++y)
 		{
-			for (int x = 0; x < MapGridConstants.MAP_WIDTH; ++x)
+			for (int x = 0; x < map_area.getWidth(); ++x)
 				s += tileGrid[x][y].getTileChar();
 			s += "\n";
 		}
@@ -104,8 +125,18 @@ public class MapGrid
 			return false;
 		File infile = new File(filename);
 		long length = infile.length();
-		if (length == 0 || length < MapGrid.AREA)
-			return false;
+
+		if (length == 0 || length < this.map_size)
+		{
+			if (length < 25)
+				return false;
+			int width = (int) Math.sqrt((double)length);
+			
+			map_area = new Dimension(width, width);
+			map_size = width*width;
+			tileGrid = new Tile[(int) map_area.getWidth()][(int) map_area.getHeight()];
+				
+		}
 
 		Scanner inScanner;
 		try
@@ -120,17 +151,17 @@ public class MapGrid
 		}
 		
 		
-		for (int y = 0; y < MapGridConstants.MAP_HEIGHT; ++y)
+		for (int y = 0; y < map_area.getHeight(); ++y)
 		{
 			if (!inScanner.hasNextLine())
 				return false;
 			
 			String currentLine = inScanner.nextLine();
 			
-			if (currentLine.length() <  MapGridConstants.MAP_WIDTH)
+			if (currentLine.length() < map_area.getWidth())
 				return false;
 
-			for (int x = 0; x <  MapGridConstants.MAP_WIDTH; ++x)
+			for (int x = 0; x <  map_area.getWidth(); ++x)
 			{
 				this.tileGrid[x][y] = new Tile(currentLine.charAt(x));
 			}
@@ -140,7 +171,8 @@ public class MapGrid
 
 	public boolean setTile(int x, int y, int i) 
 	{
-		if (i < MapGridConstants.LAST_TILE)
+		if ((0 < i && i < MapGridConstants.LAST_TILE)
+			&& tileInRange(x,y))
 		{
 			Tile oldTile = this.tileGrid[x][y];
 			if (oldTile.isReplaceable())
