@@ -161,10 +161,22 @@ public class FooCityGUI implements FooCityGUIInterface
 	{
 		map_panel.repaint();
 		minimap_panel.repaint();
+		this.currentFunds.setText("Current Funds: " + Integer.toString(city_manager.getAvailableFunds()));
 		//city_manager.propagateMetrics(); //This should not be called by the GUI
+		updateTileDescription(city_manager.getPlacingTile());
 	}
 
-
+	private void updateTileDescription(int tileType)
+	{
+	Tile tempTile = new Tile(tileType);
+	selectedCost.setText("Cost: $" + Integer.toString(tempTile.price));
+	selectedDescription.setText(tempTile.description);
+	if (tempTile.price > city_manager.getAvailableFunds())
+		selectedCost.setForeground(Color.red);
+	else
+		selectedCost.setForeground(Color.black);
+	}
+	
 	/**
 	 * Initialize the contents of the frame.
 	 */
@@ -334,14 +346,14 @@ public class FooCityGUI implements FooCityGUIInterface
 		box.add(minimap_panel);
 		
 		Box bottomBox = Box.createVerticalBox();
-		currentFunds = new JLabel("Current Funds: " + Integer.toString(city_manager.getAvailableFunds()));
+		currentFunds = new JLabel("Current Funds: " + city_manager.getAvailableFunds());
 		nextTurn = new JButton("Next Turn");
 		nextTurn.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				city_manager.advanceTurn();
-				
+				updateDisplay();
 			}
 			
 		});
@@ -493,7 +505,7 @@ public class FooCityGUI implements FooCityGUIInterface
 					}
 					city_manager.Quit();
 				}
-
+				updateDisplay();
 				GamePreviewWindow.NewGameWindow(frame);
 				updateDisplay();
 				break;
@@ -513,6 +525,7 @@ public class FooCityGUI implements FooCityGUIInterface
 					}
 					city_manager.Quit();
 				}
+				updateDisplay();
 				GamePreviewWindow.LoadGameWindow(frame);
 				updateDisplay();
 				break;
@@ -527,7 +540,7 @@ public class FooCityGUI implements FooCityGUIInterface
 							JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE))
 					{
 					case JOptionPane.CANCEL_OPTION:
-						break;
+						return;
 					case JOptionPane.YES_OPTION:
 						if (!saveGame())
 							break;
@@ -604,15 +617,9 @@ public class FooCityGUI implements FooCityGUIInterface
 			buttonPressed.setSelected(true);
 			scrollPane.grabFocus();
 			String command = e.getActionCommand();
-			Tile tempTile = new Tile(Integer.parseInt(command));
 			city_manager.setPlacingTile(Integer.parseInt(command));
-			selectedCost.setText("Cost: $" + Integer.toString(tempTile.price));
-			selectedDescription.setText(tempTile.description);
-			if (tempTile.price > city_manager.getAvailableFunds())
-				selectedCost.setForeground(Color.red);
-			else
-				selectedCost.setForeground(Color.black);
 			
+			updateTileDescription(Integer.parseInt(command));
 			return;
 		}
 	}
@@ -706,12 +713,6 @@ public class FooCityGUI implements FooCityGUIInterface
 		toolPanel.setBounds(0, 0, FooCityGUIConstants.SIDEBAR_WIDTH, r.height);
 		toolPanel.revalidate();
 	}
-	
-	public void repaint(){
-		minimap_panel.repaint();
-		map_panel.repaint();
-	}
-
 }
 
 interface FooCityGUIInterface

@@ -94,7 +94,6 @@ public class FooCityManager
 			return;
 		this.turn++;
 		this.propagateMetrics();
-		FooCityGUI.window.repaint();
 	}
 
 	public boolean setPlacingTile(int i)
@@ -117,10 +116,15 @@ public class FooCityManager
 	{
 		if (current_map != null && tile_to_place > 0)
 		{
-			// CheckFundsAvailable
-			// propagateMetrics()
-			return current_map.setTile(x, y, tile_to_place);
-			
+			Tile tempTile = new Tile(tile_to_place);
+			if (tempTile.price <= this.availableFunds)
+			{
+				if (current_map.setTile(x, y, tile_to_place))
+				{
+					this.availableFunds -= tempTile.price;
+					return true;
+				}
+			}
 		}
 		return false;
 	}
