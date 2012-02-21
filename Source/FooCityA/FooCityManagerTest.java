@@ -131,7 +131,7 @@ public class FooCityManagerTest extends TestCase{
 		for (int y = 0; y < 10; ++y)
 			for (int x = 0; x < 10; ++x)
 			{
-				int actual_happiness = city_manager.GetMapGrid().getTile(x, y).happinessActual;
+				int actual_happiness = city_manager.GetMapGrid().getTile(x, y).metricsActual[Tile.METRIC_HAPPINESS];
 				String error = "\nTile(x,y) (" + x + "," + y + ")";//\nExpected: " + expectedHappiness[x][y] + " Found : " + actual_happiness;
 				Assert.assertEquals(error, expectedHappiness[x][y] , actual_happiness);
 			}

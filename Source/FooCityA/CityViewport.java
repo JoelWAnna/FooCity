@@ -273,7 +273,7 @@ class MiniMapPanel extends JPanel
 	    } else if (viewMode == 1) { // Pollution
 	    	for (int y = 0; y < map_area.getHeight(); y++) {
 	    		for (int x = 0; x <  map_area.getWidth(); x++){
-	    			int c = current_map.getTile(x, y).pollutionActual * 10 ;
+	    			int c = current_map.getTile(x, y).metricsActual[Tile.METRIC_POLLUTION] * 10 ;
 	    			if (c > 255) c = 255;
 	    			if (c < 0) c = 0;
 	    			g1.setColor(new Color(c,c,c));
@@ -283,7 +283,7 @@ class MiniMapPanel extends JPanel
 	    } else if (viewMode == this.scale) { // Crime
 	    	for (int y = 0; y < map_area.getHeight(); y++) {
 	    		for (int x = 0; x <  map_area.getWidth(); x++) {
-	    			int c = current_map.getTile(x, y).crimeActual * 10 ;
+	    			int c = current_map.getTile(x, y).metricsActual[Tile.METRIC_CRIME] * 10 ;
 	    			if (c > 255) c = 255;
 	    			if (c < 0) c = 0;
 	    			g1.setColor(new Color(c,c,c));
@@ -293,7 +293,7 @@ class MiniMapPanel extends JPanel
 	    } else if (viewMode == 3) { // Happiness
 	    	for (int y = 0; y < map_area.getHeight(); y++) {
 	    		for (int x = 0; x <  map_area.getWidth(); x++) {
-	    			int c = current_map.getTile(x, y).happinessActual;
+	    			int c = current_map.getTile(x, y).metricsActual[Tile.METRIC_HAPPINESS];
 	    			if (c > 255) c = 255;
 	    			if (c < 0) c = 0;
 	    			g1.setColor(new Color(c,c,c));

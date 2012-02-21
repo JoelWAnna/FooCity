@@ -140,261 +140,91 @@ public class FooCityManager
 		int map_height = (int) map_area.getWidth();
 		for (int y = 0; y < map_height; y++){
 			for (int x = 0; x < map_width; x++){
-				current_map.getTile(x, y).crimeActual = 0;
-				current_map.getTile(x, y).happinessActual = 0;
-				current_map.getTile(x, y).pollutionActual = 0;
+				current_map.getTile(x, y).resetMetrics();
 			}
 			
 		}
 		
-		// Propagate crime
-		for (int y = 0; y < map_height; y++){
-			for (int x = 0; x < map_width; x++){
-				int c = current_map.getTile(x, y).crimeContributed;
-				// If we're ADDING crime...
-				if (c > 0){
-					// Branch to the right
-					for (int xx = 0; xx < c; xx++){
-						// Make sure we haven't gone past the right edge
-						if (x + xx < map_width) {
-							// Set the current value
-							current_map.getTile(x + xx, y).crimeActual += (c - xx);
-							// Branch up/down, start 1 unit past the horizontal branch
-							for (int yy = 1; yy < c - xx; yy++){
-								// Don't go past the top of the map
-								if (y - yy >= 0)
-									current_map.getTile(xx + x, y - yy).crimeActual += (c - xx - yy);
-								// Don't go below the map
-								if (y + yy < map_height)
-									current_map.getTile(xx + x, yy + y).crimeActual += (c - xx - yy);
+		// For each metric...
+		for (int metric = 0; metric < 3; metric++){
+			for (int y = 0; y < map_height; y++){
+				for (int x = 0; x < map_width; x++){
+					int c = current_map.getTile(x, y).metricsContributed[metric];
+					// If we're ADDING crime...
+					if (c > 0){
+						// Branch to the right
+						for (int xx = 0; xx < c; xx++){
+							// Make sure we haven't gone past the right edge
+							if (x + xx < map_width) {
+								// Set the current value
+								current_map.getTile(x + xx, y).metricsActual[metric] += (c - xx);
+								// Branch up/down, start 1 unit past the horizontal branch
+								for (int yy = 1; yy < c - xx; yy++){
+									// Don't go past the top of the map
+									if (y - yy >= 0)
+										current_map.getTile(xx + x, y - yy).metricsActual[metric] += (c - xx - yy);
+									// Don't go below the map
+									if (y + yy < map_height)
+										current_map.getTile(xx + x, yy + y).metricsActual[metric] += (c - xx - yy);
+								}
 							}
 						}
-					}
-					// Branch to the left
-					// We have to start 1 unit to the left to avoid
-					// double-adding the center column
-					for (int xx = -1; xx > -c; xx--){
-						// Make sure we haven't gone past the left edge
-						if (x + xx > -1) {
-							// Set the current value
-							current_map.getTile(x + xx, y).crimeActual += c + xx;
-							// Branch up/down, start 1 unit past the horizontal branch
-							for (int yy = 1; yy < c + xx; yy++){
-								// Don't go past the top of the map
-								if (y - yy >= 0)
-									current_map.getTile(x + xx, y - yy).crimeActual += (c + xx - yy);
-								// Don't go below the map
-								if (y + yy < map_height)
-									current_map.getTile(x + xx, yy + y).crimeActual += (c + xx - yy);
+						// Branch to the left
+						// We have to start 1 unit to the left to avoid
+						// double-adding the center column
+						for (int xx = -1; xx > -c; xx--){
+							// Make sure we haven't gone past the left edge
+							if (x + xx > -1) {
+								// Set the current value
+								current_map.getTile(x + xx, y).metricsActual[metric] += c + xx;
+								// Branch up/down, start 1 unit past the horizontal branch
+								for (int yy = 1; yy < c + xx; yy++){
+									// Don't go past the top of the map
+									if (y - yy >= 0)
+										current_map.getTile(x + xx, y - yy).metricsActual[metric] += (c + xx - yy);
+									// Don't go below the map
+									if (y + yy < map_height)
+										current_map.getTile(x + xx, yy + y).metricsActual[metric] += (c + xx - yy);
+								}
 							}
 						}
-					}
-				} else if (c < 0){  // But if we're SUBTRACTING crime...
-					//Treat it like we're adding it, but we'll be subtracting
-					c = -c;
-					// Branch to the right
-					for (int xx = 0; xx < c; xx++){
-						// Make sure we haven't gone past the right edge
-						if (x + xx < map_width) {
-							// Set the current value
-							current_map.getTile(x + xx, y).crimeActual -= (c - xx);
-							// Branch up/down, start 1 unit past the horizontal branch
-							for (int yy = 1; yy < c - xx; yy++){
-								// Don't go past the top of the map
-								if (y - yy >= 0)
-									current_map.getTile(xx + x, y - yy).crimeActual -= (c - xx - yy);
-								// Don't go below the map
-								if (y + yy < map_height)
-									current_map.getTile(xx + x, yy + y).crimeActual -= (c - xx - yy);
+					} else if (c < 0){  // But if we're SUBTRACTING crime...
+						//Treat it like we're adding it, but we'll be subtracting
+						c = -c;
+						// Branch to the right
+						for (int xx = 0; xx < c; xx++){
+							// Make sure we haven't gone past the right edge
+							if (x + xx < map_width) {
+								// Set the current value
+								current_map.getTile(x + xx, y).metricsActual[metric] -= (c - xx);
+								// Branch up/down, start 1 unit past the horizontal branch
+								for (int yy = 1; yy < c - xx; yy++){
+									// Don't go past the top of the map
+									if (y - yy >= 0)
+										current_map.getTile(xx + x, y - yy).metricsActual[metric] -= (c - xx - yy);
+									// Don't go below the map
+									if (y + yy < map_height)
+										current_map.getTile(xx + x, yy + y).metricsActual[metric] -= (c - xx - yy);
+								}
 							}
 						}
-					}
-					// Branch to the left
-					// We have to start 1 unit to the left to avoid
-					// double-adding the center column
-					for (int xx = -1; xx > -c; xx--){
-						// Make sure we haven't gone past the left edge
-						if (x + xx > -1) {
-							// Set the current value
-							current_map.getTile(x + xx, y).crimeActual -= c + xx;
-							// Branch up/down, start 1 unit past the horizontal branch
-							for (int yy = 1; yy < c + xx; yy++){
-								// Don't go past the top of the map
-								if (y - yy >= 0)
-									current_map.getTile(x + xx, y - yy).crimeActual -= (c + xx - yy);
-								// Don't go below the map
-								if (y + yy < map_height)
-									current_map.getTile(x + xx, yy + y).crimeActual -= (c + xx - yy);
-							}
-						}
-					}
-				}
-			}
-		}
-		
-		// Propagate pollution
-		for (int y = 0; y < map_height; y++){
-			for (int x = 0; x < map_width; x++){
-				int c = current_map.getTile(x, y).pollutionContributed;
-				// If we're ADDING crime...
-				if (c > 0){
-					// Branch to the right
-					for (int xx = 0; xx < c; xx++){
-						// Make sure we haven't gone past the right edge
-						if (x + xx < map_width) {
-							// Set the current value
-							current_map.getTile(x + xx, y).pollutionActual += (c - xx);
-							// Branch up/down, start 1 unit past the horizontal branch
-							for (int yy = 1; yy < c - xx; yy++){
-								// Don't go past the top of the map
-								if (y - yy >= 0)
-									current_map.getTile(xx + x, y - yy).pollutionActual += (c - xx - yy);
-								// Don't go below the map
-								if (y + yy < map_height)
-									current_map.getTile(xx + x, yy + y).pollutionActual += (c - xx - yy);
-							}
-						}
-					}
-					// Branch to the left
-					// We have to start 1 unit to the left to avoid
-					// double-adding the center column
-					for (int xx = -1; xx > -c; xx--){
-						// Make sure we haven't gone past the left edge
-						if (x + xx > -1) {
-							// Set the current value
-							current_map.getTile(x + xx, y).pollutionActual += c + xx;
-							// Branch up/down, start 1 unit past the horizontal branch
-							for (int yy = 1; yy < c + xx; yy++){
-								// Don't go past the top of the map
-								if (y - yy >= 0)
-									current_map.getTile(x + xx, y - yy).pollutionActual += (c + xx - yy);
-								// Don't go below the map
-								if (y + yy < map_height)
-									current_map.getTile(x + xx, yy + y).pollutionActual += (c + xx - yy);
-							}
-						}
-					}
-				} else if (c < 0){  // But if we're SUBTRACTING crime...
-					//Treat it like we're adding it, but we'll be subtracting
-					c = -c;
-					// Branch to the right
-					for (int xx = 0; xx < c; xx++){
-						// Make sure we haven't gone past the right edge
-						if (x + xx < map_width) {
-							// Set the current value
-							current_map.getTile(x + xx, y).pollutionActual -= (c - xx);
-							// Branch up/down, start 1 unit past the horizontal branch
-							for (int yy = 1; yy < c - xx; yy++){
-								// Don't go past the top of the map
-								if (y - yy >= 0)
-									current_map.getTile(xx + x, y - yy).pollutionActual -= (c - xx - yy);
-								// Don't go below the map
-								if (y + yy < map_height)
-									current_map.getTile(xx + x, yy + y).pollutionActual -= (c - xx - yy);
-							}
-						}
-					}
-					// Branch to the left
-					// We have to start 1 unit to the left to avoid
-					// double-adding the center column
-					for (int xx = -1; xx > -c; xx--){
-						// Make sure we haven't gone past the left edge
-						if (x + xx > -1) {
-							// Set the current value
-							current_map.getTile(x + xx, y).pollutionActual -= c + xx;
-							// Branch up/down, start 1 unit past the horizontal branch
-							for (int yy = 1; yy < c + xx; yy++){
-								// Don't go past the top of the map
-								if (y - yy >= 0)
-									current_map.getTile(x + xx, y - yy).pollutionActual -= (c + xx - yy);
-								// Don't go below the map
-								if (y + yy < map_height)
-									current_map.getTile(x + xx, yy + y).pollutionActual -= (c + xx - yy);
-							}
-						}
-					}
-				}
-			}
-		}
-		
-		// Propagate happiness
-		for (int y = 0; y < map_height; y++){
-			for (int x = 0; x < map_width; x++){
-				int c = current_map.getTile(x, y).happinessContributed;
-				// If we're ADDING crime...
-				if (c > 0){
-					// Branch to the right
-					for (int xx = 0; xx < c; xx++){
-						// Make sure we haven't gone past the right edge
-						if (x + xx < map_width) {
-							// Set the current value
-							current_map.getTile(x + xx, y).happinessActual += (c - xx);
-							// Branch up/down, start 1 unit past the horizontal branch
-							for (int yy = 1; yy < c - xx; yy++){
-								// Don't go past the top of the map
-								if (y - yy >= 0)
-									current_map.getTile(xx + x, y - yy).happinessActual += (c - xx - yy);
-								// Don't go below the map
-								if (y + yy < map_height)
-									current_map.getTile(xx + x, yy + y).happinessActual += (c - xx - yy);
-							}
-						}
-					}
-					// Branch to the left
-					// We have to start 1 unit to the left to avoid
-					// double-adding the center column
-					for (int xx = -1; xx > -c; xx--){
-						// Make sure we haven't gone past the left edge
-						if (x + xx > -1) {
-							// Set the current value
-							current_map.getTile(x + xx, y).happinessActual += c + xx;
-							// Branch up/down, start 1 unit past the horizontal branch
-							for (int yy = 1; yy < c + xx; yy++){
-								// Don't go past the top of the map
-								if (y - yy >= 0)
-									current_map.getTile(x + xx, y - yy).happinessActual += (c + xx - yy);
-								// Don't go below the map
-								if (y + yy < map_height)
-									current_map.getTile(x + xx, yy + y).happinessActual += (c + xx - yy);
-							}
-						}
-					}
-				} else if (c < 0){  // But if we're SUBTRACTING crime...
-					//Treat it like we're adding it, but we'll be subtracting
-					c = -c;
-					// Branch to the right
-					for (int xx = 0; xx < c; xx++){
-						// Make sure we haven't gone past the right edge
-						if (x + xx < map_width) {
-							// Set the current value
-							current_map.getTile(x + xx, y).happinessActual -= (c - xx);
-							// Branch up/down, start 1 unit past the horizontal branch
-							for (int yy = 1; yy < c - xx; yy++){
-								// Don't go past the top of the map
-								if (y - yy >= 0)
-									current_map.getTile(xx + x, y - yy).happinessActual -= (c - xx - yy);
-								// Don't go below the map
-								if (y + yy < map_height)
-									current_map.getTile(xx + x, yy + y).happinessActual -= (c - xx - yy);
-							}
-						}
-					}
-					// Branch to the left
-					// We have to start 1 unit to the left to avoid
-					// double-adding the center column
-					for (int xx = -1; xx > -c; xx--){
-						// Make sure we haven't gone past the left edge
-						if (x + xx > -1) {
-							// Set the current value
-							current_map.getTile(x + xx, y).happinessActual -= c + xx;
-							// Branch up/down, start 1 unit past the horizontal branch
-							for (int yy = 1; yy < c + xx; yy++){
-								// Don't go past the top of the map
-								if (y - yy >= 0)
-									current_map.getTile(x + xx, y - yy).happinessActual -= (c + xx - yy);
-								// Don't go below the map
-								if (y + yy < map_height)
-									current_map.getTile(x + xx, yy + y).happinessActual -= (c + xx - yy);
+						// Branch to the left
+						// We have to start 1 unit to the left to avoid
+						// double-adding the center column
+						for (int xx = -1; xx > -c; xx--){
+							// Make sure we haven't gone past the left edge
+							if (x + xx > -1) {
+								// Set the current value
+								current_map.getTile(x + xx, y).metricsActual[metric] -= c + xx;
+								// Branch up/down, start 1 unit past the horizontal branch
+								for (int yy = 1; yy < c + xx; yy++){
+									// Don't go past the top of the map
+									if (y - yy >= 0)
+										current_map.getTile(x + xx, y - yy).metricsActual[metric] -= (c + xx - yy);
+									// Don't go below the map
+									if (y + yy < map_height)
+										current_map.getTile(x + xx, yy + y).metricsActual[metric] -= (c + xx - yy);
+								}
 							}
 						}
 					}
