@@ -13,6 +13,7 @@ import java.util.Scanner;
 
 public class FooCityManager
 {
+	private int availableFunds = 1000;
 	private MapGrid current_map;
 	private int tile_to_place;
 	private int turn;
@@ -43,9 +44,7 @@ public class FooCityManager
 
 	public MapGrid GetMapGrid()
 	{
-		if (turn > 0)
-			return current_map;
-		return null;
+		return current_map;
 	}
 
 	public boolean SetMapGrid(MapGrid new_map)
@@ -55,6 +54,7 @@ public class FooCityManager
 			if (current_map == null)
 			{
 				current_map = new_map;
+				this.propagateMetrics();
 				return true;
 			}
 		}
@@ -81,7 +81,7 @@ public class FooCityManager
 
 	public void startGame()
 	{
-		advanceTurn();		
+		//advanceTurn();		
 	}
 
 	public int getCurrentTurn() {
@@ -90,8 +90,11 @@ public class FooCityManager
 
 	public void advanceTurn()
 	{
-		if (current_map != null)
-			this.turn++;
+		if (current_map == null)
+			return;
+		this.turn++;
+		this.propagateMetrics();
+		FooCityGUI.window.repaint();
 	}
 
 	public boolean setPlacingTile(int i)
@@ -168,7 +171,7 @@ public class FooCityManager
 					// double-adding the center column
 					for (int xx = -1; xx > -c; xx--){
 						// Make sure we haven't gone past the left edge
-						if (x + xx > 0) {
+						if (x + xx > -1) {
 							// Set the current value
 							current_map.getTile(x + xx, y).crimeActual += c + xx;
 							// Branch up/down, start 1 unit past the horizontal branch
@@ -207,7 +210,7 @@ public class FooCityManager
 					// double-adding the center column
 					for (int xx = -1; xx > -c; xx--){
 						// Make sure we haven't gone past the left edge
-						if (x + xx > 0) {
+						if (x + xx > -1) {
 							// Set the current value
 							current_map.getTile(x + xx, y).crimeActual -= c + xx;
 							// Branch up/down, start 1 unit past the horizontal branch
@@ -253,7 +256,7 @@ public class FooCityManager
 					// double-adding the center column
 					for (int xx = -1; xx > -c; xx--){
 						// Make sure we haven't gone past the left edge
-						if (x + xx > 0) {
+						if (x + xx > -1) {
 							// Set the current value
 							current_map.getTile(x + xx, y).pollutionActual += c + xx;
 							// Branch up/down, start 1 unit past the horizontal branch
@@ -292,7 +295,7 @@ public class FooCityManager
 					// double-adding the center column
 					for (int xx = -1; xx > -c; xx--){
 						// Make sure we haven't gone past the left edge
-						if (x + xx > 0) {
+						if (x + xx > -1) {
 							// Set the current value
 							current_map.getTile(x + xx, y).pollutionActual -= c + xx;
 							// Branch up/down, start 1 unit past the horizontal branch
@@ -338,7 +341,7 @@ public class FooCityManager
 					// double-adding the center column
 					for (int xx = -1; xx > -c; xx--){
 						// Make sure we haven't gone past the left edge
-						if (x + xx > 0) {
+						if (x + xx > -1) {
 							// Set the current value
 							current_map.getTile(x + xx, y).happinessActual += c + xx;
 							// Branch up/down, start 1 unit past the horizontal branch
@@ -377,7 +380,7 @@ public class FooCityManager
 					// double-adding the center column
 					for (int xx = -1; xx > -c; xx--){
 						// Make sure we haven't gone past the left edge
-						if (x + xx > 0) {
+						if (x + xx > -1) {
 							// Set the current value
 							current_map.getTile(x + xx, y).happinessActual -= c + xx;
 							// Branch up/down, start 1 unit past the horizontal branch
@@ -541,6 +544,6 @@ public class FooCityManager
 
 	public int getAvailableFunds()
 	{
-		return 0;
+		return availableFunds;
 	}
 }

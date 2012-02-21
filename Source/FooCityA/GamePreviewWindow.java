@@ -142,7 +142,6 @@ public class GamePreviewWindow extends JDialog implements ActionListener, FooCit
 		{
 			city_manager = new FooCityManager();
 			boolean mapLoaded = city_manager.NewGame(fc.getSelectedFile().getAbsolutePath());
-			city_manager.advanceTurn();
 			buttonOK.setEnabled(mapLoaded);
 			// Force a redraw of the window
 			repaint();

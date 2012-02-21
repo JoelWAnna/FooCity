@@ -4,9 +4,11 @@
 //
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -24,12 +26,14 @@ import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -37,6 +41,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JToggleButton;
+import javax.swing.border.Border;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -45,7 +52,7 @@ class FooCityGUIConstants
 {
 	public static final int TILE_WIDTH  = 32;
 	public static final int TILE_HEIGHT = 32;
-	public static final int WINDOW_HEIGHT = 600;
+	public static final int WINDOW_HEIGHT = 700;
 	public static final int WINDOW_WIDTH = 800;
 	public static final int SIDEBAR_WIDTH = 257;
 	
@@ -68,10 +75,15 @@ public class FooCityGUI implements FooCityGUIInterface
 	private JMenuBar menuBar;
 	private final Action NewGame = new MainMenuAction();
 	private final Action Tile = new Place_Tile_Action();
+	private JLabel currentFunds;
+	private JTextArea selectedDescription;
+	private JLabel selectedCost;
 	
-	private JButton buttonResidential, buttonCommercial, buttonIndustrial,
+	private JButton nextTurn;
+	private JToggleButton buttonResidential, buttonCommercial, buttonIndustrial,
 	buttonPark, buttonSewage, buttonPolice, buttonSolar, buttonRoad, 
-	buttonGas, buttonCoal, buttonWindFarm, buttonDirt, buttonForrest, buttonGrass;
+	buttonGas, buttonCoal, buttonWindFarm, buttonDirt, buttonForrest, buttonGrass,
+	buttonBulldoze;
 	//buttonWater, buttonBeach;
 	
 	private final String waterTile   		= "Water Tile";
@@ -94,7 +106,7 @@ public class FooCityGUI implements FooCityGUIInterface
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -104,7 +116,7 @@ public class FooCityGUI implements FooCityGUIInterface
 				}
 			}
 		});
-	}
+	}*/
 
 	/**
 	 * Create the application.
@@ -177,66 +189,67 @@ public class FooCityGUI implements FooCityGUIInterface
 		GridLayout buttonGridLayout = new GridLayout(0,3);
 		JPanel buttonGridPanel = new JPanel();
 		buttonGridPanel.setLayout(buttonGridLayout);
+		Box box = Box.createVerticalBox();
 		toolPanel.setBounds(0, 0, FooCityGUIConstants.SIDEBAR_WIDTH, FooCityGUIConstants.WINDOW_HEIGHT - 38);
 		minimap_panel = new MiniMapPanel(this, 2);
 		minimap_panel.repaint();
 		
-		buttonResidential = new JButton("R");
+		buttonResidential = new JToggleButton("R");
 		buttonResidential.addActionListener(Tile);
 		buttonResidential.setActionCommand(Integer.toString(MapGridConstants.RESIDENTIAL_TILE));
 		buttonGridPanel.add(buttonResidential);
 		
-		buttonCommercial = new JButton("C");
+		buttonCommercial = new JToggleButton("C");
 		buttonCommercial.addActionListener(Tile);
 		buttonCommercial.setActionCommand(Integer.toString(MapGridConstants.COMMERCIAL_TILE));
 		buttonGridPanel.add(buttonCommercial);
 		
-		buttonIndustrial = new JButton("I");
+		buttonIndustrial = new JToggleButton("I");
 		buttonIndustrial.addActionListener(Tile);
 		buttonIndustrial.setActionCommand(Integer.toString(MapGridConstants.INDUSTRIAL_TILE));
 		buttonGridPanel.add(buttonIndustrial);
 		
-		buttonRoad = new JButton("Road");
+		buttonRoad = new JToggleButton("Road");
 		buttonRoad.addActionListener(Tile);
 		buttonRoad.setActionCommand(Integer.toString(MapGridConstants.ROAD_TILE));
 		buttonGridPanel.add(buttonRoad);
 		
-		buttonPark = new JButton("Park");
+		buttonPark = new JToggleButton("Park");
 		buttonPark.addActionListener(Tile);
 		buttonPark.setActionCommand(Integer.toString(MapGridConstants.PARK_TILE));
 		buttonGridPanel.add(buttonPark);
 		
-		buttonSewage = new JButton("Sewage");
+		buttonSewage = new JToggleButton("Sewage");
 		buttonSewage.addActionListener(Tile);
 		buttonSewage.setActionCommand(Integer.toString(MapGridConstants.SEWAGE_TILE));
 		buttonGridPanel.add(buttonSewage);
 		
-		buttonPolice = new JButton("Police");
+		buttonPolice = new JToggleButton("Police");
 		buttonPolice.addActionListener(Tile);
 		buttonPolice.setActionCommand(Integer.toString(MapGridConstants.POLICE_TILE));
 		buttonGridPanel.add(buttonPolice);
 		
-		buttonSolar = new JButton("Solar");
+		buttonSolar = new JToggleButton("Solar");
 		buttonSolar.addActionListener(Tile);
 		buttonSolar.setActionCommand(Integer.toString(MapGridConstants.SOLAR_TILE));
 		buttonGridPanel.add(buttonSolar);
 		
-		buttonGas = new JButton("Gas");
+		buttonGas = new JToggleButton("Gas");
 		buttonGas.addActionListener(Tile);
 		buttonGas.setActionCommand(Integer.toString(MapGridConstants.GAS_TILE));
 		buttonGridPanel.add(buttonGas);
 		
-		buttonCoal = new JButton("Coal");
+		buttonCoal = new JToggleButton("Coal");
 		buttonCoal.addActionListener(Tile);
 		buttonCoal.setActionCommand(Integer.toString(MapGridConstants.COAL_TILE));
 		buttonGridPanel.add(buttonCoal);
 		
-		buttonWindFarm = new JButton("Wind");
+		buttonWindFarm = new JToggleButton("Wind");
 		buttonWindFarm.addActionListener(Tile);
 		buttonWindFarm.setActionCommand(Integer.toString(MapGridConstants.WIND_TILE));
 		buttonGridPanel.add(buttonWindFarm);
 		
-		buttonDirt = new JButton("Dirt");
+		buttonDirt = new JToggleButton("Dirt");
 		buttonDirt.addActionListener(Tile);
 		buttonDirt.setActionCommand(Integer.toString(MapGridConstants.DIRT_TILE));
 		buttonGridPanel.add(buttonDirt);
@@ -246,25 +259,30 @@ public class FooCityGUI implements FooCityGUIInterface
 		buttonWater.setActionCommand(waterTile);
 		buttonGridPanel.add(buttonWater);*/
 		
-		buttonGrass = new JButton("Grass");
+		buttonGrass = new JToggleButton("Grass");
 		buttonGrass.addActionListener(Tile);
 		buttonGrass.setActionCommand(Integer.toString(MapGridConstants.GRASS_TILE));
 		buttonGridPanel.add(buttonGrass);
 		
-		buttonForrest = new JButton("Forrest");
+		buttonForrest = new JToggleButton("Forrest");
 		buttonForrest.addActionListener(Tile);
 		buttonForrest.setActionCommand(Integer.toString(MapGridConstants.FORREST_TILE));
 		buttonGridPanel.add(buttonForrest);
+		
+		buttonBulldoze = new JToggleButton("Bulldoze");
+		buttonBulldoze.addActionListener(Tile);
+		buttonBulldoze.setActionCommand(Integer.toString(-1));
+		buttonGridPanel.add(buttonBulldoze);
+		
 		
 		/*buttonBeach = new JButton("Beach");
 		buttonBeach.addActionListener(Tile);
 		buttonBeach.setActionCommand(beachTile);
 		buttonGridPanel.add(buttonBeach);*/
+
 		
-		//JPanel miniMapGroup = new JPanel();
-		Box miniMapGroupBox = Box.createVerticalBox();
 		String[] viewModes = { "Normal", "Pollution", "Crime", "Happiness" };
-		JComboBox<String> miniMapViewList = new JComboBox<String>(viewModes);
+		JComboBox miniMapViewList = new JComboBox(viewModes);
 		miniMapViewList.addActionListener(new ActionListener(){
 
 			@Override
@@ -273,9 +291,9 @@ public class FooCityGUI implements FooCityGUIInterface
 				Object source = e.getSource();
 				// check type, uses <?> instead of String because we are only interested in
 				// the index and eliminates the warning of an unchecked conversion
-				if (source instanceof JComboBox<?>)
+				if (source instanceof JComboBox)
 				{
-					JComboBox<?> cb = (JComboBox<?>) source;
+					JComboBox cb = (JComboBox) source;
 					minimap_panel.setViewMode(cb.getSelectedIndex());
 					scrollPane.grabFocus();
 				}
@@ -284,11 +302,56 @@ public class FooCityGUI implements FooCityGUIInterface
 		});
 		miniMapViewList.setSelectedIndex(0);
 		
-		miniMapGroupBox.add(miniMapViewList);
-		miniMapGroupBox.add(minimap_panel);
 		
-		toolPanel.add(buttonGridPanel, BorderLayout.PAGE_START);
-		toolPanel.add(miniMapGroupBox, BorderLayout.PAGE_END);
+		selectedCost = new JLabel(" ");
+		selectedCost.setHorizontalAlignment(JLabel.LEFT);
+		selectedCost.setVerticalAlignment(JLabel.TOP);
+		selectedCost.setMaximumSize(new Dimension(256,15));
+		selectedCost.setAlignmentX(Component.CENTER_ALIGNMENT);
+		selectedCost.setFont(new Font("Dialog", 1, 16));
+
+		
+		selectedDescription = new JTextArea(" ");
+		selectedDescription.setMaximumSize(new Dimension(256, 80));
+		selectedDescription.setPreferredSize(new Dimension(256, 80));
+		selectedDescription.setAlignmentX(Component.CENTER_ALIGNMENT);
+		selectedDescription.setBorder(BorderFactory.createEtchedBorder());
+		selectedDescription.setEditable(false);
+		selectedDescription.setCursor(null);
+		selectedDescription.setOpaque(false);
+		selectedDescription.setFocusable(false);
+		selectedDescription.setLineWrap(true);
+		selectedDescription.setWrapStyleWord(true);
+		
+		//box.add(Box.createHorizontalGlue());
+		box.add(buttonGridPanel);
+		//box.add(Box.createHorizontalGlue());
+		box.add(selectedCost);
+		//box.add(Box.createHorizontalGlue());
+		box.add(selectedDescription);
+		//box.add(Box.createHorizontalGlue());
+		box.add(miniMapViewList);
+		box.add(minimap_panel);
+		
+		Box bottomBox = Box.createVerticalBox();
+		currentFunds = new JLabel("Current Funds: " + Integer.toString(city_manager.getAvailableFunds()));
+		nextTurn = new JButton("Next Turn");
+		nextTurn.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				city_manager.advanceTurn();
+				
+			}
+			
+		});
+		bottomBox.add(currentFunds);
+		bottomBox.add(nextTurn);
+		
+		
+		
+		toolPanel.add(box, BorderLayout.PAGE_START);
+		toolPanel.add(bottomBox, BorderLayout.PAGE_END);
 
 		frame.getContentPane().add(toolPanel);
 		frame.getContentPane().add(scrollPane);
@@ -297,6 +360,8 @@ public class FooCityGUI implements FooCityGUIInterface
 		initializeMenuBar();
 		
 		AddKeyListeners();
+		city_manager.propagateMetrics();
+		
 	}
 	
 	private void initializeMenuBar()
@@ -485,7 +550,8 @@ public class FooCityGUI implements FooCityGUIInterface
 				fc.setFileFilter(FooCitySaveFilter);
 				fc.setAcceptAllFileFilterUsed(false);
 				int returnVal = fc.showOpenDialog(null);
-				if (returnVal == JFileChooser.APPROVE_OPTION)
+				if (returnVal == JFileChooser.APPROVE_OPTION) {
+					
 				{
 					File save_file = fc.getSelectedFile();
 					if (save_file.getAbsolutePath().lastIndexOf(".fcs", 0) == -1)
@@ -503,6 +569,8 @@ public class FooCityGUI implements FooCityGUIInterface
 					}
 					return city_manager.SaveGame(save_file.getAbsolutePath());
 				}
+				}
+					
 			}
 			return false;
 		}
@@ -517,9 +585,34 @@ public class FooCityGUI implements FooCityGUIInterface
 		}
 		public void actionPerformed(ActionEvent e)
 		{
+			JToggleButton buttonPressed = (JToggleButton) e.getSource();
+			buttonResidential.setSelected(false);
+			buttonCommercial.setSelected(false);
+			buttonIndustrial.setSelected(false);
+			buttonPark.setSelected(false);
+			buttonSewage.setSelected(false);
+			buttonPolice.setSelected(false);
+			buttonSolar.setSelected(false);
+			buttonRoad.setSelected(false);
+			buttonGas.setSelected(false);
+			buttonCoal.setSelected(false);
+			buttonWindFarm.setSelected(false);
+			buttonDirt.setSelected(false);
+			buttonForrest.setSelected(false);
+			buttonGrass.setSelected(false);
+			buttonBulldoze.setSelected(false);
+			buttonPressed.setSelected(true);
 			scrollPane.grabFocus();
 			String command = e.getActionCommand();
+			Tile tempTile = new Tile(Integer.parseInt(command));
 			city_manager.setPlacingTile(Integer.parseInt(command));
+			selectedCost.setText("Cost: $" + Integer.toString(tempTile.price));
+			selectedDescription.setText(tempTile.description);
+			if (tempTile.price > city_manager.getAvailableFunds())
+				selectedCost.setForeground(Color.red);
+			else
+				selectedCost.setForeground(Color.black);
+			
 			return;
 		}
 	}
@@ -612,6 +705,11 @@ public class FooCityGUI implements FooCityGUIInterface
 		scrollPane.revalidate();
 		toolPanel.setBounds(0, 0, FooCityGUIConstants.SIDEBAR_WIDTH, r.height);
 		toolPanel.revalidate();
+	}
+	
+	public void repaint(){
+		minimap_panel.repaint();
+		map_panel.repaint();
 	}
 
 }
