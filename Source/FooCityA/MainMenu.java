@@ -10,7 +10,7 @@ import javax.swing.*;
 public class MainMenu extends JPanel implements ActionListener {
 	
 	protected JButton buttonNewGame, buttonLoadGame;
-	
+	static protected JFrame frame;
 	
 	public MainMenu(){
 				
@@ -35,7 +35,6 @@ public class MainMenu extends JPanel implements ActionListener {
 	
 	public static void createAndShowGUI(){
 		// Create window
-		JFrame frame;
 		frame = new JFrame("Welcome to FooCity");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
@@ -54,9 +53,15 @@ public class MainMenu extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if ("newgame".equals(e.getActionCommand())){
 			// Create a new game dialog
-			NewGame newgame = new NewGame();
+			GamePreviewWindow.NewGameWindow(frame);
 			// Hide this window
 			javax.swing.SwingUtilities.getWindowAncestor(this).dispose();
+		}
+		else if ("loadgame".equals(e.getActionCommand())){
+			// Hide this window
+			javax.swing.SwingUtilities.getWindowAncestor(this).dispose();
+			// Create a load game dialog
+			GamePreviewWindow.LoadGameWindow(frame);
 		}
 		
 	}

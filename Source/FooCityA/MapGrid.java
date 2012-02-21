@@ -118,7 +118,17 @@ public class MapGrid
 		}
 		return s;
 	}
-
+/*
+	public boolean FromString(String MapGridString)
+	{
+		if (MapGridString != null)// && MapGridString.length() != map_area.getHeight() * (map_area.getWidth()+1))
+		{
+			Scanner sc = new Scanner(MapGridString);
+			return fromScanner(sc);
+		}
+		return false;			
+	}
+*/
 	public boolean FromFile(String filename)
 	{
 		if (filename == null)
@@ -150,7 +160,11 @@ public class MapGrid
 			return false;
 		}
 		
-		
+		return fromScanner(inScanner);
+	}
+
+	public boolean fromScanner(Scanner inScanner)
+	{
 		for (int y = 0; y < map_area.getHeight(); ++y)
 		{
 			if (!inScanner.hasNextLine())
@@ -169,6 +183,15 @@ public class MapGrid
 		return true;
 	}
 
+	public int TileCharToInt(char c)
+	{
+		for (int i = 0; i < MapGridConstants.CHAR_TILES.length; ++i)
+		{
+			if ( MapGridConstants.CHAR_TILES[i] == c)
+				return i;
+		}
+		return 0;
+	}
 	public boolean setTile(int x, int y, int i) 
 	{
 		if ((0 < i && i < MapGridConstants.LAST_TILE)

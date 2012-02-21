@@ -8,8 +8,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
-import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -18,15 +16,18 @@ import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
+import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -38,6 +39,7 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
 
 class FooCityGUIConstants
 {
@@ -77,7 +79,7 @@ public class FooCityGUI implements FooCityGUIInterface
 	private final String grassTile  		= "Grass Tile";
 	private final String dirtTile	 		= "Dirt Tile";
 	private final String forrestTile 		= "Forrest Tile";
-	private final String residentialTile	= "Residential Tile";
+/*	private final String residentialTile	= "Residential Tile";
 	private final String commercialTile 	= "Commercial Tile";
 	private final String industrialTile		= "Industrial Tile";
 	private final String parkTile			= "Park Tile";
@@ -88,7 +90,7 @@ public class FooCityGUI implements FooCityGUIInterface
 	private final String coalTile			= "Coal Tile";
 	private final String windTile			= "Wind Tile";
 	private final String roadTile			= "Road Tile";
-
+*/
 	/**
 	 * Launch the application.
 	 */
@@ -116,6 +118,12 @@ public class FooCityGUI implements FooCityGUIInterface
 	public FooCityGUI(MapGrid new_map)
 	{
 		city_manager = new FooCityManager(new_map);
+		initialize();
+	}
+
+	public FooCityGUI(FooCityManager city_manager2)
+	{
+		city_manager = city_manager2;
 		initialize();
 	}
 
@@ -170,7 +178,7 @@ public class FooCityGUI implements FooCityGUIInterface
 		JPanel buttonGridPanel = new JPanel();
 		buttonGridPanel.setLayout(buttonGridLayout);
 		toolPanel.setBounds(0, 0, FooCityGUIConstants.SIDEBAR_WIDTH, FooCityGUIConstants.WINDOW_HEIGHT - 38);
-		minimap_panel = new MiniMapPanel(this);
+		minimap_panel = new MiniMapPanel(this, 2);
 		minimap_panel.repaint();
 		
 		buttonResidential = new JButton("R");
@@ -256,13 +264,21 @@ public class FooCityGUI implements FooCityGUIInterface
 		//JPanel miniMapGroup = new JPanel();
 		Box miniMapGroupBox = Box.createVerticalBox();
 		String[] viewModes = { "Normal", "Pollution", "Crime", "Happiness" };
-		JComboBox miniMapViewList = new JComboBox(viewModes);
+		JComboBox<String> miniMapViewList = new JComboBox<String>(viewModes);
 		miniMapViewList.addActionListener(new ActionListener(){
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				JComboBox cb = (JComboBox)e.getSource();
-				minimap_panel.setViewMode(cb.getSelectedIndex());				
+			public void actionPerformed(ActionEvent e)
+			{
+				Object source = e.getSource();
+				// check type, uses <?> instead of String because we are only interested in
+				// the index and eliminates the warning of an unchecked conversion
+				if (source instanceof JComboBox<?>)
+				{
+					JComboBox<?> cb = (JComboBox<?>) source;
+					minimap_panel.setViewMode(cb.getSelectedIndex());
+					scrollPane.grabFocus();
+				}
 			}
 			
 		});
@@ -273,10 +289,11 @@ public class FooCityGUI implements FooCityGUIInterface
 		
 		toolPanel.add(buttonGridPanel, BorderLayout.PAGE_START);
 		toolPanel.add(miniMapGroupBox, BorderLayout.PAGE_END);
-		
+
 		frame.getContentPane().add(toolPanel);
 		frame.getContentPane().add(scrollPane);
-		
+
+		scrollPane.grabFocus();
 		initializeMenuBar();
 		
 		AddKeyListeners();
@@ -366,6 +383,19 @@ public class FooCityGUI implements FooCityGUIInterface
 		}
 	}
 
+	public boolean setCityManager(FooCityManager city_manager2)
+	{
+		if (city_manager2 != null)
+		{
+			if (city_manager.getCurrentTurn() == 0)
+			{
+				city_manager = city_manager2;
+				return true;
+			}
+		}
+		return false;		
+	}
+
 	private class MainMenuAction extends AbstractAction
 	{
 		private FileFilter FooCitySaveFilter;
@@ -385,23 +415,21 @@ public class FooCityGUI implements FooCityGUIInterface
 			case FooCityGUIConstants.NEW_GAME:
 				if (city_manager != null && city_manager.GetMapGrid() != null)
 				{
-					final JOptionPane pane = new JOptionPane();
-
 					switch (JOptionPane.showInternalConfirmDialog(frame.getContentPane(),
 							"Save current game before starting a new game?", "New game",
 							JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE))
 					{
 					case JOptionPane.CANCEL_OPTION:
-						return;
+						break;
 					case JOptionPane.YES_OPTION:
 						if (!saveGame())
-							return;
+							break;
 					default:
 					}
 					city_manager.Quit();
 				}
-				
-				NewGame newgame = new NewGame();
+
+				GamePreviewWindow.NewGameWindow(frame);
 				updateDisplay();
 				break;
 			case FooCityGUIConstants.LOAD_GAME:
@@ -412,15 +440,16 @@ public class FooCityGUI implements FooCityGUIInterface
 							JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE))
 					{
 					case JOptionPane.CANCEL_OPTION:
-						return;
+						break;
 					case JOptionPane.YES_OPTION:
 						if (!saveGame())
-							return;
+							break;
 					default:
 					}
 					city_manager.Quit();
 				}
-				//LoadGame
+				GamePreviewWindow.LoadGameWindow(frame);
+				updateDisplay();
 				break;
 			case FooCityGUIConstants.SAVE_GAME:
 				saveGame();
@@ -433,31 +462,47 @@ public class FooCityGUI implements FooCityGUIInterface
 							JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE))
 					{
 					case JOptionPane.CANCEL_OPTION:
-						return;
+						break;
 					case JOptionPane.YES_OPTION:
 						if (!saveGame())
-							return;
+							break;
 					default:
 					}
 				}
 				System.exit(0);
 			}
-			
+			scrollPane.grabFocus();
 		}
-		
+
 		private boolean saveGame()
 		{
 			if (city_manager.getCurrentTurn() > 0)
 			{
 				JFileChooser fc = new JFileChooser();
-				fc.setCurrentDirectory(new java.io.File("./save"));
+				fc.setCurrentDirectory(new java.io.File("./saves"));
 				fc.setDialogTitle("Save file as...");
 				fc.setDialogType(JFileChooser.FILES_ONLY);
 				fc.setFileFilter(FooCitySaveFilter);
 				fc.setAcceptAllFileFilterUsed(false);
 				int returnVal = fc.showOpenDialog(null);
 				if (returnVal == JFileChooser.APPROVE_OPTION)
-					return true;
+				{
+					File save_file = fc.getSelectedFile();
+					if (save_file.getAbsolutePath().lastIndexOf(".fcs", 0) == -1)
+						save_file = new File(save_file.getAbsolutePath() + ".fcs");
+					if (save_file.exists())
+					{
+						switch (JOptionPane.showInternalConfirmDialog(frame.getContentPane(),
+								save_file.getAbsolutePath() + " exists, Overwrite?", "Confirm Save",
+								JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE))
+						{
+						case JOptionPane.NO_OPTION:
+							return false;
+						case JOptionPane.YES_OPTION:
+						}
+					}
+					return city_manager.SaveGame(save_file.getAbsolutePath());
+				}
 			}
 			return false;
 		}
@@ -472,24 +517,26 @@ public class FooCityGUI implements FooCityGUIInterface
 		}
 		public void actionPerformed(ActionEvent e)
 		{
+			scrollPane.grabFocus();
 			String command = e.getActionCommand();
 			city_manager.setPlacingTile(Integer.parseInt(command));
 			return;
 		}
 	}
 
-	private class keyDispatcher implements KeyEventDispatcher {
+	private class keyDispatcher extends KeyAdapter {
 		@Override
-		public boolean dispatchKeyEvent(KeyEvent e) {
-			if (e.getID() == KeyEvent.KEY_PRESSED){
+		public void keyPressed(KeyEvent e)
+		{
+			super.keyPressed(e);
+			if (e.getID() == KeyEvent.KEY_PRESSED && scrollPane.hasFocus() && city_manager != null)
+			{
+				Dimension map_area = city_manager.getMapArea();
+				if (map_area == null)
+					return;
 				char c = e.getKeyChar();
 				Point p = (Point) scrollPane.getViewport().getViewPosition().clone();
 				Rectangle r = (Rectangle) scrollPane.getViewport().getVisibleRect().clone();
-				if (city_manager == null)
-					return true;
-				Dimension map_area = city_manager.getMapArea();
-				if (map_area == null)
-					return true;
 				
 				int x = p.x;
 				int y = p.y;
@@ -525,13 +572,12 @@ public class FooCityGUI implements FooCityGUIInterface
 				}
 				updateDisplay(new Point(x, y));
 			}
-			return true;
+			return;
 		}
 	}
 	
 	private void AddKeyListeners(){
-		KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-		manager.addKeyEventDispatcher(new keyDispatcher());
+		scrollPane.addKeyListener(new keyDispatcher());
 	}
 	
 	private void AddResizeListener()
@@ -567,6 +613,7 @@ public class FooCityGUI implements FooCityGUIInterface
 		toolPanel.setBounds(0, 0, FooCityGUIConstants.SIDEBAR_WIDTH, r.height);
 		toolPanel.revalidate();
 	}
+
 }
 
 interface FooCityGUIInterface

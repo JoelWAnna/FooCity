@@ -1,4 +1,10 @@
 import java.awt.Dimension;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Scanner;
 
 // Project FooCity-group2
 // CS300
@@ -10,8 +16,9 @@ public class FooCityManager
 	private MapGrid current_map;
 	private int tile_to_place;
 	private int turn;
-	public static void main(String[] args)
+	public void FooCityLog(String msg)
 	{
+		System.out.println(msg);
 	}
 	
 	public FooCityManager()
@@ -59,7 +66,9 @@ public class FooCityManager
 		if (current_map == null)
 		{
 			current_map = new MapGrid();
-			return current_map.FromFile(map_name);
+			if (current_map.FromFile(map_name))
+				return true;
+			current_map = null;
 		}
 		return false;
 	}
@@ -67,6 +76,7 @@ public class FooCityManager
 	public void Quit()
 	{
 		current_map = null;
+		turn = 0;
 	}
 
 	public void startGame()
@@ -78,8 +88,10 @@ public class FooCityManager
 		return turn;
 	}
 
-	public void advanceTurn() {
-		this.turn++;
+	public void advanceTurn()
+	{
+		if (current_map != null)
+			this.turn++;
 	}
 
 	public boolean setPlacingTile(int i)
@@ -382,5 +394,153 @@ public class FooCityManager
 				}
 			}
 		}
+	}
+
+	public boolean SaveGame(String savePath)
+	{
+		if ((current_map != null) &&
+			(turn > 0) &&			
+		 (savePath != null))
+		{
+			File save_file = new File(savePath);
+			try
+			{
+				BufferedWriter bw = new BufferedWriter(new FileWriter(save_file));
+
+				if (bw != null)
+				{
+					bw.write("FOOCITYMAGIC\n");
+					bw.write("CurrentTurn:" + turn + "\n");
+					bw.write("AvailableFunds:" + 100 + "\n");
+					bw.write("MapGrid:1\n");
+					bw.write("width:" + (int)current_map.getMapArea().getWidth() + "\n");
+					bw.write("height:" + (int)current_map.getMapArea().getHeight() + "\n");
+					bw.write(current_map.toString() + "\n");
+					bw.close();
+					return true;
+				}
+			}
+			catch (IOException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return false;
+	}
+
+	public boolean LoadGame(String savePath) 
+	{
+		if (savePath != null)
+		{
+			File save_file = new File(savePath);
+			Scanner sc;
+			try {
+				sc = new Scanner(save_file);
+			} catch (FileNotFoundException e) {
+				return false;
+			}
+			if (sc.hasNextLine())
+			{
+				String line = sc.nextLine();
+				if (0==line.compareTo("FOOCITYMAGIC\n"))
+				{
+					FooCityLog("Invalid Magic \"" + line +"\"\n");
+					return false;
+				}
+				turn = 0;
+				while (sc.hasNextLine())
+				{
+					String line2 = sc.nextLine();
+					if (line2.length() == 0)
+						break;
+					
+					String[] parsedline = line2.split(":");
+					if (parsedline.length != 2)
+					{
+						FooCityLog("parsedline length != 2 \"" + parsedline.length +"\"\n");
+						return false;
+					}
+					
+					FooCityLog(parsedline[0]);
+							
+					if (parsedline[0].equals("MapGrid"))
+					{
+						try
+						{
+							switch (Integer.parseInt(parsedline[1]))
+							{
+							case 1:
+
+								int width = 0;
+								int height = 0;
+								if (sc.hasNextLine())
+								{
+									String[] widthLine = sc.nextLine().split(":");
+									if (widthLine.length == 2)
+										width = Integer.parseInt(widthLine[1]);
+								}
+								if (sc.hasNextLine())
+								{
+									String[] heightLine = sc.nextLine().split(":");
+									if (heightLine.length == 2)
+										height = Integer.parseInt(heightLine[1]);
+								}
+								if (width < 5 || height < 5)
+								{
+									FooCityLog("width = " + width + " height = " + height);
+									return false;
+								}
+								current_map = new MapGrid(width, height);
+								current_map.fromScanner(sc);
+									break;
+							default:
+							}
+						
+							
+						}
+						catch (NumberFormatException e)
+						{
+							System.err.println("MapGrid");
+							e.printStackTrace();
+							return false;
+						}
+					}
+					else if (parsedline[0].equals("CurrentTurn"))
+					{
+						try
+						{
+							turn = Integer.parseInt(parsedline[1]);
+						}
+						catch (NumberFormatException e)
+						{
+							System.err.println("CurrentTurn");
+							e.printStackTrace();
+							return false;
+						}
+					}
+					else if (parsedline[0].equals("AvailableFunds"))
+					{
+						try
+						{
+							Integer.parseInt(parsedline[1]);
+						}
+						catch (NumberFormatException e)
+						{
+							System.err.println("AvailableFunds");
+							e.printStackTrace();
+							return false;
+						}
+					}
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public int getAvailableFunds()
+	{
+		return 0;
 	}
 }

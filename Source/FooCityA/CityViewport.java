@@ -43,7 +43,6 @@ class CityViewport extends JPanel
 				@Override
 				public void mousePressed(MouseEvent e)
 				{
-					
 					if (Interface.getCityManager().getPlacingTile() == 0)
 						return;
 					Point p = e.getPoint();
@@ -156,17 +155,21 @@ class MiniMapPanel extends JPanel
 	private int viewMode;
 	FooCityGUIInterface Interface;
 	private Dimension map_area;
-    public MiniMapPanel(FooCityGUIInterface i)
+	private int scale;
+    public MiniMapPanel(FooCityGUIInterface i, int _scale)
     {
     	super();
     	Interface = i;
+    	scale = _scale;
+    	if (scale < 1 || scale > 10)
+    		scale = 2;
     	if (Interface != null)
     	{
 	    	this.addMouseListener(new MouseAdapter()
 	    	{
 				@Override
 				public void mousePressed(MouseEvent arg0) {
-					Point point = new Point(arg0.getX() / 2, arg0.getY() / 2);
+					Point point = new Point(arg0.getX() / scale, arg0.getY() / scale);
 					Interface.updateDisplayCenter(point);
 				}
 	    	});
@@ -176,7 +179,7 @@ class MiniMapPanel extends JPanel
 	    		@Override
 	    		public void mouseDragged(MouseEvent arg0)
 	    		{
-	    			Point point = new Point(arg0.getX() / 2, arg0.getY() / 2);
+	    			Point point = new Point(arg0.getX() / scale, arg0.getY() / scale);
 	    			Interface.updateDisplayCenter(point);
 	    		}
 	    	});
@@ -264,7 +267,7 @@ class MiniMapPanel extends JPanel
 	    				System.err.print("Unknown tile drawn on minimap\n");
 						break;
 	    			}
-	    			g1.fillRect(x * 2, y * 2, 2, 2);
+	    			g1.fillRect(x * this.scale, y * this.scale, this.scale, this.scale);
 	    		}
 	    	}
 	    } else if (viewMode == 1) { // Pollution
@@ -274,17 +277,17 @@ class MiniMapPanel extends JPanel
 	    			if (c > 255) c = 255;
 	    			if (c < 0) c = 0;
 	    			g1.setColor(new Color(c,c,c));
-	    			g1.fillRect(x * 2, y * 2, 2, 2);
+	    			g1.fillRect(x * this.scale, y * this.scale, this.scale, this.scale);
 	    		}
 	    	}
-	    } else if (viewMode == 2) { // Crime
+	    } else if (viewMode == this.scale) { // Crime
 	    	for (int y = 0; y < map_area.getHeight(); y++) {
 	    		for (int x = 0; x <  map_area.getWidth(); x++) {
 	    			int c = current_map.getTile(x, y).crimeActual * 10 ;
 	    			if (c > 255) c = 255;
 	    			if (c < 0) c = 0;
 	    			g1.setColor(new Color(c,c,c));
-	    			g1.fillRect(x * 2, y * 2, 2, 2);
+	    			g1.fillRect(x * this.scale, y * this.scale, this.scale, this.scale);
 	    		}
 	    	}
 	    } else if (viewMode == 3) { // Happiness
@@ -294,25 +297,28 @@ class MiniMapPanel extends JPanel
 	    			if (c > 255) c = 255;
 	    			if (c < 0) c = 0;
 	    			g1.setColor(new Color(c,c,c));
-	    			g1.fillRect(x * 2, y * 2, 2, 2);
+	    			g1.fillRect(x * this.scale, y * this.scale, this.scale, this.scale);
 	    		}
 	    	}
 		}
     	// Draw the frame around our current view
     	Rectangle r = Interface.getViewRect();
     	Point p = Interface.getViewPoint();
-    	//System.out.print("visiblerect = " + r +"\n"); 
-    	r.x = 2 * p.x / FooCityGUIConstants.TILE_WIDTH;
-    	r.y = 2 * p.y / FooCityGUIConstants.TILE_HEIGHT;
-    	r.width = 2 * r.width / FooCityGUIConstants.TILE_WIDTH;
-    	r.height = 2 * r.height / FooCityGUIConstants.TILE_HEIGHT;
-    	g1.setColor(Color.black);    	
-    	g1.drawRect(r.x, r.y, r.width, r.height);
+    	if (r != null && p != null)
+    	{
+			//System.out.print("visiblerect = " + r +"\n"); 
+			r.x = this.scale * p.x / FooCityGUIConstants.TILE_WIDTH;
+			r.y = this.scale * p.y / FooCityGUIConstants.TILE_HEIGHT;
+			r.width = this.scale * r.width / FooCityGUIConstants.TILE_WIDTH;
+			r.height = this.scale * r.height / FooCityGUIConstants.TILE_HEIGHT;
+			g1.setColor(Color.black);    	
+			g1.drawRect(r.x, r.y, r.width, r.height);
+    	}
     }
     @Override
     public Dimension getPreferredSize()
     {
-        return new Dimension(256, 256);
+        return new Dimension(scale * 128, scale * 128);
     }
     
 }
