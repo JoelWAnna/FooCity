@@ -70,5 +70,70 @@ public class FooCityManagerTest extends TestCase{
 		Assert.assertEquals("LoadGame(\"existing filename\") should return true", true, city_manager.LoadGame("./saves/SampleSave.fcs"));
 		Assert.assertEquals("Current turn should be greater than 0 after a successfull load", true, city_manager.getCurrentTurn() > 0);
 	}
+	
+	@Test
+	public void testSetPlacingTileGetPlacingTile()
+	{
+		for (int i = MapGridConstants.WATER_TILE; i < MapGridConstants.LAST_TILE; ++i)
+		{
+			Assert.assertTrue("Place Tile " + MapGridConstants.CHAR_TILES[i], city_manager.setPlacingTile(i));
+			Assert.assertEquals(i, city_manager.getPlacingTile());
+		}
+		Assert.assertFalse("Place Tile 0" , city_manager.setPlacingTile(0));
+		Assert.assertEquals(0, city_manager.getPlacingTile());
 
+		Assert.assertFalse("Place Tile " + Integer.MAX_VALUE , city_manager.setPlacingTile(Integer.MAX_VALUE));
+		Assert.assertEquals(0, city_manager.getPlacingTile());
+		Assert.assertFalse("Place Tile " + Integer.MIN_VALUE , city_manager.setPlacingTile(Integer.MIN_VALUE));
+		Assert.assertEquals(0, city_manager.getPlacingTile());	
+	}
+	
+	
+	@Test
+	public void testPlaceTile()
+	{
+		MapGrid sample_map = new MapGrid(10, 10);
+		Assert.assertTrue("FromString", sample_map.FromString("DDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\n"));
+		Assert.assertTrue(city_manager.SetMapGrid(sample_map));
+		city_manager.startGame();
+		Assert.assertNotNull(city_manager.GetMapGrid());
+		for (int y = 0; y < 10; ++y)
+			for (int x = 0; x < 10; ++x)
+			{
+				Assert.assertEquals(MapGridConstants.DIRT_TILE, city_manager.GetMapGrid().getTileAt(x, y));
+			}
+		Assert.assertTrue("Place Tile " + MapGridConstants.CHAR_TILES[6], city_manager.setPlacingTile(6));
+		Assert.assertTrue("Place Tile 0,0", city_manager.placeTile(0, 0));
+		Assert.assertEquals(MapGridConstants.INDUSTRIAL_TILE, city_manager.GetMapGrid().getTileAt(0, 0));
+		
+	}
+	public void testGenerateHappinessMetrics()
+	{
+		MapGrid sample_map = new MapGrid(10, 10);
+		Assert.assertTrue("FromString", sample_map.FromString("DDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\n"));
+		Assert.assertTrue(city_manager.SetMapGrid(sample_map));
+		city_manager.startGame();
+		Assert.assertNotNull(city_manager.GetMapGrid());
+		city_manager.propagateMetrics();
+		
+		int [][] expectedHappiness =
+				{{ 4, 5, 5, 5, 5, 5, 5, 5, 5, 4},
+				{5, 6, 6, 6, 6, 6, 6, 6, 6, 5},
+				{5, 6, 6, 6, 6, 6, 6, 6, 6, 5},
+				{5, 6, 6, 6, 6, 6, 6, 6, 6, 5},
+				{5, 6, 6, 6, 6, 6, 6, 6, 6, 5},
+				{5, 6, 6, 6, 6, 6, 6, 6, 6, 5},
+				{5, 6, 6, 6, 6, 6, 6, 6, 6, 5},
+				{5, 6, 6, 6, 6, 6, 6, 6, 6, 5},
+				{5, 6, 6, 6, 6, 6, 6, 6, 6, 5},
+				{ 4, 5, 5, 5, 5, 5, 5, 5, 5, 4}};
+				
+		for (int y = 0; y < 10; ++y)
+			for (int x = 0; x < 10; ++x)
+			{
+				int actual_happiness = city_manager.GetMapGrid().getTile(x, y).happinessActual;
+				String error = "\nTile(x,y) (" + x + "," + y + ")";//\nExpected: " + expectedHappiness[x][y] + " Found : " + actual_happiness;
+				Assert.assertEquals(error, expectedHappiness[x][y] , actual_happiness);
+			}
+	}
 }

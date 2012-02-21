@@ -118,7 +118,7 @@ public class MapGrid
 		}
 		return s;
 	}
-/*
+
 	public boolean FromString(String MapGridString)
 	{
 		if (MapGridString != null)// && MapGridString.length() != map_area.getHeight() * (map_area.getWidth()+1))
@@ -128,7 +128,7 @@ public class MapGrid
 		}
 		return false;			
 	}
-*/
+
 	public boolean FromFile(String filename)
 	{
 		if (filename == null)

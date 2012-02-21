@@ -96,7 +96,7 @@ public class FooCityManager
 
 	public boolean setPlacingTile(int i)
 	{
-		if (i >= MapGridConstants.WATER_TILE || i < MapGridConstants.LAST_TILE)
+		if (i >= MapGridConstants.WATER_TILE && i < MapGridConstants.LAST_TILE)
 		{
 			this.tile_to_place = i;
 			return true;
