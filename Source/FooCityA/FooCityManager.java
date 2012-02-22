@@ -13,10 +13,15 @@ import java.util.Scanner;
 
 public class FooCityManager
 {
-	private int availableFunds = 1000;
+	private int availableFunds = 10000;
 	private MapGrid current_map;
 	private int tile_to_place;
 	private int turn;
+	public int powerConsumed = 0, powerGenerated = 0;
+	public int waterConsumed = 0, waterGenerated = 0;
+	public int income = 0, expenses = 0;
+	public int cashFlow = 0;
+	public int jobs = 0, residents = 0;
 	public void FooCityLog(String msg)
 	{
 		System.out.println(msg);
@@ -90,10 +95,95 @@ public class FooCityManager
 
 	public void advanceTurn()
 	{
+		long timeBegun = System.nanoTime();
 		if (current_map == null)
 			return;
+		//Advance the turn
 		this.turn++;
+		//Propagate the metrics
 		this.propagateMetrics();
+		// Reset some variables
+		powerConsumed = 0; powerGenerated = 0;
+		waterConsumed = 0; waterGenerated = 0;
+		income = 0; expenses = 0;
+		jobs = 0; residents = 0;
+		float factor;
+		
+		//For each tile...
+		for (int y = 0; y < MapGridConstants.MAP_HEIGHT; y++){
+			for (int x = 0; x < MapGridConstants.MAP_WIDTH; x++){
+				// Get the tile
+				Tile tile = current_map.getTile(x, y);
+				
+				//Add to power consumed if its consuming, otherwise "add" it to generated
+				//(Remember that if its generating, the consumed amount is negative
+				//So we SUBTRACT it to ADD it)
+				if (tile.powerConsumed > 0)
+					powerConsumed += tile.powerConsumed;
+				else
+					powerGenerated -= tile.powerConsumed;
+				
+				//Do the same with water
+				if (tile.waterConsumed > 0)
+					waterConsumed += tile.waterConsumed;
+				else
+					waterGenerated -= tile.waterConsumed;
+				
+				//Do a similar thing with residents versus jobs
+				if (tile.jobs > 0)
+					jobs += tile.jobs;
+				else
+					residents -= tile.jobs;
+				
+				//If the residents are employed (Or the job location has a resident nearby)
+				//Then add it to the budget
+				if (tile.employed){
+					if (tile.monthlyCost > 0)
+						expenses += tile.monthlyCost;
+					else
+						income -= tile.monthlyCost;
+				}
+				
+				
+				
+			}
+		}
+		//Now, we have to reduce the budget based on a lack of jobs, residents, water, or power
+		//The formula in each case is basically:
+		// budget = budget * factor
+		// Where factor = Provided / Needed (capped to a value of 1)
+		// (Just make sure we're not going to divide by zero!)
+		
+		if (waterConsumed > 0){
+			factor = (float) waterGenerated / waterConsumed;
+			if (factor < 1)
+				income *= factor;
+		}
+		
+		if (powerConsumed > 0) {
+			factor = (float) powerGenerated / powerConsumed;
+			if (factor < 1)
+				income *= factor;
+		}
+		
+		if (residents > 0) {
+			factor = (float) jobs / residents;
+			if (factor < 1)
+				income *= factor;
+		}
+		
+		if (jobs > 0) {
+			factor = (float) residents / jobs;
+			if (factor < 1)
+				income *= factor;
+		}
+		
+		
+		// We're done with the budget!  Make the change.
+		cashFlow = (int) (income - expenses);
+		this.availableFunds += cashFlow;
+		
+		System.out.print("advanceTurn took " + Long.toString((System.nanoTime() - timeBegun)/ 1000000) + " ms\n");
 	}
 
 	public boolean setPlacingTile(int i)

@@ -6,6 +6,7 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
@@ -353,6 +354,7 @@ public class FooCityGUI implements FooCityGUIInterface
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				city_manager.advanceTurn();
+				showEndOfTurnReport();
 				updateDisplay();
 			}
 			
@@ -373,6 +375,48 @@ public class FooCityGUI implements FooCityGUIInterface
 		
 		AddKeyListeners();
 		city_manager.propagateMetrics();
+		
+	}
+	private void showEndOfTurnReport(){
+		JDialog reportDialog = new JDialog(frame, "End of Turn Report");
+		reportDialog.setModalityType(ModalityType.DOCUMENT_MODAL);
+		
+		JPanel topPanel = new JPanel();
+		GridLayout gridLayout = new GridLayout(0,3);
+		gridLayout.setHgap(15);
+		gridLayout.setVgap(5);
+		topPanel.setLayout(gridLayout);
+		
+		topPanel.add(new JLabel(" ")); // Place holder
+		topPanel.add(new JLabel("Produced"));
+		topPanel.add(new JLabel("Consumed"));
+		topPanel.add(new JLabel("Water"));
+		topPanel.add(new JLabel(Float.toString(city_manager.waterGenerated)));
+		topPanel.add(new JLabel(Float.toString(city_manager.waterConsumed)));
+		topPanel.add(new JLabel("Electricity"));
+		topPanel.add(new JLabel(Float.toString(city_manager.powerGenerated)));
+		topPanel.add(new JLabel(Float.toString(city_manager.powerConsumed)));
+		topPanel.add(new JLabel("Jobs"));
+		topPanel.add(new JLabel(Float.toString(city_manager.jobs)));
+		topPanel.add(new JLabel(Float.toString(city_manager.residents)));
+		topPanel.add(new JLabel(" ")); // Another place holder
+		topPanel.add(new JLabel("Tax income: "));
+		topPanel.add(new JLabel(Integer.toString(city_manager.income)));
+		topPanel.add(new JLabel(" ")); // Another place holder
+		topPanel.add(new JLabel("Upkeep expenses: "));
+		topPanel.add(new JLabel(Integer.toString(city_manager.expenses)));
+		topPanel.add(new JLabel(" ")); // Yet another place holder 
+		topPanel.add(new JLabel("Cash Flow: "));
+		topPanel.add(new JLabel("$" + Integer.toString(city_manager.cashFlow)));
+		topPanel.add(new JLabel(" ")); // woot for place holders
+		topPanel.add(new JLabel("Available Funds:"));
+		topPanel.add(new JLabel("$" + Integer.toString(city_manager.getAvailableFunds())));
+		
+		reportDialog.add(topPanel);
+		
+		reportDialog.pack();
+		reportDialog.setLocationRelativeTo(null);
+		reportDialog.setVisible(true);
 		
 	}
 	
