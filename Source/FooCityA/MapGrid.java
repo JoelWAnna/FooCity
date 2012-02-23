@@ -58,7 +58,12 @@ public class MapGrid
 	{
 		this(MapGridConstants.MAP_WIDTH, MapGridConstants.MAP_HEIGHT);
 	}
-	
+
+	public MapGrid(Dimension mapArea)
+	{
+		this((int)mapArea.getWidth(), (int)mapArea.getHeight());
+	}
+
 	public MapGrid(int width, int height)
 	{
 		if (width < 5 || height < 5)
@@ -86,7 +91,7 @@ public class MapGrid
 				   (y < map_area.getWidth()));
 	}
 
-	public int getTileAt(int x,int y) 
+	public int getTileInt(int x,int y) 
 	{
 		if (tileInRange(x, y))
 		{
@@ -206,6 +211,41 @@ public class MapGrid
 		}
 
 		return false;
+	}
+
+	public int[][] getResidentialMatrix()
+	{
+		int [][] matrix = new int[this.map_area.width][this.map_area.height];
+		for (int y = 0; y < this.map_area.height; ++y)
+			for (int x = 0; x < this.map_area.width; ++x)
+				matrix[x][y] = (tileGrid[x][y].jobs < 0) ? -tileGrid[x][y].jobs : 0;
+		return matrix;
+	}
+
+	public int[][] getJobMatrix()
+	{
+		int [][] matrix = new int[this.map_area.width][this.map_area.height];
+		for (int y = 0; y < this.map_area.height; ++y)
+			for (int x = 0; x < this.map_area.width; ++x)
+			{
+				matrix[x][y] = (tileGrid[x][y].jobs > 0) ? tileGrid[x][y].jobs : 0;
+				//System.out.println(x + " " + y + " " + matrix[x][y]);
+			}
+		return matrix;
+	}
+
+	public int[][] getRoadMatrix()
+	{
+		int [][] matrix = new int[this.map_area.width][this.map_area.height];
+		for (int y = 0; y < this.map_area.height; ++y)
+			for (int x = 0; x < this.map_area.width; ++x)
+			{
+				if (tileGrid[x][y].tileInt == MapGridConstants.ROAD_TILE)
+					matrix[x][y] = 1;
+				else
+					matrix[x][y] = 0;
+			}
+		return matrix;
 	}
 
 }

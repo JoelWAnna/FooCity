@@ -8,7 +8,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Point;
@@ -44,7 +43,6 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
-import javax.swing.border.Border;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -499,7 +497,6 @@ public class FooCityGUI implements FooCityGUIInterface
 	{
 		if (city_manager.SetMapGrid(new_map))
 		{
-			city_manager.startGame();
 			updateDisplay();
 		}
 	}
@@ -534,7 +531,7 @@ public class FooCityGUI implements FooCityGUIInterface
 			switch (command_int)
 			{
 			case FooCityGUIConstants.NEW_GAME:
-				if (city_manager != null && city_manager.GetMapGrid() != null)
+				if (city_manager != null && !city_manager.MapGridLoaded())
 				{
 					switch (JOptionPane.showInternalConfirmDialog(frame.getContentPane(),
 							"Save current game before starting a new game?", "New game",
@@ -554,7 +551,7 @@ public class FooCityGUI implements FooCityGUIInterface
 				updateDisplay();
 				break;
 			case FooCityGUIConstants.LOAD_GAME:
-				if (city_manager != null && city_manager.GetMapGrid() != null) 
+				if (city_manager != null && !city_manager.MapGridLoaded()) 
 				{
 					switch (JOptionPane.showInternalConfirmDialog(frame.getContentPane(),
 							"Save current game before loading?", "Load game",
@@ -577,7 +574,7 @@ public class FooCityGUI implements FooCityGUIInterface
 				saveGame();
 				break;
 			case FooCityGUIConstants.QUIT:
-				if (city_manager != null && city_manager.GetMapGrid() != null) 
+				if (city_manager != null && !city_manager.MapGridLoaded()) 
 				{
 					switch (JOptionPane.showInternalConfirmDialog(frame.getContentPane(),
 							"Save game before exiting?", "Quit",
@@ -643,6 +640,7 @@ public class FooCityGUI implements FooCityGUIInterface
 		public void actionPerformed(ActionEvent e)
 		{
 			JToggleButton buttonPressed = (JToggleButton) e.getSource();
+			boolean selected = buttonPressed.isSelected();
 			buttonResidential.setSelected(false);
 			buttonCommercial.setSelected(false);
 			buttonIndustrial.setSelected(false);
@@ -658,11 +656,13 @@ public class FooCityGUI implements FooCityGUIInterface
 			buttonForrest.setSelected(false);
 			buttonGrass.setSelected(false);
 			buttonBulldoze.setSelected(false);
-			buttonPressed.setSelected(true);
+			buttonPressed.setSelected(selected);
 			scrollPane.grabFocus();
 			String command = e.getActionCommand();
-			city_manager.setPlacingTile(Integer.parseInt(command));
-			
+			if (selected)
+					city_manager.setPlacingTile(Integer.parseInt(command));
+			else
+				city_manager.setPlacingTile(0);
 			updateTileDescription(Integer.parseInt(command));
 			return;
 		}

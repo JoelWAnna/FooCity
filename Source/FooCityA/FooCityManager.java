@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.Stack;
 
 // Project FooCity-group2
 // CS300
@@ -13,7 +14,8 @@ import java.util.Scanner;
 
 public class FooCityManager
 {
-	private int availableFunds = 10000;
+	public static final int STARTING_FUNDS = 10000;
+	private int availableFunds;
 	private MapGrid current_map;
 	private int tile_to_place;
 	private int turn;
@@ -22,6 +24,7 @@ public class FooCityManager
 	public int income = 0, expenses = 0;
 	public int cashFlow = 0;
 	public int jobs = 0, residents = 0;
+
 	public void FooCityLog(String msg)
 	{
 		System.out.println(msg);
@@ -47,9 +50,23 @@ public class FooCityManager
 		return null;
 	}
 
-	public MapGrid GetMapGrid()
+	public int getTileInt(int x, int y)
 	{
-		return current_map;
+		if (current_map != null)
+			return current_map.getTileInt(x, y);
+		return 0;
+	}
+
+	public Tile getTile(int x, int y)
+	{
+		if (current_map != null)
+			return current_map.getTile(x, y);
+		return null;
+	}
+
+	public boolean MapGridLoaded()
+	{
+		return current_map != null;
 	}
 
 	public boolean SetMapGrid(MapGrid new_map)
@@ -59,7 +76,7 @@ public class FooCityManager
 			if (current_map == null)
 			{
 				current_map = new_map;
-				this.propagateMetrics();
+				startGame();
 				return true;
 			}
 		}
@@ -72,7 +89,10 @@ public class FooCityManager
 		{
 			current_map = new MapGrid();
 			if (current_map.FromFile(map_name))
+			{
+				startGame();
 				return true;
+			}
 			current_map = null;
 		}
 		return false;
@@ -82,11 +102,13 @@ public class FooCityManager
 	{
 		current_map = null;
 		turn = 0;
+		availableFunds = 0;
 	}
 
-	public void startGame()
+	private void startGame()
 	{
-		//advanceTurn();		
+		availableFunds = FooCityManager.STARTING_FUNDS;
+		propagateMetrics();
 	}
 
 	public int getCurrentTurn() {
@@ -102,6 +124,7 @@ public class FooCityManager
 		this.turn++;
 		//Propagate the metrics
 		this.propagateMetrics();
+
 		// Reset some variables
 		powerConsumed = 0; powerGenerated = 0;
 		waterConsumed = 0; waterGenerated = 0;
@@ -110,8 +133,8 @@ public class FooCityManager
 		float factor;
 		
 		//For each tile...
-		for (int y = 0; y < MapGridConstants.MAP_HEIGHT; y++){
-			for (int x = 0; x < MapGridConstants.MAP_WIDTH; x++){
+		for (int y = 0; y < current_map.getMapArea().getHeight(); y++){
+			for (int x = 0; x < current_map.getMapArea().getWidth(); x++){
 				// Get the tile
 				Tile tile = current_map.getTile(x, y);
 				
@@ -182,7 +205,7 @@ public class FooCityManager
 		// We're done with the budget!  Make the change.
 		cashFlow = (int) (income - expenses);
 		this.availableFunds += cashFlow;
-		
+		this.findJobs();
 		System.out.print("advanceTurn took " + Long.toString((System.nanoTime() - timeBegun)/ 1000000) + " ms\n");
 	}
 
@@ -326,12 +349,11 @@ public class FooCityManager
 	public boolean SaveGame(String savePath)
 	{
 		if ((current_map != null) &&
-			(turn > 0) &&			
 		 (savePath != null))
 		{
-			File save_file = new File(savePath);
 			try
 			{
+				File save_file = new File(savePath);
 				BufferedWriter bw = new BufferedWriter(new FileWriter(save_file));
 
 				if (bw != null)
@@ -347,6 +369,11 @@ public class FooCityManager
 					return true;
 				}
 			}
+			catch (FileNotFoundException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			catch (IOException e)
 			{
 				// TODO Auto-generated catch block
@@ -358,6 +385,7 @@ public class FooCityManager
 
 	public boolean LoadGame(String savePath) 
 	{
+		boolean valid_save = true;
 		if (savePath != null)
 		{
 			File save_file = new File(savePath);
@@ -376,7 +404,7 @@ public class FooCityManager
 					return false;
 				}
 				turn = 0;
-				while (sc.hasNextLine())
+				while (sc.hasNextLine() && valid_save)
 				{
 					String line2 = sc.nextLine();
 					if (line2.length() == 0)
@@ -386,7 +414,8 @@ public class FooCityManager
 					if (parsedline.length != 2)
 					{
 						FooCityLog("parsedline length != 2 \"" + parsedline.length +"\"\n");
-						return false;
+						valid_save = false;
+						break;
 					}
 					
 					FooCityLog(parsedline[0]);
@@ -416,7 +445,8 @@ public class FooCityManager
 								if (width < 5 || height < 5)
 								{
 									FooCityLog("width = " + width + " height = " + height);
-									return false;
+									valid_save = false;
+									break;
 								}
 								current_map = new MapGrid(width, height);
 								current_map.fromScanner(sc);
@@ -430,7 +460,7 @@ public class FooCityManager
 						{
 							System.err.println("MapGrid");
 							e.printStackTrace();
-							return false;
+							valid_save = false;
 						}
 					}
 					else if (parsedline[0].equals("CurrentTurn"))
@@ -438,29 +468,38 @@ public class FooCityManager
 						try
 						{
 							turn = Integer.parseInt(parsedline[1]);
+							if (turn < 0)
+								valid_save = false;
 						}
 						catch (NumberFormatException e)
 						{
 							System.err.println("CurrentTurn");
 							e.printStackTrace();
-							return false;
+							valid_save = false;
 						}
 					}
 					else if (parsedline[0].equals("AvailableFunds"))
 					{
 						try
 						{
-							Integer.parseInt(parsedline[1]);
+							availableFunds = Integer.parseInt(parsedline[1]);
+							if (availableFunds < 0)
+								valid_save = false;
 						}
 						catch (NumberFormatException e)
 						{
 							System.err.println("AvailableFunds");
 							e.printStackTrace();
-							return false;
+							valid_save = false;
 						}
 					}
 				}
-				return true;
+				
+				if (!valid_save)
+				{
+					Quit();
+				}
+				return valid_save;
 			}
 		}
 		return false;
@@ -469,5 +508,64 @@ public class FooCityManager
 	public int getAvailableFunds()
 	{
 		return availableFunds;
+	}
+
+	public void findJobs()
+	{
+		int[][] residential_matrix = this.current_map.getResidentialMatrix();
+		int[][] job_matrix = current_map.getJobMatrix();
+		@SuppressWarnings("unused")
+		int[][] road_matrix = current_map.getRoadMatrix();
+		int jobsFound = 0;
+		Stack<Dimension> found = new Stack<Dimension>();
+		for (int y = 0; y < current_map.getMapArea().height; ++y)
+			for (int x = 0; x < current_map.getMapArea().width; ++x)
+			{
+				if (residential_matrix[x][y] > 0)
+				{
+					for (int y2 = y-2; y2 < y+3; ++y2)
+						for (int x2 = x-2; x2 < x+3; ++x2)
+						{
+							//FooCityLog(x + " " + y + " " + Integer.toString(job_matrix[x][y]));
+							if (y2 < 0 || y2 >= current_map.getMapArea().height)
+								continue;
+							if (x2 < 0 || x2 >= current_map.getMapArea().width)
+								continue;
+
+							if (job_matrix[x2][y2] > 0)
+								found.push(new Dimension(x2,y2));
+						}
+					if (found.size() > 0)
+					{
+						while (found.size() > 0)
+						{
+							int number = residential_matrix[x][y] / found.size();
+							if (residential_matrix[x][y] % found.size() > 0)
+								number++;
+						
+							Dimension location = found.pop();
+							FooCityLog("Trying to find " + number);
+							FooCityLog("residents " + residential_matrix[x][y]);
+							FooCityLog("jobs " + job_matrix[location.width][location.height]);
+							number = residential_matrix[x][y] > number ? number : residential_matrix[x][y];
+							number = job_matrix[location.width][location.height] > number ? number : job_matrix[location.width][location.height];
+							
+							FooCityLog("Found " + number);
+							
+							job_matrix[location.width][location.height] -= number;
+							residential_matrix[x][y] -= number;
+							jobsFound += number;
+						}
+					}
+				}
+			}
+		this.jobs = jobsFound;
+		FooCityLog("Final Found " + jobsFound);
+		
+	}
+
+	public int getJobs() {
+		// TODO Auto-generated method stub
+		return jobs;
 	}
 }

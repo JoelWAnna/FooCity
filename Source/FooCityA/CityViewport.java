@@ -21,7 +21,7 @@ import javax.swing.JPanel;
 class CityViewport extends JPanel
 {
 	FooCityGUIInterface Interface;
-	private TileLoader tiles;
+	private TileLoader tileLoader;
 	private Point cursor;
 	private Dimension map_area;
 	private Dimension preferred_size;
@@ -29,7 +29,7 @@ class CityViewport extends JPanel
     {
     	super();
     	Interface = i;
-        tiles = new TileLoader();
+        tileLoader = new TileLoader();
         cursor = null;
         map_area = new Dimension(MapGridConstants.MAP_WIDTH, MapGridConstants.MAP_HEIGHT);
         preferred_size = new Dimension((int)map_area.getWidth() * FooCityGUIConstants.TILE_WIDTH,
@@ -82,21 +82,20 @@ class CityViewport extends JPanel
     public void paint(Graphics g1)
     {
     	super.paint(g1);
-    	if (Interface == null || tiles == null)
+    	if (Interface == null || tileLoader == null)
     		return;
     	Graphics2D g = (Graphics2D) g1;
     	FooCityManager city_manager = Interface.getCityManager();
     	if (city_manager == null)
     		return;
     	
-    	map_area = city_manager.getMapArea();
+       	map_area = city_manager.getMapArea();
     	if (map_area == null)
     		return;
     	preferred_size = new Dimension((int)map_area.getWidth() * FooCityGUIConstants.TILE_WIDTH,
         							(int)map_area.getHeight() * FooCityGUIConstants.TILE_HEIGHT);
-    
-    	MapGrid current_map = city_manager.GetMapGrid();
-    	if (current_map == null)
+
+    	if (!city_manager.MapGridLoaded())
     		return;
     	Rectangle r = this.getVisibleRect();
     	g.clearRect(r.x, r.y, r.width, r.height);
@@ -116,7 +115,7 @@ class CityViewport extends JPanel
             	if ((xCoord < r.x - FooCityGUIConstants.TILE_WIDTH) || (xCoord >= r.x + r.width + FooCityGUIConstants.TILE_WIDTH))
             		continue;
         		BufferedImage bI = null;
-        		bI = tiles.GetTitle(current_map.getTileAt(x, y));
+        		bI = tileLoader.GetTitle(city_manager.getTileInt(x, y));
         		if (bI != null)
         			g.drawImage(bI, xCoord, yCoord , null);
         		g.drawLine(xCoord, yCoord, xCoord, yCoord + FooCityGUIConstants.TILE_HEIGHT);
@@ -128,7 +127,7 @@ class CityViewport extends JPanel
     	int mouse_tile = city_manager.getPlacingTile();
     	if (cursor != null && mouse_tile > 0)
     	{
-    		BufferedImage mImage = tiles.GetTitle(mouse_tile);
+    		BufferedImage mImage = tileLoader.GetTitle(mouse_tile);
     		if (mImage != null)
     		{
     			final float [] scales = {1f, 1f, 1f, 0.5f};
@@ -205,14 +204,13 @@ class MiniMapPanel extends JPanel
     	map_area = city_manager.getMapArea();
     	if (map_area == null)
     		return;
-    	MapGrid current_map = city_manager.GetMapGrid();
-    	if (current_map == null)
+    	if (!city_manager.MapGridLoaded())
     		return;
     	if (viewMode == 0){ //Normal view
 	    	for (int y = 0; y < map_area.getHeight(); y++){
 	    		for (int x = 0; x <  map_area.getWidth(); x++)
 	    		{
-	    			switch(current_map.getTileAt(x, y))
+	    			switch(city_manager.getTileInt(x, y))
 	    			{
 	    			case (MapGridConstants.BEACH_TILE):
 						g1.setColor(new Color(255,225,0));  //A yellowish sandy color
@@ -273,7 +271,7 @@ class MiniMapPanel extends JPanel
 	    } else if (viewMode == 1) { // Pollution
 	    	for (int y = 0; y < map_area.getHeight(); y++) {
 	    		for (int x = 0; x <  map_area.getWidth(); x++){
-	    			int c = current_map.getTile(x, y).metricsActual[Tile.METRIC_POLLUTION] * 10 ;
+	    			int c = city_manager.getTile(x, y).metricsActual[Tile.METRIC_POLLUTION] * 10 ;
 	    			if (c > 255) c = 255;
 	    			if (c < 0) c = 0;
 	    			g1.setColor(new Color(c,c,c));
@@ -283,7 +281,7 @@ class MiniMapPanel extends JPanel
 	    } else if (viewMode == this.scale) { // Crime
 	    	for (int y = 0; y < map_area.getHeight(); y++) {
 	    		for (int x = 0; x <  map_area.getWidth(); x++) {
-	    			int c = current_map.getTile(x, y).metricsActual[Tile.METRIC_CRIME] * 10 ;
+	    			int c = city_manager.getTile(x, y).metricsActual[Tile.METRIC_CRIME] * 10 ;
 	    			if (c > 255) c = 255;
 	    			if (c < 0) c = 0;
 	    			g1.setColor(new Color(c,c,c));
@@ -293,7 +291,7 @@ class MiniMapPanel extends JPanel
 	    } else if (viewMode == 3) { // Happiness
 	    	for (int y = 0; y < map_area.getHeight(); y++) {
 	    		for (int x = 0; x <  map_area.getWidth(); x++) {
-	    			int c = current_map.getTile(x, y).metricsActual[Tile.METRIC_HAPPINESS];
+	    			int c = city_manager.getTile(x, y).metricsActual[Tile.METRIC_HAPPINESS];
 	    			if (c > 255) c = 255;
 	    			if (c < 0) c = 0;
 	    			g1.setColor(new Color(c,c,c));
