@@ -17,6 +17,10 @@ import java.awt.image.RescaleOp;
 
 import javax.swing.JPanel;
 
+import foocityBackend.FooCityManager;
+import foocityBackend.MapGridConstants;
+import foocityBackend.Tile;
+
 
 class CityViewport extends JPanel
 {

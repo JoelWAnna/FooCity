@@ -2,7 +2,6 @@
 // CS300
 // Developers: Joel Anna and David Wiza
 //
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -45,6 +44,10 @@ import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import foocityBackend.FooCityManager;
+import foocityBackend.MapGridConstants;
+import foocityBackend.Tile;
 
 
 class FooCityGUIConstants
@@ -123,12 +126,6 @@ public class FooCityGUI implements FooCityGUIInterface
 	public FooCityGUI()
 	{
 		city_manager = new FooCityManager();
-		initialize();
-	}
-
-	public FooCityGUI(MapGrid new_map)
-	{
-		city_manager = new FooCityManager(new_map);
 		initialize();
 	}
 
@@ -473,10 +470,6 @@ public class FooCityGUI implements FooCityGUIInterface
 		mnBuild.add(forrestTile_menuItem);	
 	}
 
-/*	public MapGrid getMap() {
-		return city_manager.GetMapGrid();
-	}
-	*/
 	@Override
 	public FooCityManager getCityManager()
 	{
@@ -491,14 +484,6 @@ public class FooCityGUI implements FooCityGUIInterface
 	@Override
 	public Point getViewPoint(){
 		return (Point) scrollPane.getViewport().getViewPosition().clone();
-	}
-
-	public void setMap(MapGrid new_map)
-	{
-		if (city_manager.SetMapGrid(new_map))
-		{
-			updateDisplay();
-		}
 	}
 
 	public boolean setCityManager(FooCityManager city_manager2)

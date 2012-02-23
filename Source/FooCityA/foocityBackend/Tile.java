@@ -1,3 +1,4 @@
+package foocityBackend;
 
 public class Tile
 {
@@ -28,7 +29,9 @@ public class Tile
 		metricsContributed = new int[3];
 		setValues();
 	}
-	protected Tile(int tileType){
+	
+	// TODO: return this to protected, currently needed for FooCityGUI to get tile price/description
+	public Tile(int tileType){
 		this.tileInt = tileType;
 		this.tileChar = MapGridConstants.CHAR_TILES[tileType];
 		metricsActual = new int[3];

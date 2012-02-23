@@ -8,6 +8,7 @@ import java.io.File;
 
 import javax.imageio.ImageIO;
 
+import foocityBackend.MapGridConstants;
 
 class TileLoader
 {

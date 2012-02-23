@@ -20,6 +20,8 @@ import javax.swing.JPanel;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import foocityBackend.FooCityManager;
+
 public class GamePreviewWindow extends JDialog implements ActionListener, FooCityGUIInterface
 {
 	private FileFilter FooCitySaveFilter;
