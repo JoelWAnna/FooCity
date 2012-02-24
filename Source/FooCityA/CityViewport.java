@@ -136,19 +136,14 @@ class CityViewport extends JPanel
     	int mouse_tile = city_manager.getPlacingTile();
     	if (cursor != null && mouse_tile > 0)
     	{
-    		BufferedImage mImage = tileLoader.getTile(mouse_tile);
+    		BufferedImage mImage = tileLoader.getTile(mouse_tile).getSubimage(0, 0, 32, 32);
     		if (mImage != null)
     		{
-    			/*final float [] scales = {1f, 1f, 1f, 0.5f};
+    			final float [] scales = {1f, 1f, 1f, 0.5f};
         		final float [] offsets = new float[4];
-        		final RescaleOp rop = new RescaleOp(scales, offsets, null);*/
+        		final RescaleOp rop = new RescaleOp(scales, offsets, null);
     			Color color = new Color(1f, 1f, 1f, 0.5f);
-        		//g.drawImage(mImage, rop, cursor.x & ~(FooCityGUIConstants.TILE_WIDTH-1) , (cursor.y & ~(FooCityGUIConstants.TILE_HEIGHT-1)));
-    			g.drawImage(mImage, cursor.x & ~(FooCityGUIConstants.TILE_WIDTH-1), (cursor.y & ~(FooCityGUIConstants.TILE_HEIGHT-1)), 
-    					(cursor.x & ~(FooCityGUIConstants.TILE_WIDTH-1)) + FooCityGUIConstants.TILE_WIDTH,
-    					(cursor.y & ~(FooCityGUIConstants.TILE_HEIGHT-1)) + FooCityGUIConstants.TILE_HEIGHT,
-    					0, 0, FooCityGUIConstants.TILE_WIDTH, FooCityGUIConstants.TILE_HEIGHT, color, null);
-    			
+        		g.drawImage(mImage, rop, cursor.x & ~(FooCityGUIConstants.TILE_WIDTH-1) , (cursor.y & ~(FooCityGUIConstants.TILE_HEIGHT-1)));
     		}
     	}
 		

@@ -7,7 +7,6 @@ package foocityBackend;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.PrintStream;
 import java.util.Scanner;
 
 
@@ -29,8 +28,6 @@ class MapGrid
 		return (Dimension)map_area.clone();
 	}
 
-	public static PrintStream out = new PrintStream(System.out);
-
 	public MapGrid()
 	{
 		this(MapGridConstants.MAP_WIDTH, MapGridConstants.MAP_HEIGHT);
@@ -49,15 +46,10 @@ class MapGrid
 			height = MapGridConstants.MAP_HEIGHT;
 		}
 		if (width != height)
-			System.out.println("width != height");
+			FooLogger.errorLog("MapGrid: width != height (" + width + ", " + height + ")");
 		map_area = new Dimension(width, height);
 		this.tileGrid = new Tile[(int) map_area.getWidth()][(int) map_area.getHeight()];
 		map_size = width * height;
-	}
-
-	public void Print()
-	{
-		out.print(this.toString());
 	}
 
 	private boolean tileInRange(int x, int y)
@@ -137,8 +129,8 @@ class MapGrid
 		}
 		catch (FileNotFoundException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			FooLogger.errorLog("MapGrid:FromFile FileNotFoundException");
+			FooLogger.errorLog(e.getMessage());
 			return false;
 		}
 		
@@ -206,7 +198,6 @@ class MapGrid
 			for (int x = 0; x < this.map_area.width; ++x)
 			{
 				matrix[x][y] = (tileGrid[x][y].jobs > 0) ? tileGrid[x][y].jobs : 0;
-				//System.out.println(x + " " + y + " " + matrix[x][y]);
 			}
 		return matrix;
 	}
@@ -217,10 +208,17 @@ class MapGrid
 		for (int y = 0; y < this.map_area.height; ++y)
 			for (int x = 0; x < this.map_area.width; ++x)
 			{
-				if (tileGrid[x][y].tileInt == MapGridConstants.ROAD_TILE)
-					matrix[x][y] = 1;
-				else
-					matrix[x][y] = 0;
+				switch (tileGrid[x][y].getTileInt())
+				{
+				case MapGridConstants.WATER_TILE:
+					matrix[x][y] = JobManager.NO_PATH;
+					break;
+				case MapGridConstants.ROAD_TILE:
+					matrix[x][y] = JobManager.PATH_ROAD;
+					break;
+				default: 
+					matrix[x][y] = JobManager.PATH_WALK;
+				}
 			}
 		return matrix;
 	}

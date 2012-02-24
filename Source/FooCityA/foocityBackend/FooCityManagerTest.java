@@ -277,12 +277,64 @@ public class FooCityManagerTest extends TestCase{
 		Assert.assertTrue(city_manager.SetMapGrid(sample_map));
 		Assert.assertTrue(city_manager.setPlacingTile(MapGridConstants.RESIDENTIAL_TILE));
 		Assert.assertTrue(city_manager.placeTile(0, 0));
+		Assert.assertTrue(city_manager.placeTile(2, 0));
 		Assert.assertTrue(city_manager.setPlacingTile(MapGridConstants.COMMERCIAL_TILE));
 		Assert.assertTrue(city_manager.placeTile(0,1));
 		Assert.assertTrue(city_manager.placeTile(1,0));
 		Assert.assertTrue(city_manager.placeTile(1,1));
 		//Assert.assertTrue(city_manager.placeTile(2,0));
 		city_manager.advanceTurn();
-		Assert.assertEquals(100, city_manager.getJobs());
+		Assert.assertEquals(103, city_manager.getJobs());
+	}
+	
+	public void testJobFinder2()
+	{
+		int size = 20;
+		MapGrid sample_map = new MapGrid(size, size);
+		Assert.assertTrue("FromString", sample_map.FromString
+		(
+				"DDDDDDDDDDDDDDDDDDDD\n" +
+				"DDDDDDDDDDDDDDDDDDDD\n" +
+				"DDDDDDDDDDDDDDDDDDDD\n" +
+				"DDDDDDDDDDDDDDDDDDDD\n" +
+				"DDDDDDDDDDDDDDDDDDDD\n" +
+				"DDDDDDDDDDDDDDDDDDDD\n" +
+				"DDDDDDDDDDDDDDDDDDDD\n" +
+				"DDDDDDDDDDDDDDDDDDDD\n" +
+				"DDDDDDDDDDDDDDDDDDDD\n" +
+				"DDDDDDDDDDDDDDDDDDDD\n" +
+				"DDDDDDDDDDDDDDDDDDDD\n" +
+				"DDDDDDDDDDDDDDDDDDDD\n" +
+				"DDDDDDDDDDDDDDDDDDDD\n" +
+				"DDDDDDDDDDDDDDDDDDDD\n" +
+				"DDDDDDDDDDDDDDDDDDDD\n" +
+				"DDDDDDDDDDDDDDDDDDDD\n" +
+				"DDDDDDDDDDDDDDDDDDDD\n" +
+				"DDDDDDDDDDDDDDDDDDDD\n" +
+				"DDDDDDDDDDDDDDDDDDDD\n" +
+				"DDDDDDDDDDDDDDDDDDDD\n"));
+		Assert.assertTrue(city_manager.SetMapGrid(sample_map));
+		Assert.assertTrue(city_manager.setPlacingTile(MapGridConstants.RESIDENTIAL_TILE));
+		Assert.assertTrue(city_manager.placeTile(0, 0));
+		Assert.assertTrue(city_manager.setPlacingTile(MapGridConstants.ROAD_TILE));
+		Assert.assertTrue(city_manager.placeTile(0,1));
+		Assert.assertTrue(city_manager.placeTile(0,2));
+		Assert.assertTrue(city_manager.placeTile(0,3));
+		Assert.assertTrue(city_manager.placeTile(0,4));
+		Assert.assertTrue(city_manager.placeTile(1,4));
+		Assert.assertTrue(city_manager.placeTile(2,4));
+		Assert.assertTrue(city_manager.placeTile(3,4));
+		Assert.assertTrue(city_manager.placeTile(4,4));
+		Assert.assertTrue(city_manager.placeTile(4,5));
+		Assert.assertTrue(city_manager.placeTile(4,6));
+		Assert.assertTrue(city_manager.placeTile(4,7));
+		Assert.assertTrue(city_manager.placeTile(4,8));
+		Assert.assertTrue(city_manager.placeTile(4,9));
+		Assert.assertTrue(city_manager.placeTile(4,10));
+		Assert.assertTrue(city_manager.placeTile(4,11));
+		Assert.assertTrue(city_manager.setPlacingTile(MapGridConstants.COMMERCIAL_TILE));
+		Assert.assertTrue(city_manager.placeTile(5,11));
+		city_manager.advanceTurn();
+		Assert.assertEquals(35, city_manager.getJobs());
 	}
 }

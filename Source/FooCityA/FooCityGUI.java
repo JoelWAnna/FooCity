@@ -164,13 +164,25 @@ public class FooCityGUI implements FooCityGUIInterface
 
 	private void updateTileDescription(int tileType)
 	{
-	Tile tempTile = new Tile(tileType);
-	selectedCost.setText("Cost: $" + Integer.toString(tempTile.price));
-	selectedDescription.setText(tempTile.description);
-	if (tempTile.price > city_manager.getAvailableFunds())
-		selectedCost.setForeground(Color.red);
-	else
-		selectedCost.setForeground(Color.black);
+		if (tileType >= MapGridConstants.WATER_TILE && tileType < MapGridConstants.LAST_TILE)
+		{
+			Tile tempTile = new Tile(tileType);
+			selectedCost.setText("Cost: $" + Integer.toString(tempTile.price));
+			selectedDescription.setText(tempTile.description);
+			if (tempTile.price > city_manager.getAvailableFunds())
+				selectedCost.setForeground(Color.red);
+			else
+				selectedCost.setForeground(Color.black);
+		}
+		else if (tileType == -1)//MapGridConstants.BULLDOZER)
+		{
+			
+		}
+		else
+		{
+			selectedCost.setText("");
+			selectedDescription.setText("");
+		}
 	}
 	
 	/**
@@ -643,12 +655,12 @@ public class FooCityGUI implements FooCityGUIInterface
 			buttonBulldoze.setSelected(false);
 			buttonPressed.setSelected(selected);
 			scrollPane.grabFocus();
-			String command = e.getActionCommand();
-			if (selected)
-					city_manager.setPlacingTile(Integer.parseInt(command));
-			else
-				city_manager.setPlacingTile(0);
-			updateTileDescription(Integer.parseInt(command));
+			int placingTile = Integer.parseInt(e.getActionCommand());
+			if (!selected)
+				placingTile = 0;
+			if (!city_manager.setPlacingTile(placingTile))
+				placingTile = 0;
+			updateTileDescription(placingTile);
 			return;
 		}
 	}

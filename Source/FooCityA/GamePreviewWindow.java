@@ -80,8 +80,7 @@ public class GamePreviewWindow extends JDialog implements ActionListener, FooCit
 		button_box.add(buttonOK);
 		button_box.add(buttonCancel);
 		Box layout_box = Box.createVerticalBox();
-		
-		JPanel panel = new JPanel();
+
 		// Add the box to the frame
 		layout_box.add(button_box);
 		layout_box.add(new MiniMapPanel(this, 3));
