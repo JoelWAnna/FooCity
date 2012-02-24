@@ -236,11 +236,46 @@ public class FooCityManager
 				if (current_map.setTile(x, y, tile_to_place))
 				{
 					this.availableFunds -= tempTile.price;
+					// Set the graphic variation for this and the neighboring tiles
+					for (int xv = x - 1; xv < x + 2; xv++){
+						for (int yv = y - 1; yv < y + 2; yv++){
+							setVariation(xv, yv);
+						}
+					}
 					return true;
 				}
 			}
 		}
 		return false;
+	}
+	
+	public void setVariation(int x, int y){
+		// First, make sure the coordinates are valid
+		if (x < 0 || x >= MapGridConstants.MAP_WIDTH || y < 0 || y >= MapGridConstants.MAP_HEIGHT)
+			return;
+		Tile tile = getTile(x,y);
+		int variation = 0;
+		switch(tile.getTileInt()){
+		case MapGridConstants.ROAD_TILE:
+			if (y > 0)
+				if (getTile(x, y - 1).getTileInt() == MapGridConstants.ROAD_TILE)
+					variation += 1;
+			if (x < MapGridConstants.MAP_WIDTH - 2)
+				if (getTile(x + 1, y).getTileInt() == MapGridConstants.ROAD_TILE)
+					variation += 2;
+			if (y < MapGridConstants.MAP_HEIGHT - 2)
+				if (getTile(x, y + 1).getTileInt() == MapGridConstants.ROAD_TILE)
+					variation += 4;
+			if (x > 0)
+				if (getTile(x - 1, y).getTileInt() == MapGridConstants.ROAD_TILE)
+					variation += 8;
+			break;
+		default:
+			variation = 0;
+				
+		}
+		
+		tile.variation = variation;
 	}
 	
 	public void propagateMetrics(){

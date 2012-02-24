@@ -5,6 +5,7 @@
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
@@ -17,7 +18,7 @@ class TileLoader
 	private String tileNames[];
 	private BufferedImage tiles[];
     private String TileSet;
-    
+    private BufferedImage road;
 
 	public TileLoader()
 	{
@@ -38,13 +39,27 @@ class TileLoader
 	        //	m_valid = false;
 	        }
 		}
+		
+		try {
+			road = ImageIO.read(new File("images/road.png"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		m_valid = true;
 	}
 
 	public BufferedImage getTile(int i)
 	{
-		if (!m_valid && (i < 0 || i > tiles.length))
-			return null;
+		switch(i){
+		case (MapGridConstants.ROAD_TILE):
+			return road;
+		default:
+			if (!m_valid && (i < 0 || i > tiles.length))
+				return null;
+		}
+		
 		return tiles[i];
 	}
 	

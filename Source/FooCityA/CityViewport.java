@@ -119,9 +119,14 @@ class CityViewport extends JPanel
             	if ((xCoord < r.x - FooCityGUIConstants.TILE_WIDTH) || (xCoord >= r.x + r.width + FooCityGUIConstants.TILE_WIDTH))
             		continue;
         		BufferedImage bI = null;
-        		bI = tileLoader.getTile(city_manager.getTileInt(x, y));
+        		Tile tile = city_manager.getTile(x, y);
+        		bI = tileLoader.getTile(tile.getTileInt());
         		if (bI != null)
-        			g.drawImage(bI, xCoord, yCoord , null);
+        			g.drawImage(bI, xCoord, yCoord, xCoord + FooCityGUIConstants.TILE_WIDTH, yCoord + FooCityGUIConstants.TILE_HEIGHT,
+        					(tile.variation % 16) * FooCityGUIConstants.TILE_WIDTH, (tile.variation / 16) * FooCityGUIConstants.TILE_HEIGHT,
+        					(tile.variation % 16) * FooCityGUIConstants.TILE_WIDTH + FooCityGUIConstants.TILE_WIDTH, 
+        					(tile.variation / 16) * FooCityGUIConstants.TILE_HEIGHT + FooCityGUIConstants.TILE_HEIGHT, null);
+
         		g.drawLine(xCoord, yCoord, xCoord, yCoord + FooCityGUIConstants.TILE_HEIGHT);
         	}
         	g.drawLine(r.x, yCoord, r.x + (int) map_area.getWidth() * FooCityGUIConstants.TILE_WIDTH, yCoord);
@@ -134,10 +139,16 @@ class CityViewport extends JPanel
     		BufferedImage mImage = tileLoader.getTile(mouse_tile);
     		if (mImage != null)
     		{
-    			final float [] scales = {1f, 1f, 1f, 0.5f};
+    			/*final float [] scales = {1f, 1f, 1f, 0.5f};
         		final float [] offsets = new float[4];
-        		final RescaleOp rop = new RescaleOp(scales, offsets, null);
-        		g.drawImage(mImage, rop, cursor.x & ~(FooCityGUIConstants.TILE_WIDTH-1) , (cursor.y & ~(FooCityGUIConstants.TILE_HEIGHT-1)));
+        		final RescaleOp rop = new RescaleOp(scales, offsets, null);*/
+    			Color color = new Color(1f, 1f, 1f, 0.5f);
+        		//g.drawImage(mImage, rop, cursor.x & ~(FooCityGUIConstants.TILE_WIDTH-1) , (cursor.y & ~(FooCityGUIConstants.TILE_HEIGHT-1)));
+    			g.drawImage(mImage, cursor.x & ~(FooCityGUIConstants.TILE_WIDTH-1), (cursor.y & ~(FooCityGUIConstants.TILE_HEIGHT-1)), 
+    					(cursor.x & ~(FooCityGUIConstants.TILE_WIDTH-1)) + FooCityGUIConstants.TILE_WIDTH,
+    					(cursor.y & ~(FooCityGUIConstants.TILE_HEIGHT-1)) + FooCityGUIConstants.TILE_HEIGHT,
+    					0, 0, FooCityGUIConstants.TILE_WIDTH, FooCityGUIConstants.TILE_HEIGHT, color, null);
+    			
     		}
     	}
 		

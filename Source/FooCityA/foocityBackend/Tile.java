@@ -14,6 +14,7 @@ public class Tile
 	public int powerConsumed;
 	public int waterConsumed;
 	public boolean employed;
+	public int variation;
 	private char tileChar;
 	protected int tileInt;
 	protected boolean replaceable;
