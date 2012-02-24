@@ -17,6 +17,7 @@ class TileLoader
 	private String tileNames[];
 	private BufferedImage tiles[];
     private String TileSet;
+    
 
 	public TileLoader()
 	{
@@ -40,7 +41,7 @@ class TileLoader
 		m_valid = true;
 	}
 
-	public BufferedImage GetTitle(int i)
+	public BufferedImage getTile(int i)
 	{
 		if (!m_valid && (i < 0 || i > tiles.length))
 			return null;

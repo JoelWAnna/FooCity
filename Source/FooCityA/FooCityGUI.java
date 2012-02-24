@@ -76,7 +76,7 @@ public class FooCityGUI implements FooCityGUIInterface
 	public static FooCityGUI window;
 	private JMenuBar menuBar;
 	private final Action NewGame = new MainMenuAction();
-	private final Action Tile = new Place_Tile_Action();
+	private final Action Tile = new PlaceTileAction();
 	private JLabel currentFunds;
 	private JTextArea selectedDescription;
 	private JLabel selectedCost;
@@ -615,9 +615,9 @@ public class FooCityGUI implements FooCityGUIInterface
 		}
 	}
 
-	private class Place_Tile_Action extends AbstractAction
+	private class PlaceTileAction extends AbstractAction
 	{
-		public Place_Tile_Action()
+		public PlaceTileAction()
 		{
 			putValue(NAME, "Place Tile");
 			putValue(SHORT_DESCRIPTION, "Some short description");

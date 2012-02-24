@@ -119,7 +119,7 @@ class CityViewport extends JPanel
             	if ((xCoord < r.x - FooCityGUIConstants.TILE_WIDTH) || (xCoord >= r.x + r.width + FooCityGUIConstants.TILE_WIDTH))
             		continue;
         		BufferedImage bI = null;
-        		bI = tileLoader.GetTitle(city_manager.getTileInt(x, y));
+        		bI = tileLoader.getTile(city_manager.getTileInt(x, y));
         		if (bI != null)
         			g.drawImage(bI, xCoord, yCoord , null);
         		g.drawLine(xCoord, yCoord, xCoord, yCoord + FooCityGUIConstants.TILE_HEIGHT);
@@ -131,7 +131,7 @@ class CityViewport extends JPanel
     	int mouse_tile = city_manager.getPlacingTile();
     	if (cursor != null && mouse_tile > 0)
     	{
-    		BufferedImage mImage = tileLoader.GetTitle(mouse_tile);
+    		BufferedImage mImage = tileLoader.getTile(mouse_tile);
     		if (mImage != null)
     		{
     			final float [] scales = {1f, 1f, 1f, 0.5f};
