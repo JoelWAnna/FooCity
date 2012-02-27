@@ -21,7 +21,8 @@ public class JobManager {
 	public static final int PATH_ROAD = 1 << 8;
 	public static final int PATH_MAX_ROADS = 15 << 8;
 	public static final int PATH_MAX_WALKED = 2;
-	
+	private static final int PATH_WALK_MASK = 0xf;
+
 	/**
 	 *  Constructor
 	 *  no operations necessary at this time
@@ -183,9 +184,9 @@ public class JobManager {
 							int newPathCost = thisTile + totalPath;
 
 							// new Road, only add if total roads will be PATH_MAX_ROADS or less
-							if (((thisTile == PATH_ROAD) && ((newPathCost >> 8) <= PATH_MAX_ROADS)) ||
+							if (((thisTile == PATH_ROAD) && ((newPathCost & ~PATH_WALK_MASK) <= PATH_MAX_ROADS)) ||
 							// new walk, only add it total walking will be PATH_MAX_WALKED or less
-								((thisTile == PATH_WALK) && ((newPathCost & 0xF) <= PATH_MAX_WALKED)))
+								((thisTile == PATH_WALK) && ((newPathCost & PATH_WALK_MASK) <= PATH_MAX_WALKED)))
 							{
 								
 								switch (found_matrix[xPath][yNext])
@@ -198,7 +199,7 @@ public class JobManager {
 									break;
 								default:
 									// Check for a better path, replacing walking with a road where possible
-									if ((found_matrix[xPath][yNext]&0xF) > (newPathCost&0xF))
+									if ((found_matrix[xPath][yNext]&PATH_WALK_MASK) > (newPathCost&PATH_WALK_MASK))
 									{
 										changed = true;
 										found_matrix[xPath][yNext] = newPathCost;
@@ -229,9 +230,9 @@ public class JobManager {
 							
 							int newPathCost = thisTile + totalPath;
 							// new Road, only add if total roads will be PATH_MAX_ROADS or less
-							if (((thisTile == PATH_ROAD) && ((newPathCost >> 8) <= PATH_MAX_ROADS)) ||
+							if (((thisTile == PATH_ROAD) && ((newPathCost & ~PATH_WALK_MASK) <= PATH_MAX_ROADS)) ||
 							// new walk, only add it total walking will be PATH_MAX_WALKED or less
-								((thisTile == PATH_WALK) && ((newPathCost & 0xF) <= PATH_MAX_WALKED)))
+								((thisTile == PATH_WALK) && ((newPathCost & PATH_WALK_MASK) <= PATH_MAX_WALKED)))
 							{
 								
 								switch (found_matrix[xNext][yPath])
@@ -244,7 +245,7 @@ public class JobManager {
 									break;
 								default:
 									// Check for a better path, replacing walking with a road where possible
-									if ((found_matrix[xNext][yPath]&0xF) > (newPathCost&0xF))
+									if ((found_matrix[xNext][yPath]&PATH_WALK_MASK) > (newPathCost&PATH_WALK_MASK))
 									{
 										changed = true;
 										found_matrix[xNext][yPath] = newPathCost;
