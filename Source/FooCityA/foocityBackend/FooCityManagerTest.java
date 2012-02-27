@@ -334,7 +334,9 @@ public class FooCityManagerTest extends TestCase{
 		Assert.assertTrue(city_manager.placeTile(4,11));
 		Assert.assertTrue(city_manager.setPlacingTile(MapGridConstants.COMMERCIAL_TILE));
 		Assert.assertTrue(city_manager.placeTile(5,11));
+		Assert.assertTrue(city_manager.placeTile(5,10));
+		Assert.assertTrue(city_manager.placeTile(1,0));
 		city_manager.advanceTurn();
-		Assert.assertEquals(35, city_manager.getJobs());
+		Assert.assertEquals(100, city_manager.getJobs());
 	}
 }

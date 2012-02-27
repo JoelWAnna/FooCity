@@ -4,28 +4,58 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.util.Stack;
 
+/**
+ * JobManager
+ * Pathfinder class for locating jobs for residents
+ * 
+ * @author Joel Anna <annajoel@cecs.pdx.edu>
+ * 2012 February 23
+ * 
+ *
+ */
 public class JobManager {
 	private int jobs;
 	public static final int NO_PATH = -1;
+	public static final int PATH_ORIGIN = 0;
 	public static final int PATH_WALK = 1;
 	public static final int PATH_ROAD = 1 << 8;
 	public static final int PATH_MAX_ROADS = 15 << 8;
 	public static final int PATH_MAX_WALKED = 2;
-	public JobManager()
-	{
-	}
 	
+	/**
+	 *  Constructor
+	 *  no operations necessary at this time
+	 */
+	public JobManager()
+	{}
+	
+	/**
+	 * clearJobs
+	 * resets available jobs to 0, to be used when a game is quit
+	 */
 	public void clearJobs()
 	{
 		jobs = 0;
 	}
 
+	/**
+	 * findJobs
+	 * @param map_area Dimension of the matrices used in calculation
+	 * @param residential_matrix matrix filled with the number of residents at each square
+	 * @param job_matrix matrix filled with the number of available jobs at each square
+	 * @param path_matrix matrix of travel costs for each square, Water = -1, Road = 1 << 8, everything else = 1
+	 * @return number of jobs found by the pathfinding algorithm
+	 */
 	public int findJobs(Dimension map_area, int[][] residential_matrix, int[][] job_matrix, int[][] path_matrix)
 	{
 		clearJobs();
 
 		int jobsFound = 0;
-		Stack<Dimension> found = new Stack<Dimension>();		
+
+		// Stack for storing available job locations
+		Stack<Point> found = new Stack<Point>();
+		
+		// Traverse through residential_matrix looking for residents
 		for (int ySource = 0; ySource < map_area.height; ++ySource)
 			for (int xSource = 0; xSource < map_area.width; ++xSource)
 			{
@@ -35,7 +65,11 @@ public class JobManager {
 					int xDestMin = Math.max(0, xSource-17);
 					int yDestMax = Math.min(map_area.height, ySource+18);
 					int xDestMax = Math.min(map_area.width, xSource+18);
-					int [][] resolved_path_matrix = findPath(new Point(xSource,ySource), path_matrix, new Dimension(xDestMax, yDestMax));
+					
+					// Find path costs for squares within road/walking distance
+					int [][] resolved_path_matrix = findPath(new Point(xSource,ySource), new Dimension(xDestMax, yDestMax), path_matrix);
+					
+					// Traverse Job locations within road/walking distance and compare to resolved_path_matrix
 					for (int yDest = yDestMin; yDest < yDestMax; ++yDest)
 					{
 						for (int xDest = xDestMin; xDest < xDestMax; ++xDest)
@@ -43,42 +77,50 @@ public class JobManager {
 							if (job_matrix[xDest][yDest] > 0)
 							{
 								if (resolved_path_matrix[xDest][yDest] > 0)
-									found.push(new Dimension(xDest,yDest));
+									found.push(new Point(xDest,yDest));
 								
 							}
 						}
 					}
 
-					if (found.size() > 0)
+					while (found.size() > 0)
 					{
-						while (found.size() > 0)
-						{
-							int jobs_to_place = residential_matrix[xSource][ySource] / found.size();
-							if (residential_matrix[xSource][ySource] % found.size() > 0)
-								jobs_to_place++;
-							
-							Dimension location = found.pop();
-							FooLogger.infoLog("Trying to find " + jobs_to_place);
-							FooLogger.infoLog("residents " + residential_matrix[xSource][ySource]);
-							FooLogger.infoLog("jobs " + job_matrix[location.width][location.height]);
-							jobs_to_place = residential_matrix[xSource][ySource] > jobs_to_place ? jobs_to_place : residential_matrix[xSource][ySource];
-							jobs_to_place = job_matrix[location.width][location.height] > jobs_to_place ? jobs_to_place : job_matrix[location.width][location.height];
-							
-							FooLogger.infoLog("Found " + jobs_to_place);
-							
-							job_matrix[location.width][location.height] -= jobs_to_place;
-							residential_matrix[xSource][ySource] -= jobs_to_place;
-							jobsFound += jobs_to_place;
-						}
+						// Divide residents between all available jobs
+						// TODO: this should be fixed to relook if all residents do not find jobs
+						int jobs_to_place = residential_matrix[xSource][ySource] / found.size();
+						if (residential_matrix[xSource][ySource] % found.size() > 0)
+							jobs_to_place++;
+						
+						Point location = found.pop();
+						FooLogger.infoLog("Trying to find " + jobs_to_place);
+						FooLogger.infoLog("residents " + residential_matrix[xSource][ySource]);
+						FooLogger.infoLog("jobs " + job_matrix[location.x][location.y]);
+				
+						jobs_to_place = residential_matrix[xSource][ySource] > jobs_to_place ? jobs_to_place : residential_matrix[xSource][ySource];
+						jobs_to_place = job_matrix[location.x][location.y] > jobs_to_place ? jobs_to_place : job_matrix[location.x][location.y];
+						
+						FooLogger.infoLog("Found " + jobs_to_place);
+						
+						job_matrix[location.x][location.y] -= jobs_to_place;
+						residential_matrix[xSource][ySource] -= jobs_to_place;
+						jobsFound += jobs_to_place;
 					}
 				}
 			}
+
 		this.jobs = jobsFound;
 		FooLogger.infoLog("Final Found " + jobsFound);
 		return jobs;
 	}
 
-	private int [][] findPath(Point origin, int[][] path_matrix, Dimension map_area)
+	/**
+	 * 
+	 * @param origin - residential location to start searching
+	 * @param map_area - Dimensions of the path_matrix
+ 	 * @param path_matrix -  matrix of travel costs for each square, Water = -1, Road = 1 << 8, everything else = 1
+	 * @return
+	 */
+	private int [][] findPath(Point origin, Dimension map_area, int[][] path_matrix)
 	{
 		int yMin = Math.max(origin.y - 17, 0);
 		int xMin = Math.max(origin.x - 17, 0);
@@ -88,23 +130,24 @@ public class JobManager {
 
 		int [][]found_matrix = new int[xMax][yMax];
 
-		// Initialize Paths
+		// Initialize Paths, 0 at origin, -1 elsewhere
 		for (int yDestination = 0; yDestination < yMax; ++yDestination)
 		{
 			for (int xDestination = 0; xDestination < xMax; ++xDestination)
 			{
 				if (yDestination == origin.y && xDestination == origin.x)
 				{
-					found_matrix[xDestination][yDestination] = 0;
+					found_matrix[xDestination][yDestination] = PATH_ORIGIN;
 				}
 				else
 				{
-					found_matrix[xDestination][yDestination] = -1;
+					found_matrix[xDestination][yDestination] = NO_PATH;
 				}		
 			}
 		}
 			
 
+		// Loop through and update path costs until no further paths are found
 		boolean changed = true;
 		while (changed)
 		{
@@ -113,10 +156,16 @@ public class JobManager {
 			{
 				for (int xPath = xMin; xPath < xMax; xPath++)
 				{
-					if (found_matrix[xPath][yPath] != -1)
+					// Only Start from a location that can be reached
+					if (found_matrix[xPath][yPath] != NO_PATH)
 					{
-						for (int yNext = Math.max(yPath-1, 0); yNext < Math.min(yPath+2, xMax); ++yNext)
+						// Add N and S
+						for (int yNext = Math.max(yPath-1, 0); yNext < Math.min(yPath+2, yMax); ++yNext)
 						{
+							// skip the current tile here for edge cases (yPath == 0 || yPath == yMax)
+							if (yNext == yPath)
+								continue;
+							
 							int previousTile = path_matrix[xPath][yPath];
 							int totalPath = found_matrix[xPath][yPath];
 							int thisTile = path_matrix[xPath][yNext];
@@ -131,35 +180,41 @@ public class JobManager {
 						
 							
 							
-							int newValue = path_matrix[xPath][yNext] + found_matrix[xPath][yPath];
-							// new Road
-							if (((thisTile == PATH_ROAD) && ((newValue >> 8) <= PATH_MAX_ROADS)) ||
-							// new walk
-								((thisTile == PATH_WALK) && ((newValue & 0xF) <= PATH_MAX_WALKED)))
+							int newPathCost = thisTile + totalPath;
+
+							// new Road, only add if total roads will be PATH_MAX_ROADS or less
+							if (((thisTile == PATH_ROAD) && ((newPathCost >> 8) <= PATH_MAX_ROADS)) ||
+							// new walk, only add it total walking will be PATH_MAX_WALKED or less
+								((thisTile == PATH_WALK) && ((newPathCost & 0xF) <= PATH_MAX_WALKED)))
 							{
 								
 								switch (found_matrix[xPath][yNext])
 								{
-								case 0: // starting square don't update
-									break;
-								case -1: // Always update from no path to this path
+								//case PATH_ORIGIN: // starting square don't update
+								//	break;
+								case NO_PATH: // Always update from no path to this path
 									changed = true;
-									found_matrix[xPath][yNext] = newValue;
+									found_matrix[xPath][yNext] = newPathCost;
 									break;
 								default:
 									// Check for a better path, replacing walking with a road where possible
-									if ((found_matrix[xPath][yNext]&0xF) > (newValue&0xF))
+									if ((found_matrix[xPath][yNext]&0xF) > (newPathCost&0xF))
 									{
 										changed = true;
-										found_matrix[xPath][yNext] = newValue;
+										found_matrix[xPath][yNext] = newPathCost;
 									}
 								}
 
 							}
 						}
 						
+						// Add E W
 						for (int xNext = Math.max(xPath-1, 0); xNext < Math.min(xPath+2, xMax); ++xNext)
 						{
+							// skip the current tile here for edge cases (xPath == 0 || xPath == xMax)
+							if (xNext == xPath)
+								continue;
+	
 							int previousTile = path_matrix[xPath][yPath];
 							int totalPath = found_matrix[xPath][yPath];
 							int thisTile = path_matrix[xNext][yPath];
@@ -173,17 +228,17 @@ public class JobManager {
 							}
 							
 							int newPathCost = thisTile + totalPath;
-							// new Road
+							// new Road, only add if total roads will be PATH_MAX_ROADS or less
 							if (((thisTile == PATH_ROAD) && ((newPathCost >> 8) <= PATH_MAX_ROADS)) ||
-							// new walk
+							// new walk, only add it total walking will be PATH_MAX_WALKED or less
 								((thisTile == PATH_WALK) && ((newPathCost & 0xF) <= PATH_MAX_WALKED)))
 							{
 								
 								switch (found_matrix[xNext][yPath])
 								{
-								case 0: // starting square don't update
-									break;
-								case -1: // Always update from no path to this path
+								//case PATH_ORIGIN: // starting square don't update
+								//	break;
+								case NO_PATH: // Always update from no path to this path
 									changed = true;
 									found_matrix[xNext][yPath] = newPathCost;
 									break;
@@ -207,6 +262,13 @@ public class JobManager {
 		return found_matrix;
 	}
 
+	/**
+	 * printMatrix
+	 * debugging print to view contents of matrix
+	 * @param found_matrix matrix to print
+	 * @param height maximum height to print
+	 * @param width maximum width to print
+	 */
 	private void printMatrix(int[][] found_matrix, int height, int width) {
 		if (FooLogger.MAX_ERROR < FooLogger.INFO_LOG)
 			return;
