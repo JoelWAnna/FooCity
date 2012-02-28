@@ -233,7 +233,7 @@ public class FooCityManagerTest extends TestCase{
 		for (int y = 0; y < size; ++y)
 			for (int x = 0; x < size; ++x)
 			{
-				int actual_happiness = city_manager.getTile(x, y).metricsActual[Tile.METRIC_HAPPINESS];
+				int actual_happiness = city_manager.getTileMetrics(x, y, MapGridConstants.METRIC_HAPPINESS);
 				String error = "\nTile(x,y) (" + x + "," + y + ")";//\nExpected: " + expectedHappiness[x][y] + " Found : " + actual_happiness;
 				Assert.assertEquals(error, expectedHappiness[x][y] , actual_happiness);
 			}
@@ -263,7 +263,7 @@ public class FooCityManagerTest extends TestCase{
 		for (int y = 0; y < size; ++y)
 			for (int x = 0; x < size; ++x)
 			{
-				int actual_happiness = city_manager.getTile(x, y).metricsActual[Tile.METRIC_HAPPINESS];
+				int actual_happiness = city_manager.getTileMetrics(x, y, MapGridConstants.METRIC_HAPPINESS);
 				String error = "\nTile(x,y) (" + x + "," + y + ")";//\nExpected: " + expectedHappiness[x][y] + " Found : " + actual_happiness;
 				Assert.assertEquals(error, expectedHappiness[x][y] , actual_happiness);
 			}

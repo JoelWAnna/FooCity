@@ -6,7 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
-import java.util.Stack;
+
+import javax.swing.JLabel;
 
 // Project FooCity-group2
 // CS300
@@ -29,11 +30,11 @@ public class FooCityManager
 	private MapGrid current_map;
 	private int tile_to_place;
 	private int turn;
-	public int powerConsumed = 0, powerGenerated = 0;
-	public int waterConsumed = 0, waterGenerated = 0;
-	public int income = 0, expenses = 0;
-	public int cashFlow = 0;
-	public int jobs = 0, residents = 0;
+	private int powerConsumed = 0, powerGenerated = 0;
+	private int waterConsumed = 0, waterGenerated = 0;
+	private int income = 0, expenses = 0;
+	private int cashFlow = 0;
+	private int jobs = 0, residents = 0;
 	private JobManager job_manager;
 
 	public FooCityManager()
@@ -64,11 +65,31 @@ public class FooCityManager
 		return 0;
 	}
 
-	public Tile getTile(int x, int y)
+	public int getTileVariation(int x, int y)
 	{
 		if (current_map != null)
-			return current_map.getTile(x, y);
-		return null;
+		{
+			Tile currentTile = current_map.getTile(x,y);
+			if (currentTile != null)
+			{
+				return currentTile.variation;
+			}
+		}
+		return 0;
+	}
+
+	public int getTileMetrics(int x, int y, int Metric)
+	{
+		if ((current_map != null) &&
+			(MapGridConstants.METRIC_CRIME <= Metric && Metric < MapGridConstants.METRIC_LAST))				
+		{
+			Tile currentTile = current_map.getTile(x,y);
+			if (currentTile != null)
+			{
+				return currentTile.metricsActual[Metric];
+			}
+		}
+		return 0;
 	}
 
 	public boolean MapGridLoaded()
@@ -145,36 +166,36 @@ public class FooCityManager
 		for (int y = 0; y < current_map.getMapArea().getHeight(); y++){
 			for (int x = 0; x < current_map.getMapArea().getWidth(); x++){
 				// Get the tile
-				Tile tile = current_map.getTile(x, y);
+				TileMetrics tile_metrics = TileMetrics.GetTileMetrics(current_map.getTileInt(x, y));
 				
 				//Add to power consumed if its consuming, otherwise "add" it to generated
 				//(Remember that if its generating, the consumed amount is negative
 				//So we SUBTRACT it to ADD it)
-				if (tile.powerConsumed > 0)
-					powerConsumed += tile.powerConsumed;
+				if (tile_metrics.getPowerConsumed() > 0)
+					powerConsumed += tile_metrics.getPowerConsumed();
 				else
-					powerGenerated -= tile.powerConsumed;
+					powerGenerated -= tile_metrics.getPowerConsumed();
 				
 				//Do the same with water
-				if (tile.waterConsumed > 0)
-					waterConsumed += tile.waterConsumed;
+				if (tile_metrics.getWaterConsumed() > 0)
+					waterConsumed += tile_metrics.getWaterConsumed() ;
 				else
-					waterGenerated -= tile.waterConsumed;
+					waterGenerated -= tile_metrics.getWaterConsumed() ;
 				
 				//Do a similar thing with residents versus jobs
-				if (tile.jobs > 0)
-					jobs += tile.jobs;
+				if (tile_metrics.getJobs() > 0)
+					jobs += tile_metrics.getJobs();
 				else
-					residents -= tile.jobs;
+					residents -= tile_metrics.getJobs();
 				
 				//If the residents are employed (Or the job location has a resident nearby)
 				//Then add it to the budget
-				if (tile.employed){
-					if (tile.monthlyCost > 0)
-						expenses += tile.monthlyCost;
+				//if (tile_metrics.employed){
+					if (tile_metrics.getMonthlyCost() > 0)
+						expenses += tile_metrics.getMonthlyCost();
 					else
-						income -= tile.monthlyCost;
-				}
+						income -= tile_metrics.getMonthlyCost();
+			//	}
 				
 				
 				
@@ -238,12 +259,12 @@ public class FooCityManager
 	{
 		if (current_map != null && tile_to_place > 0)
 		{
-			Tile tempTile = new Tile(tile_to_place);
-			if (tempTile.price <= this.availableFunds)
+			int price = TileMetrics.GetTileMetrics(tile_to_place).getPrice();
+			if (price <= this.availableFunds)
 			{
 				if (current_map.setTile(x, y, tile_to_place))
 				{
-					this.availableFunds -= tempTile.price;
+					this.availableFunds -= price;
 					// Set the graphic variation for this and the neighboring tiles
 					for (int xv = x - 1; xv < x + 2; xv++){
 						for (int yv = y - 1; yv < y + 2; yv++){
@@ -259,23 +280,26 @@ public class FooCityManager
 	
 	public void setVariation(int x, int y){
 		// First, make sure the coordinates are valid
-		if (x < 0 || x >= MapGridConstants.MAP_WIDTH || y < 0 || y >= MapGridConstants.MAP_HEIGHT)
+		if ((current_map == null) ||
+			((x < 0 || x >= MapGridConstants.MAP_WIDTH) ||
+			(y < 0 || y >= MapGridConstants.MAP_HEIGHT)))
 			return;
-		Tile tile = getTile(x,y);
+		
+		Tile tile = current_map.getTile(x,y);
 		int variation = 0;
 		switch(tile.getTileInt()){
 		case MapGridConstants.ROAD_TILE:
 			if (y > 0)
-				if (getTile(x, y - 1).getTileInt() == MapGridConstants.ROAD_TILE)
+				if (getTileInt(x, y - 1) == MapGridConstants.ROAD_TILE)
 					variation += 1;
-			if (x < MapGridConstants.MAP_WIDTH - 2)
-				if (getTile(x + 1, y).getTileInt() == MapGridConstants.ROAD_TILE)
+			if (x < MapGridConstants.MAP_WIDTH - 1)
+				if (getTileInt(x + 1, y) == MapGridConstants.ROAD_TILE)
 					variation += 2;
-			if (y < MapGridConstants.MAP_HEIGHT - 2)
-				if (getTile(x, y + 1).getTileInt() == MapGridConstants.ROAD_TILE)
+			if (y < MapGridConstants.MAP_HEIGHT - 1)
+				if (getTileInt(x, y + 1) == MapGridConstants.ROAD_TILE)
 					variation += 4;
 			if (x > 0)
-				if (getTile(x - 1, y).getTileInt() == MapGridConstants.ROAD_TILE)
+				if (getTileInt(x - 1, y) == MapGridConstants.ROAD_TILE)
 					variation += 8;
 			break;
 		default:
@@ -303,45 +327,45 @@ public class FooCityManager
 		}
 		
 		// For each metric...
-		for (int metric = 0; metric < 3; metric++){
-			for (int y = 0; y < map_height; y++){
-				for (int x = 0; x < map_width; x++){
-					int c = current_map.getTile(x, y).metricsContributed[metric];
+		for (int metric = 0; metric < MapGridConstants.METRIC_LAST; metric++){
+			for (int yOrigin = 0; yOrigin < map_height; yOrigin++){
+				for (int xOrigin = 0; xOrigin < map_width; xOrigin++){
+					int c = TileMetrics.GetTileMetrics(current_map.getTileInt(xOrigin, yOrigin)).getMetricsContributed()[metric];
 					// If we're ADDING crime...
 					if (c > 0){
 						// Branch to the right
-						for (int xx = 0; xx < c; xx++){
+						for (int xOffset = 0; xOffset < c; xOffset++){
 							// Make sure we haven't gone past the right edge
-							if (x + xx < map_width) {
+							if (xOrigin + xOffset < map_width) {
 								// Set the current value
-								current_map.getTile(x + xx, y).metricsActual[metric] += (c - xx);
+								current_map.updateMetrics(xOrigin + xOffset, yOrigin, metric, c - xOffset);
 								// Branch up/down, start 1 unit past the horizontal branch
-								for (int yy = 1; yy < c - xx; yy++){
+								for (int yOffset = 1; yOffset < c - xOffset; yOffset++){
 									// Don't go past the top of the map
-									if (y - yy >= 0)
-										current_map.getTile(xx + x, y - yy).metricsActual[metric] += (c - xx - yy);
+									if (yOrigin - yOffset >= 0)
+										current_map.updateMetrics(xOrigin + xOffset, yOrigin - yOffset, metric, c - xOffset - yOffset);										
 									// Don't go below the map
-									if (y + yy < map_height)
-										current_map.getTile(xx + x, yy + y).metricsActual[metric] += (c - xx - yy);
+									if (yOrigin + yOffset < map_height)
+										current_map.updateMetrics(xOrigin + xOffset, yOrigin + yOffset, metric, c - xOffset - yOffset);										
 								}
 							}
 						}
 						// Branch to the left
 						// We have to start 1 unit to the left to avoid
 						// double-adding the center column
-						for (int xx = -1; xx > -c; xx--){
+						for (int xOffset = -1; xOffset > -c; xOffset--){
 							// Make sure we haven't gone past the left edge
-							if (x + xx > -1) {
+							if (xOrigin + xOffset > -1) {
 								// Set the current value
-								current_map.getTile(x + xx, y).metricsActual[metric] += c + xx;
+								current_map.updateMetrics(xOrigin + xOffset, yOrigin, metric, c + xOffset);
 								// Branch up/down, start 1 unit past the horizontal branch
-								for (int yy = 1; yy < c + xx; yy++){
+								for (int yOffset = 1; yOffset < c + xOffset; yOffset++){
 									// Don't go past the top of the map
-									if (y - yy >= 0)
-										current_map.getTile(x + xx, y - yy).metricsActual[metric] += (c + xx - yy);
+									if (yOrigin - yOffset >= 0)
+										current_map.updateMetrics(xOrigin + xOffset, yOrigin - yOffset, metric, c + xOffset - yOffset);
 									// Don't go below the map
-									if (y + yy < map_height)
-										current_map.getTile(x + xx, yy + y).metricsActual[metric] += (c + xx - yy);
+									if (yOrigin + yOffset < map_height)
+										current_map.updateMetrics(xOrigin + xOffset, yOrigin + yOffset, metric, c + xOffset - yOffset);
 								}
 							}
 						}
@@ -349,38 +373,38 @@ public class FooCityManager
 						//Treat it like we're adding it, but we'll be subtracting
 						c = -c;
 						// Branch to the right
-						for (int xx = 0; xx < c; xx++){
+						for (int xOffset = 0; xOffset < c; xOffset++){
 							// Make sure we haven't gone past the right edge
-							if (x + xx < map_width) {
+							if (xOrigin + xOffset < map_width) {
 								// Set the current value
-								current_map.getTile(x + xx, y).metricsActual[metric] -= (c - xx);
+								current_map.updateMetrics(xOrigin + xOffset, yOrigin, metric, -(c - xOffset));
 								// Branch up/down, start 1 unit past the horizontal branch
-								for (int yy = 1; yy < c - xx; yy++){
+								for (int yOffset = 1; yOffset < c - xOffset; yOffset++){
 									// Don't go past the top of the map
-									if (y - yy >= 0)
-										current_map.getTile(xx + x, y - yy).metricsActual[metric] -= (c - xx - yy);
+									if (yOrigin - yOffset >= 0)
+										current_map.updateMetrics(xOrigin + xOffset, yOrigin - yOffset, metric, -(c - xOffset - yOffset));
 									// Don't go below the map
-									if (y + yy < map_height)
-										current_map.getTile(xx + x, yy + y).metricsActual[metric] -= (c - xx - yy);
+									if (yOrigin + yOffset < map_height)
+										current_map.updateMetrics(xOrigin + xOffset, yOrigin + yOffset, metric, -(c - xOffset - yOffset));
 								}
 							}
 						}
 						// Branch to the left
 						// We have to start 1 unit to the left to avoid
 						// double-adding the center column
-						for (int xx = -1; xx > -c; xx--){
+						for (int xOffset = -1; xOffset > -c; xOffset--){
 							// Make sure we haven't gone past the left edge
-							if (x + xx > -1) {
+							if (xOrigin + xOffset > -1) {
 								// Set the current value
-								current_map.getTile(x + xx, y).metricsActual[metric] -= c + xx;
+								current_map.updateMetrics(xOrigin + xOffset, yOrigin, metric, -(c + xOffset));
 								// Branch up/down, start 1 unit past the horizontal branch
-								for (int yy = 1; yy < c + xx; yy++){
+								for (int yOffset = 1; yOffset < c + xOffset; yOffset++){
 									// Don't go past the top of the map
-									if (y - yy >= 0)
-										current_map.getTile(x + xx, y - yy).metricsActual[metric] -= (c + xx - yy);
+									if (yOrigin - yOffset >= 0)
+										current_map.updateMetrics(xOrigin + xOffset, yOrigin - yOffset, metric, -(c + xOffset - yOffset));
 									// Don't go below the map
-									if (y + yy < map_height)
-										current_map.getTile(x + xx, yy + y).metricsActual[metric] -= (c + xx - yy);
+									if (yOrigin + yOffset < map_height)
+										current_map.updateMetrics(xOrigin + xOffset, yOrigin + yOffset, metric, -(c + xOffset - yOffset));
 								}
 							}
 						}
@@ -563,5 +587,42 @@ public class FooCityManager
 	public int getJobs() {
 		// TODO Auto-generated method stub
 		return jobs;
+	}
+
+	public String getEndOfTurnReport()
+	{
+		final String PLACEHOLDER = " \n";
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append("End of Turn Report for Turn: \n");
+		sb.append(Integer.toString(turn) + "\n");
+		sb.append(PLACEHOLDER);
+		
+		sb.append(PLACEHOLDER);
+		sb.append("Produced\n");
+		sb.append("Consumed\n");
+		sb.append("Water\n");
+		sb.append(Float.toString(waterGenerated) + "\n");
+		sb.append(Float.toString(waterConsumed) + "\n");
+		sb.append("Electricity" + "\n");
+		sb.append(Float.toString(powerGenerated) + "\n");
+		sb.append(Float.toString(powerConsumed) + "\n");
+		sb.append("Jobs" + "\n");
+		sb.append(Float.toString(jobs) + "\n");
+		sb.append(Float.toString(residents) + "\n");
+		sb.append(PLACEHOLDER);
+		sb.append("Tax income: " + "\n");
+		sb.append(Integer.toString(income) + "\n");
+		sb.append(PLACEHOLDER);
+		sb.append("Upkeep expenses: " + "\n");
+		sb.append(Integer.toString(expenses) + "\n");
+		sb.append(PLACEHOLDER); 
+		sb.append("Cash Flow: " + "\n");
+		sb.append("$" + Integer.toString(cashFlow) + "\n");
+		sb.append(PLACEHOLDER);
+		sb.append("Available Funds:" + "\n");
+		sb.append("$" + Integer.toString(getAvailableFunds()) + "\n");
+
+		return sb.toString();
 	}
 }

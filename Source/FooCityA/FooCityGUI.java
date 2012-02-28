@@ -22,6 +22,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.io.File;
+import java.util.Scanner;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -47,7 +48,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import foocityBackend.FooCityManager;
 import foocityBackend.MapGridConstants;
-import foocityBackend.Tile;
+import foocityBackend.TileMetrics;
 
 
 class FooCityGUIConstants
@@ -164,12 +165,13 @@ public class FooCityGUI implements FooCityGUIInterface
 
 	private void updateTileDescription(int tileType)
 	{
-		if (tileType >= MapGridConstants.WATER_TILE && tileType < MapGridConstants.LAST_TILE)
+
+		TileMetrics selectedTile = TileMetrics.GetTileMetrics(tileType);
+		if (selectedTile != null)
 		{
-			Tile tempTile = new Tile(tileType);
-			selectedCost.setText("Cost: $" + Integer.toString(tempTile.price));
-			selectedDescription.setText(tempTile.description);
-			if (tempTile.price > city_manager.getAvailableFunds())
+			selectedCost.setText("Cost: $" + Integer.toString(selectedTile.getPrice()));
+			selectedDescription.setText(selectedTile.getDescription());
+			if (selectedTile.getPrice() > city_manager.getAvailableFunds())
 				selectedCost.setForeground(Color.red);
 			else
 				selectedCost.setForeground(Color.black);
@@ -384,6 +386,7 @@ public class FooCityGUI implements FooCityGUIInterface
 		city_manager.propagateMetrics();
 		
 	}
+
 	private void showEndOfTurnReport(){
 		JDialog reportDialog = new JDialog(frame, "End of Turn Report");
 		reportDialog.setModalityType(ModalityType.DOCUMENT_MODAL);
@@ -393,32 +396,13 @@ public class FooCityGUI implements FooCityGUIInterface
 		gridLayout.setHgap(15);
 		gridLayout.setVgap(5);
 		topPanel.setLayout(gridLayout);
-		
-		topPanel.add(new JLabel(" ")); // Place holder
-		topPanel.add(new JLabel("Produced"));
-		topPanel.add(new JLabel("Consumed"));
-		topPanel.add(new JLabel("Water"));
-		topPanel.add(new JLabel(Float.toString(city_manager.waterGenerated)));
-		topPanel.add(new JLabel(Float.toString(city_manager.waterConsumed)));
-		topPanel.add(new JLabel("Electricity"));
-		topPanel.add(new JLabel(Float.toString(city_manager.powerGenerated)));
-		topPanel.add(new JLabel(Float.toString(city_manager.powerConsumed)));
-		topPanel.add(new JLabel("Jobs"));
-		topPanel.add(new JLabel(Float.toString(city_manager.jobs)));
-		topPanel.add(new JLabel(Float.toString(city_manager.residents)));
-		topPanel.add(new JLabel(" ")); // Another place holder
-		topPanel.add(new JLabel("Tax income: "));
-		topPanel.add(new JLabel(Integer.toString(city_manager.income)));
-		topPanel.add(new JLabel(" ")); // Another place holder
-		topPanel.add(new JLabel("Upkeep expenses: "));
-		topPanel.add(new JLabel(Integer.toString(city_manager.expenses)));
-		topPanel.add(new JLabel(" ")); // Yet another place holder 
-		topPanel.add(new JLabel("Cash Flow: "));
-		topPanel.add(new JLabel("$" + Integer.toString(city_manager.cashFlow)));
-		topPanel.add(new JLabel(" ")); // woot for place holders
-		topPanel.add(new JLabel("Available Funds:"));
-		topPanel.add(new JLabel("$" + Integer.toString(city_manager.getAvailableFunds())));
-		
+		Scanner reportScanner = new Scanner(city_manager.getEndOfTurnReport());
+
+		while (reportScanner.hasNextLine())
+		{
+			topPanel.add(new JLabel(reportScanner.nextLine()));
+		}
+	
 		reportDialog.add(topPanel);
 		
 		reportDialog.pack();
@@ -528,14 +512,14 @@ public class FooCityGUI implements FooCityGUIInterface
 			switch (command_int)
 			{
 			case FooCityGUIConstants.NEW_GAME:
-				if (city_manager != null && !city_manager.MapGridLoaded())
+				if (city_manager != null && city_manager.MapGridLoaded())
 				{
 					switch (JOptionPane.showInternalConfirmDialog(frame.getContentPane(),
 							"Save current game before starting a new game?", "New game",
 							JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE))
 					{
 					case JOptionPane.CANCEL_OPTION:
-						break;
+						return;
 					case JOptionPane.YES_OPTION:
 						if (!saveGame())
 							break;
@@ -548,14 +532,14 @@ public class FooCityGUI implements FooCityGUIInterface
 				updateDisplay();
 				break;
 			case FooCityGUIConstants.LOAD_GAME:
-				if (city_manager != null && !city_manager.MapGridLoaded()) 
+				if (city_manager != null && city_manager.MapGridLoaded()) 
 				{
 					switch (JOptionPane.showInternalConfirmDialog(frame.getContentPane(),
 							"Save current game before loading?", "Load game",
 							JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE))
 					{
 					case JOptionPane.CANCEL_OPTION:
-						break;
+						return;
 					case JOptionPane.YES_OPTION:
 						if (!saveGame())
 							break;

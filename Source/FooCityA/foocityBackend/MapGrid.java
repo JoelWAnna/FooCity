@@ -168,7 +168,7 @@ class MapGrid
 	}
 	public boolean setTile(int x, int y, int i) 
 	{
-		if ((0 < i && i < MapGridConstants.LAST_TILE)
+		if ((MapGridConstants.WATER_TILE <= i && i < MapGridConstants.LAST_TILE)
 			&& tileInRange(x,y))
 		{
 			Tile oldTile = this.tileGrid[x][y];
@@ -187,7 +187,7 @@ class MapGrid
 		int [][] matrix = new int[this.map_area.width][this.map_area.height];
 		for (int y = 0; y < this.map_area.height; ++y)
 			for (int x = 0; x < this.map_area.width; ++x)
-				matrix[x][y] = (tileGrid[x][y].jobs < 0) ? -tileGrid[x][y].jobs : 0;
+				matrix[x][y] = TileMetrics.GetTileMetrics(tileGrid[x][y].getTileInt()).getJobs() < 0 ? -TileMetrics.GetTileMetrics(tileGrid[x][y].getTileInt()).getJobs() : 0;
 		return matrix;
 	}
 
@@ -197,7 +197,7 @@ class MapGrid
 		for (int y = 0; y < this.map_area.height; ++y)
 			for (int x = 0; x < this.map_area.width; ++x)
 			{
-				matrix[x][y] = (tileGrid[x][y].jobs > 0) ? tileGrid[x][y].jobs : 0;
+				matrix[x][y] = (TileMetrics.GetTileMetrics(tileGrid[x][y].getTileInt()).getJobs() > 0) ? TileMetrics.GetTileMetrics(tileGrid[x][y].getTileInt()).getJobs() : 0;
 			}
 		return matrix;
 	}
@@ -221,6 +221,15 @@ class MapGrid
 				}
 			}
 		return matrix;
+	}
+
+	public void updateMetrics(int x, int y, int metric, int value)
+	{
+		if (tileInRange(x, y))
+		{
+			if (MapGridConstants.METRIC_CRIME <= metric && metric < MapGridConstants.METRIC_LAST)
+				tileGrid[x][y].metricsActual[metric] += value;
+		}
 	}
 
 }

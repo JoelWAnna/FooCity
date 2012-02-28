@@ -5,6 +5,11 @@ public class MapGridConstants
 	public static final int MAP_WIDTH   = 128;
 	public static final int MAP_HEIGHT  = 128;
 
+	public static final int METRIC_CRIME = 0;
+	public static final int METRIC_POLLUTION = 1;
+	public static final int METRIC_HAPPINESS = 2;
+	public static final int METRIC_LAST = 3;
+
 	public static final int WATER_TILE = 1;
 	public static final int BEACH_TILE = 2;
 	public static final int GRASS_TILE = 3;

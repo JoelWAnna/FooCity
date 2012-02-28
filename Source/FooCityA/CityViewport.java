@@ -13,13 +13,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
+import java.awt.image.RasterFormatException;
 import java.awt.image.RescaleOp;
 
 import javax.swing.JPanel;
 
 import foocityBackend.FooCityManager;
 import foocityBackend.MapGridConstants;
-import foocityBackend.Tile;
 
 
 class CityViewport extends JPanel
@@ -119,13 +119,25 @@ class CityViewport extends JPanel
             	if ((xCoord < r.x - FooCityGUIConstants.TILE_WIDTH) || (xCoord >= r.x + r.width + FooCityGUIConstants.TILE_WIDTH))
             		continue;
         		BufferedImage bI = null;
-        		Tile tile = city_manager.getTile(x, y);
-        		bI = tileLoader.getTile(tile.getTileInt());
+        		int tileType = city_manager.getTileInt(x, y);
+        		int variation = city_manager.getTileVariation(x, y);
+        		try
+        		{
+        			bI = tileLoader.getTile(tileType).getSubimage(variation*FooCityGUIConstants.TILE_WIDTH, 0, FooCityGUIConstants.TILE_WIDTH, FooCityGUIConstants.TILE_HEIGHT);
+        		}
+        		catch (RasterFormatException e)
+        		{
+        			try
+        			{
+        				bI = tileLoader.getTile(tileType).getSubimage(0, 0, FooCityGUIConstants.TILE_WIDTH, FooCityGUIConstants.TILE_HEIGHT);
+        			}
+        			catch (RasterFormatException e1)
+        			{
+        				bI = null;
+        			}
+        		}
         		if (bI != null)
-        			g.drawImage(bI, xCoord, yCoord, xCoord + FooCityGUIConstants.TILE_WIDTH, yCoord + FooCityGUIConstants.TILE_HEIGHT,
-        					(tile.variation % 16) * FooCityGUIConstants.TILE_WIDTH, (tile.variation / 16) * FooCityGUIConstants.TILE_HEIGHT,
-        					(tile.variation % 16) * FooCityGUIConstants.TILE_WIDTH + FooCityGUIConstants.TILE_WIDTH, 
-        					(tile.variation / 16) * FooCityGUIConstants.TILE_HEIGHT + FooCityGUIConstants.TILE_HEIGHT, null);
+        			g.drawImage(bI, xCoord, yCoord, null);
 
         		g.drawLine(xCoord, yCoord, xCoord, yCoord + FooCityGUIConstants.TILE_HEIGHT);
         	}
@@ -136,13 +148,21 @@ class CityViewport extends JPanel
     	int mouse_tile = city_manager.getPlacingTile();
     	if (cursor != null && mouse_tile > 0)
     	{
-    		BufferedImage mImage = tileLoader.getTile(mouse_tile).getSubimage(0, 0, 32, 32);
+    		BufferedImage mImage = null;
+    		try
+    		{
+    			mImage = tileLoader.getTile(mouse_tile).getSubimage(0, 0, FooCityGUIConstants.TILE_WIDTH, FooCityGUIConstants.TILE_HEIGHT);
+    		}
+    		catch(RasterFormatException e)
+			{
+    			mImage = null;
+			}
+
     		if (mImage != null)
     		{
     			final float [] scales = {1f, 1f, 1f, 0.5f};
         		final float [] offsets = new float[4];
         		final RescaleOp rop = new RescaleOp(scales, offsets, null);
-    			Color color = new Color(1f, 1f, 1f, 0.5f);
         		g.drawImage(mImage, rop, cursor.x & ~(FooCityGUIConstants.TILE_WIDTH-1) , (cursor.y & ~(FooCityGUIConstants.TILE_HEIGHT-1)));
     		}
     	}
@@ -281,17 +301,17 @@ class MiniMapPanel extends JPanel
 	    } else if (viewMode == 1) { // Pollution
 	    	for (int y = 0; y < map_area.getHeight(); y++) {
 	    		for (int x = 0; x <  map_area.getWidth(); x++){
-	    			int c = city_manager.getTile(x, y).metricsActual[Tile.METRIC_POLLUTION] * 10 ;
+	    			int c = city_manager.getTileMetrics(x, y, MapGridConstants.METRIC_POLLUTION) * 10 ;
 	    			if (c > 255) c = 255;
 	    			if (c < 0) c = 0;
 	    			g1.setColor(new Color(c,c,c));
 	    			g1.fillRect(x * this.scale, y * this.scale, this.scale, this.scale);
 	    		}
 	    	}
-	    } else if (viewMode == this.scale) { // Crime
+	    } else if (viewMode == 2) { // Crime
 	    	for (int y = 0; y < map_area.getHeight(); y++) {
 	    		for (int x = 0; x <  map_area.getWidth(); x++) {
-	    			int c = city_manager.getTile(x, y).metricsActual[Tile.METRIC_CRIME] * 10 ;
+	    			int c = city_manager.getTileMetrics(x, y, MapGridConstants.METRIC_CRIME) * 10 ;
 	    			if (c > 255) c = 255;
 	    			if (c < 0) c = 0;
 	    			g1.setColor(new Color(c,c,c));
@@ -301,7 +321,7 @@ class MiniMapPanel extends JPanel
 	    } else if (viewMode == 3) { // Happiness
 	    	for (int y = 0; y < map_area.getHeight(); y++) {
 	    		for (int x = 0; x <  map_area.getWidth(); x++) {
-	    			int c = city_manager.getTile(x, y).metricsActual[Tile.METRIC_HAPPINESS];
+	    			int c = city_manager.getTileMetrics(x, y, MapGridConstants.METRIC_HAPPINESS);
 	    			if (c > 255) c = 255;
 	    			if (c < 0) c = 0;
 	    			g1.setColor(new Color(c,c,c));
