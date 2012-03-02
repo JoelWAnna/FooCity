@@ -3,5 +3,6 @@
 	<classpathentry excluding="**/.*/|*.jar|.classpath|.project|CreateJar.xml" kind="src" path=""/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="C:/eclipse/plugins/org.junit_4.8.2.v4_8_2_v20110321-1705/junit.jar"/>
+	<classpathentry kind="lib" path="terrain/TerrainViewer.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

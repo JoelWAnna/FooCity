@@ -4,7 +4,6 @@
 //
 
 import java.awt.Dialog;
-import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -16,7 +15,6 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -25,9 +23,7 @@ import foocityBackend.FooCityManager;
 public class GamePreviewWindow extends JDialog implements ActionListener, FooCityGUIInterface
 {
 	private FileFilter FooCitySaveFilter;
-	protected JButton buttonLoad, buttonOK, buttonCancel;
-	protected JDialog dialog;
-	protected JPanel frame;
+	protected JButton buttonLoad, buttonGenerate, buttonOK, buttonCancel;
 	protected int panelHeight;
 	protected FooCityManager city_manager;
 	public static final int NEW_GAME = 1;
@@ -36,6 +32,7 @@ public class GamePreviewWindow extends JDialog implements ActionListener, FooCit
 	public static final int CANCEL_BUTTON = 1002;
 	public static final int LOAD_MAP_BUTTON = 1003;
 	public static final int LOAD_SAVE_BUTTON = 1004;
+	public static final int GENERATE_MAP_BUTTON = 1005;
 	
 
 	public static GamePreviewWindow NewGameWindow(JFrame parent)
@@ -50,21 +47,30 @@ public class GamePreviewWindow extends JDialog implements ActionListener, FooCit
 
 	private GamePreviewWindow(JFrame parent, int type)
 	{
-		super(parent, "Select a terrain file");
+		super(parent);
 		super.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
 		FooCitySaveFilter = new FileNameExtensionFilter("FooCity Save files (fcs)", "fcs");
 		
+		Box button_box = Box.createHorizontalBox();
+
 		if (type == LOAD_GAME)
 		{
+			super.setTitle("Select a SaveGame");
 			buttonLoad = new JButton("Load Save File");
 			buttonLoad.addActionListener(this);
-			buttonLoad.setActionCommand(Integer.toString(LOAD_SAVE_BUTTON));			
+			buttonLoad.setActionCommand(Integer.toString(LOAD_SAVE_BUTTON));
 		}
 		else 
 		{
+			super.setTitle("Generate a New Map or Select a Terrain File");
 			buttonLoad = new JButton("Load Map");
 			buttonLoad.addActionListener(this);
-			buttonLoad.setActionCommand(Integer.toString(LOAD_MAP_BUTTON));			
+			buttonLoad.setActionCommand(Integer.toString(LOAD_MAP_BUTTON));
+			
+			buttonGenerate = new JButton("Generate New Map");
+			buttonGenerate.addActionListener(this);
+			buttonGenerate.setActionCommand(Integer.toString(GENERATE_MAP_BUTTON));
+			button_box.add(buttonGenerate);
 		}
 		buttonOK = new JButton("OK");
 		buttonOK.addActionListener(this);
@@ -75,29 +81,26 @@ public class GamePreviewWindow extends JDialog implements ActionListener, FooCit
 		buttonCancel.addActionListener(this);
 		buttonCancel.setActionCommand(Integer.toString(CANCEL_BUTTON));
 		// Add buttons to the layout box
-		Box button_box = Box.createHorizontalBox();
 		button_box.add(buttonLoad);
 		button_box.add(buttonOK);
 		button_box.add(buttonCancel);
-		Box layout_box = Box.createVerticalBox();
 
+		MiniMapPanel minimap_panel = new MiniMapPanel(this, 3);
+		Box minimap_box = Box.createHorizontalBox();
+		minimap_box.add(Box.createHorizontalGlue());
+		minimap_box.add(minimap_panel);
 		// Add the box to the frame
+		Box layout_box = Box.createVerticalBox();
+		layout_box.add(Box.createVerticalGlue());
 		layout_box.add(button_box);
-		layout_box.add(new MiniMapPanel(this, 3));
-		this.add(layout_box);
-		// Resize the window to make room for drawing the map
-		//panelHeight = this.getSize().height - 384;
+		layout_box.add(Box.createVerticalGlue());
+		layout_box.add(minimap_box);
+		add(layout_box);
 		pack();
 		// Move it to the center of the screen and show it
 		setLocationRelativeTo(null);
 		this.setResizable(false);
 		setVisible(true);
-	}
-
-	@Override
-	public Dimension getPreferredSize()
-	{
-		return new Dimension(392, getSize().height + 384);
 	}
 
 	@Override
@@ -127,11 +130,21 @@ public class GamePreviewWindow extends JDialog implements ActionListener, FooCit
 		case LOAD_MAP_BUTTON:
 			LoadMap();
 			break;
+		case GENERATE_MAP_BUTTON:
+		    GenerateMap();
+			break;
 		case LOAD_SAVE_BUTTON:
 			LoadSave();
 			break;
 		}		
-	}	
+	}
+
+	private void GenerateMap() {
+		city_manager = new FooCityManager();
+		boolean mapLoaded = city_manager.NewGeneratedGame(Generate.generate());
+		buttonOK.setEnabled(mapLoaded);
+		repaint();
+	}
 
 	private void LoadMap()
 	{
@@ -166,7 +179,6 @@ public class GamePreviewWindow extends JDialog implements ActionListener, FooCit
 			{
 				city_manager = new FooCityManager();
 				boolean mapLoaded = city_manager.LoadGame(save_file.getAbsolutePath());
-				//city_manager.advanceTurn();
 				buttonOK.setEnabled(mapLoaded);
 			}
 			// Force a redraw of the window
