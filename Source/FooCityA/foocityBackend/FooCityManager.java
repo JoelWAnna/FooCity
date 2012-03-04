@@ -43,11 +43,6 @@ public class FooCityManager {
 		turn = 0;
 	}
 
-	public FooCityManager(MapGrid new_map) {
-		this();
-		SetMapGrid(new_map);
-	}
-
 	public Dimension getMapArea() {
 		if (current_map != null)
 			return current_map.getMapArea();
@@ -83,17 +78,6 @@ public class FooCityManager {
 
 	public boolean MapGridLoaded() {
 		return current_map != null;
-	}
-
-	public boolean SetMapGrid(MapGrid new_map) {
-		if (new_map != null) {
-			if (current_map == null) {
-				current_map = new_map;
-				startGame();
-				return true;
-			}
-		}
-		return false;
 	}
 
 	public boolean NewGame(String map_name) {

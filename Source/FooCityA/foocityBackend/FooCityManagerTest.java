@@ -1,4 +1,5 @@
 package foocityBackend;
+
 import java.awt.Dimension;
 import java.io.File;
 
@@ -47,10 +48,8 @@ public class FooCityManagerTest extends TestCase {
 		Assert.assertFalse(city_manager.MapGridLoaded());
 		Assert.assertNull(city_manager.getMapArea());
 		Dimension testDimension = new Dimension(5, 5);
-		MapGrid tempMap = new MapGrid(testDimension);
-		Assert.assertTrue(tempMap
-				.FromString("DDDDD\nDDDDD\nDDDDD\nDDDDD\nDDDDD\n"));
-		Assert.assertTrue(city_manager.SetMapGrid(tempMap));
+		Assert.assertTrue(city_manager
+				.NewGeneratedGame("DDDDD\nDDDDD\nDDDDD\nDDDDD\nDDDDD\n"));
 		Assert.assertEquals(testDimension, city_manager.getMapArea());
 		city_manager.Quit();
 		Assert.assertEquals("Terrain File Should Exist", true,
@@ -59,15 +58,24 @@ public class FooCityManagerTest extends TestCase {
 				city_manager.NewGame(testMap));
 		Assert.assertEquals(new Dimension(MapGridConstants.MAP_WIDTH,
 				MapGridConstants.MAP_HEIGHT), city_manager.getMapArea());
+		city_manager.Quit();
+		Assert.assertFalse(city_manager.MapGridLoaded());
+		Assert.assertEquals("Terrain File Should Exist", true,
+				new File(testMap).exists());
+		Assert.assertEquals("Map should be loaded", true,
+				city_manager.NewGame(testMap));
+		Assert.assertEquals(new Dimension(MapGridConstants.MAP_WIDTH,
+				MapGridConstants.MAP_HEIGHT), city_manager.getMapArea());
+
 	}
 
 	/**
-	 * testGetMapGrid verifies that GetMapGrid returns null when no map is
-	 * loaded verifies that GetMapGrid returns a valid MapGrid when a map is
+	 * testMapGridLoaded verifies that MapGridLoaded returns false when no map
+	 * is loaded verifies that GetMapGrid returns true MapGrid when a map is
 	 * loaded
 	 */
 	@Test
-	public void testGetMapGrid() {
+	public void testMapGridLoaded() {
 		Assert.assertFalse(city_manager.MapGridLoaded());
 		Assert.assertEquals("Terrain File Should Exist", true,
 				new File(testMap).exists());
@@ -89,6 +97,48 @@ public class FooCityManagerTest extends TestCase {
 				new File(testMap).exists());
 		Assert.assertEquals("Map should be loaded", true,
 				city_manager.NewGame(testMap));
+		Assert.assertEquals("FundsAvailable Should = "
+				+ FooCityManager.STARTING_FUNDS, FooCityManager.STARTING_FUNDS,
+				city_manager.getAvailableFunds());
+
+	}
+	/**
+	 * testNewGeneratedGame verifies that NewGame returns false with input of
+	 * null or an invalid filename verifies that NewGame returns true with input
+	 * of a valid map file verifies that FundsAvailable =
+	 * FooCityManager.STARTING_FUNDS
+	 */
+	@Test
+	public void testNewGeneratedGame() {
+		Assert.assertFalse("Should Not load a null string",
+				city_manager.NewGeneratedGame(null));
+		Assert.assertFalse("Should Not load an invalid string",
+				city_manager.NewGeneratedGame("invalidstring"));
+
+		Assert.assertTrue("Should load a generated map", city_manager
+				.NewGeneratedGame("DDDDD\nDDDDD\nDDDDD\nDDDDD\nDDDDD\n"));
+
+		Assert.assertTrue("Map should be loaded", city_manager.MapGridLoaded());
+		Assert.assertEquals("FundsAvailable Should = "
+				+ FooCityManager.STARTING_FUNDS, FooCityManager.STARTING_FUNDS,
+				city_manager.getAvailableFunds());
+		city_manager.Quit();
+		Assert.assertFalse("Map should not be loaded",
+				city_manager.MapGridLoaded());
+		// Generate.generate();
+		String generated = "";
+		for (int y = 0; y < 128; ++y) {
+
+			for (int x = 0; x < 128; ++x) {
+				generated += 'D';
+			}
+			generated += '\n';
+		}
+
+		Assert.assertTrue("Should load a generated map",
+				city_manager.NewGeneratedGame(generated));
+
+		Assert.assertTrue("Map should be loaded", city_manager.MapGridLoaded());
 		Assert.assertEquals("FundsAvailable Should = "
 				+ FooCityManager.STARTING_FUNDS, FooCityManager.STARTING_FUNDS,
 				city_manager.getAvailableFunds());
@@ -217,11 +267,8 @@ public class FooCityManagerTest extends TestCase {
 	@Test
 	public void testPlaceTile() {
 		MapGrid sample_map = new MapGrid(10, 10);
-		Assert.assertTrue(
-				"FromString",
-				sample_map
-						.FromString("DDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\n"));
-		Assert.assertTrue(city_manager.SetMapGrid(sample_map));
+		Assert.assertTrue(city_manager
+				.NewGeneratedGame("DDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\n"));
 		Assert.assertTrue(city_manager.MapGridLoaded());
 		for (int y = 0; y < 10; ++y)
 			for (int x = 0; x < 10; ++x) {
@@ -237,10 +284,8 @@ public class FooCityManagerTest extends TestCase {
 	}
 	public void testWaterGenerateHappinessMetrics() {
 		int size = 5;
-		MapGrid sample_map = new MapGrid(size, size);
-		Assert.assertTrue("FromString",
-				sample_map.FromString("WWWWW\nWWWWW\nWWWWW\nWWWWW\nWWWWW\n"));
-		Assert.assertTrue(city_manager.SetMapGrid(sample_map));
+		Assert.assertTrue(city_manager
+				.NewGeneratedGame("WWWWW\nWWWWW\nWWWWW\nWWWWW\nWWWWW\n"));
 		Assert.assertTrue(city_manager.MapGridLoaded());
 		city_manager.propagateMetrics();
 
@@ -252,11 +297,7 @@ public class FooCityManagerTest extends TestCase {
 			for (int x = 0; x < size; ++x) {
 				int actual_happiness = city_manager.getTileMetrics(x, y,
 						MapGridConstants.METRIC_HAPPINESS);
-				String error = "\nTile(x,y) (" + x + "," + y + ")";// \nExpected:
-																	// " + expectedHappiness[x][y] + "
-																	// Found : "
-																	// +
-																	// actual_happiness;
+				String error = "\nTile(x,y) (" + x + "," + y + ")";
 				Assert.assertEquals(error, expectedHappiness[x][y],
 						actual_happiness);
 			}
@@ -264,12 +305,8 @@ public class FooCityManagerTest extends TestCase {
 
 	public void testDirtGenerateHappinessMetrics() {
 		int size = 10;
-		MapGrid sample_map = new MapGrid(size, size);
-		Assert.assertTrue(
-				"FromString",
-				sample_map
-						.FromString("DDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\n"));
-		Assert.assertTrue(city_manager.SetMapGrid(sample_map));
+		Assert.assertTrue(city_manager
+				.NewGeneratedGame("DDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\n"));
 		Assert.assertNotNull(city_manager.MapGridLoaded());
 		city_manager.propagateMetrics();
 
@@ -295,11 +332,8 @@ public class FooCityManagerTest extends TestCase {
 	}
 
 	public void testJobFinder() {
-		int size = 5;
-		MapGrid sample_map = new MapGrid(size, size);
-		Assert.assertTrue("FromString",
-				sample_map.FromString("DDDDD\nDDDDD\nDDDDD\nDDDDD\nDDDDD\n"));
-		Assert.assertTrue(city_manager.SetMapGrid(sample_map));
+		Assert.assertTrue(city_manager
+				.NewGeneratedGame("DDDDD\nDDDDD\nDDDDD\nDDDDD\nDDDDD\n"));
 		Assert.assertTrue(city_manager
 				.setPlacingTile(MapGridConstants.RESIDENTIAL_TILE));
 		Assert.assertTrue(city_manager.placeTile(0, 0));
@@ -316,9 +350,8 @@ public class FooCityManagerTest extends TestCase {
 
 	public void testJobFinder2() {
 		int size = 20;
-		MapGrid sample_map = new MapGrid(size, size);
-		Assert.assertTrue("FromString", sample_map
-				.FromString("DDDDDDDDDDDDDDDDDDDD\n" + "DDDDDDDDDDDDDDDDDDDD\n"
+		Assert.assertTrue(city_manager
+				.NewGeneratedGame("DDDDDDDDDDDDDDDDDDDD\n"
 						+ "DDDDDDDDDDDDDDDDDDDD\n" + "DDDDDDDDDDDDDDDDDDDD\n"
 						+ "DDDDDDDDDDDDDDDDDDDD\n" + "DDDDDDDDDDDDDDDDDDDD\n"
 						+ "DDDDDDDDDDDDDDDDDDDD\n" + "DDDDDDDDDDDDDDDDDDDD\n"
@@ -327,8 +360,8 @@ public class FooCityManagerTest extends TestCase {
 						+ "DDDDDDDDDDDDDDDDDDDD\n" + "DDDDDDDDDDDDDDDDDDDD\n"
 						+ "DDDDDDDDDDDDDDDDDDDD\n" + "DDDDDDDDDDDDDDDDDDDD\n"
 						+ "DDDDDDDDDDDDDDDDDDDD\n" + "DDDDDDDDDDDDDDDDDDDD\n"
-						+ "DDDDDDDDDDDDDDDDDDDD\n" + "DDDDDDDDDDDDDDDDDDDD\n"));
-		Assert.assertTrue(city_manager.SetMapGrid(sample_map));
+						+ "DDDDDDDDDDDDDDDDDDDD\n" + "DDDDDDDDDDDDDDDDDDDD\n"
+						+ "DDDDDDDDDDDDDDDDDDDD\n"));
 		Assert.assertTrue(city_manager
 				.setPlacingTile(MapGridConstants.RESIDENTIAL_TILE));
 		Assert.assertTrue(city_manager.placeTile(0, 0));
