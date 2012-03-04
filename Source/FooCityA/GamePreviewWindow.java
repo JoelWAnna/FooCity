@@ -20,8 +20,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import foocityBackend.FooCityManager;
 
-public class GamePreviewWindow extends JDialog implements ActionListener, FooCityGUIInterface
-{
+public class GamePreviewWindow extends JDialog
+		implements
+			ActionListener,
+			FooCityGUIInterface {
 	private FileFilter FooCitySaveFilter;
 	protected JButton buttonLoad, buttonGenerate, buttonOK, buttonCancel;
 	protected int panelHeight;
@@ -33,50 +35,45 @@ public class GamePreviewWindow extends JDialog implements ActionListener, FooCit
 	public static final int LOAD_MAP_BUTTON = 1003;
 	public static final int LOAD_SAVE_BUTTON = 1004;
 	public static final int GENERATE_MAP_BUTTON = 1005;
-	
 
-	public static GamePreviewWindow NewGameWindow(JFrame parent)
-	{
+	public static GamePreviewWindow NewGameWindow(JFrame parent) {
 		return new GamePreviewWindow(parent, NEW_GAME);
 	}
-	
-	public static GamePreviewWindow LoadGameWindow(JFrame parent)
-	{
+
+	public static GamePreviewWindow LoadGameWindow(JFrame parent) {
 		return new GamePreviewWindow(parent, LOAD_GAME);
 	}
 
-	private GamePreviewWindow(JFrame parent, int type)
-	{
+	private GamePreviewWindow(JFrame parent, int type) {
 		super(parent);
 		super.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
-		FooCitySaveFilter = new FileNameExtensionFilter("FooCity Save files (fcs)", "fcs");
-		
+		FooCitySaveFilter = new FileNameExtensionFilter(
+				"FooCity Save files (fcs)", "fcs");
+
 		Box button_box = Box.createHorizontalBox();
 
-		if (type == LOAD_GAME)
-		{
+		if (type == LOAD_GAME) {
 			super.setTitle("Select a SaveGame");
 			buttonLoad = new JButton("Load Save File");
 			buttonLoad.addActionListener(this);
 			buttonLoad.setActionCommand(Integer.toString(LOAD_SAVE_BUTTON));
-		}
-		else 
-		{
+		} else {
 			super.setTitle("Generate a New Map or Select a Terrain File");
 			buttonLoad = new JButton("Load Map");
 			buttonLoad.addActionListener(this);
 			buttonLoad.setActionCommand(Integer.toString(LOAD_MAP_BUTTON));
-			
+
 			buttonGenerate = new JButton("Generate New Map");
 			buttonGenerate.addActionListener(this);
-			buttonGenerate.setActionCommand(Integer.toString(GENERATE_MAP_BUTTON));
+			buttonGenerate.setActionCommand(Integer
+					.toString(GENERATE_MAP_BUTTON));
 			button_box.add(buttonGenerate);
 		}
 		buttonOK = new JButton("OK");
 		buttonOK.addActionListener(this);
 		buttonOK.setActionCommand(Integer.toString(OK_BUTTON));
 		buttonOK.setEnabled(false);
-		
+
 		buttonCancel = new JButton("Cancel");
 		buttonCancel.addActionListener(this);
 		buttonCancel.setActionCommand(Integer.toString(CANCEL_BUTTON));
@@ -104,39 +101,34 @@ public class GamePreviewWindow extends JDialog implements ActionListener, FooCit
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e)
-	{
-		switch (Integer.parseInt(e.getActionCommand()))
-		{
-		case OK_BUTTON:
-			if (FooCityGUI.window == null)
-			{
-				// Show the game UI and close this window
-				FooCityGUI.window = new FooCityGUI(city_manager);
-			}
-			else
-			{
-				if (!FooCityGUI.window.setCityManager(city_manager))
-					System.out.println("setCityManager failed");
-			}
-			super.dispose();
-			break;
-		case CANCEL_BUTTON:
-			// Close this window and show the main menu
-			super.dispose();
-			if (FooCityGUI.window == null)
-				MainMenu.createAndShowGUI();
-			break;
-		case LOAD_MAP_BUTTON:
-			LoadMap();
-			break;
-		case GENERATE_MAP_BUTTON:
-		    GenerateMap();
-			break;
-		case LOAD_SAVE_BUTTON:
-			LoadSave();
-			break;
-		}		
+	public void actionPerformed(ActionEvent e) {
+		switch (Integer.parseInt(e.getActionCommand())) {
+			case OK_BUTTON :
+				if (FooCityGUI.window == null) {
+					// Show the game UI and close this window
+					FooCityGUI.window = new FooCityGUI(city_manager);
+				} else {
+					if (!FooCityGUI.window.setCityManager(city_manager))
+						System.out.println("setCityManager failed");
+				}
+				super.dispose();
+				break;
+			case CANCEL_BUTTON :
+				// Close this window and show the main menu
+				super.dispose();
+				if (FooCityGUI.window == null)
+					MainMenu.createAndShowGUI();
+				break;
+			case LOAD_MAP_BUTTON :
+				LoadMap();
+				break;
+			case GENERATE_MAP_BUTTON :
+				GenerateMap();
+				break;
+			case LOAD_SAVE_BUTTON :
+				LoadSave();
+				break;
+		}
 	}
 
 	private void GenerateMap() {
@@ -146,24 +138,22 @@ public class GamePreviewWindow extends JDialog implements ActionListener, FooCit
 		repaint();
 	}
 
-	private void LoadMap()
-	{
+	private void LoadMap() {
 		// Show the Open File dialog
 		JFileChooser fc = new JFileChooser();
 		fc.setCurrentDirectory(new java.io.File("./terrain"));
 		int returnVal = fc.showOpenDialog(this);
-		if (returnVal == JFileChooser.APPROVE_OPTION)
-		{
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			city_manager = new FooCityManager();
-			boolean mapLoaded = city_manager.NewGame(fc.getSelectedFile().getAbsolutePath());
+			boolean mapLoaded = city_manager.NewGame(fc.getSelectedFile()
+					.getAbsolutePath());
 			buttonOK.setEnabled(mapLoaded);
 			// Force a redraw of the window
 			repaint();
 		}
 	}
 
-	private void LoadSave()
-	{
+	private void LoadSave() {
 		// Show the Open File dialog
 		JFileChooser fc = new JFileChooser();
 		fc.setCurrentDirectory(new java.io.File("./saves"));
@@ -172,13 +162,12 @@ public class GamePreviewWindow extends JDialog implements ActionListener, FooCit
 		fc.setFileFilter(FooCitySaveFilter);
 		fc.setAcceptAllFileFilterUsed(false);
 		int returnVal = fc.showOpenDialog(this);
-		if (returnVal == JFileChooser.APPROVE_OPTION)
-		{
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File save_file = fc.getSelectedFile();
-			if (save_file.exists())
-			{
+			if (save_file.exists()) {
 				city_manager = new FooCityManager();
-				boolean mapLoaded = city_manager.LoadGame(save_file.getAbsolutePath());
+				boolean mapLoaded = city_manager.LoadGame(save_file
+						.getAbsolutePath());
 				buttonOK.setEnabled(mapLoaded);
 			}
 			// Force a redraw of the window
@@ -187,8 +176,7 @@ public class GamePreviewWindow extends JDialog implements ActionListener, FooCit
 	}
 
 	@Override
-	public Point getViewPoint()
-	{
+	public Point getViewPoint() {
 		return null;
 	}
 
@@ -198,18 +186,19 @@ public class GamePreviewWindow extends JDialog implements ActionListener, FooCit
 	}
 
 	@Override
-	public void updateDisplayCenter(Point center) {}
+	public void updateDisplayCenter(Point center) {
+	}
 
 	@Override
-	public void updateDisplay(Point NEpoint) {}
+	public void updateDisplay(Point NEpoint) {
+	}
 
 	@Override
-	public void updateDisplay() {}
+	public void updateDisplay() {
+	}
 
 	@Override
-	public FooCityManager getCityManager()
-	{
+	public FooCityManager getCityManager() {
 		return city_manager;
 	}
 }
-

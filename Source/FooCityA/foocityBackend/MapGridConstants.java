@@ -1,9 +1,8 @@
 package foocityBackend;
 
-public class MapGridConstants
-{	
-	public static final int MAP_WIDTH   = 128;
-	public static final int MAP_HEIGHT  = 128;
+public class MapGridConstants {
+	public static final int MAP_WIDTH = 128;
+	public static final int MAP_HEIGHT = 128;
 
 	public static final int METRIC_CRIME = 0;
 	public static final int METRIC_POLLUTION = 1;
@@ -27,7 +26,7 @@ public class MapGridConstants
 	public static final int RESIDENTIAL_TILE = 15;
 	public static final int ROAD_TILE = 16;
 	public static final int LAST_TILE = 17;
-	public static final char CHAR_TILES[] = {' ', 'W', 'B', 'G', 'D', 'T', 'I', 'C', 
-											 'P', 'S', 'O', 'L', 'A', 'E', 'N', 'R', 'F'};
+	public static final char CHAR_TILES[] = {' ', 'W', 'B', 'G', 'D', 'T', 'I',
+			'C', 'P', 'S', 'O', 'L', 'A', 'E', 'N', 'R', 'F'};
 
 }
