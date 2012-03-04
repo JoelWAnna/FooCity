@@ -126,6 +126,20 @@ public class FooCityManager
 		return false;
 	}
 
+	public boolean NewGeneratedGame(String map_string) {
+		if (current_map == null)
+		{
+			current_map = new MapGrid();
+			if (current_map.FromString(map_string))
+			{
+				startGame();
+				return true;
+			}
+			current_map = null;
+		}
+		return false;
+	}
+
 	public void Quit()
 	{
 		current_map = null;
