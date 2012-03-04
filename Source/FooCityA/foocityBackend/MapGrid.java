@@ -82,6 +82,14 @@ class MapGrid {
 									// map_area.getHeight() *
 									// (map_area.getWidth()+1))
 		{
+			long length = MapGridString.length();
+
+			if (length < this.map_size) {
+				if (length < 25)
+					return false;
+				if (!resize((int) Math.sqrt((double) length)))
+					return false;
+			}
 			Scanner sc = new Scanner(MapGridString);
 			return fromScanner(sc);
 		}
@@ -94,15 +102,11 @@ class MapGrid {
 		File infile = new File(filename);
 		long length = infile.length();
 
-		if (length == 0 || length < this.map_size) {
+		if (length < this.map_size) {
 			if (length < 25)
 				return false;
-			int width = (int) Math.sqrt((double) length);
-
-			map_area = new Dimension(width, width);
-			map_size = width * width;
-			tileGrid = new Tile[(int) map_area.getWidth()][(int) map_area
-					.getHeight()];
+			if (!resize((int) Math.sqrt((double) length)))
+				return false;
 
 		}
 
@@ -116,6 +120,17 @@ class MapGrid {
 		}
 
 		return fromScanner(inScanner);
+	}
+
+	private boolean resize(int width) {
+		if (width < 5)
+			return false;
+		map_area = new Dimension(width, width);
+		map_size = width * width;
+		tileGrid = new Tile[(int) map_area.getWidth()][(int) map_area
+				.getHeight()];
+		return true;
+		
 	}
 
 	public boolean fromScanner(Scanner inScanner) {
