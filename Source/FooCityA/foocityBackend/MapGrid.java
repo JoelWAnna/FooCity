@@ -9,40 +9,99 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-
 /**
  * @author Joel Anna
  * 
  */
+
 class MapGrid {
 	private Tile[][] tileGrid;
 	private Dimension map_area;
-	private int map_size;
+	private boolean valid;
+
+	public static MapGrid FromString(String map_string) {
+		if (map_string != null) {
+			long length = map_string.length();
+			if (length >= 25) {
+				int width, height;
+				width = height = (int) Math.sqrt((double) length);
+				Scanner inScanner;
+				inScanner = new Scanner(map_string);
+
+				MapGrid grid = new MapGrid(new Dimension(width, height),
+						inScanner);
+				if (grid.isValid())
+					return grid;
+			}
+		}
+		return null;
+	}
+
+	public static MapGrid FromFile(String filename) {
+		if (filename != null) {
+			File infile = new File(filename);
+			long length = infile.length();
+			if (length >= 25) {
+				int width, height;
+				width = height = (int) Math.sqrt((double) length);
+				Scanner inScanner;
+				try {
+					inScanner = new Scanner(infile);
+				} catch (FileNotFoundException e) {
+					FooLogger
+							.errorLog("MapGrid:FromFile FileNotFoundException");
+					FooLogger.errorLog(e.getMessage());
+					return null;
+				}
+
+				MapGrid grid = new MapGrid(new Dimension(width, height),
+						inScanner);
+				if (grid.isValid())
+					return grid;
+			}
+		}
+
+		return null;
+	}
+
+	private MapGrid(Dimension map_area, Scanner inscanner) {
+		valid = false;
+		if ((map_area.width >= 5) || (map_area.height >= 5)) {
+			this.map_area = (Dimension) map_area.clone();
+			tileGrid = new Tile[this.map_area.width][this.map_area.height];
+			valid = fromScanner(inscanner);
+			if (!valid)
+				tileGrid = null;
+		}
+
+	}
+
+	private boolean fromScanner(Scanner inScanner) {
+		for (int y = 0; y < map_area.getHeight(); ++y) {
+			if (!inScanner.hasNextLine())
+				return false;
+
+			String currentLine = inScanner.nextLine();
+
+			if (currentLine.length() < map_area.getWidth())
+				return false;
+
+			for (int x = 0; x < map_area.getWidth(); ++x) {
+				char nextTile = currentLine.charAt(x);
+				if (TileCharToInt(nextTile) == 0)
+					return false;
+				this.tileGrid[x][y] = new Tile(nextTile);
+			}
+		}
+		return true;
+	}
+
+	private boolean isValid() {
+		return valid;
+	}
 
 	public Dimension getMapArea() {
 		return (Dimension) map_area.clone();
-	}
-
-	public MapGrid() {
-		this(MapGridConstants.MAP_WIDTH, MapGridConstants.MAP_HEIGHT);
-	}
-
-	public MapGrid(Dimension mapArea) {
-		this((int) mapArea.getWidth(), (int) mapArea.getHeight());
-	}
-
-	public MapGrid(int width, int height) {
-		if (width < 5 || height < 5) {
-			width = MapGridConstants.MAP_WIDTH;
-			height = MapGridConstants.MAP_HEIGHT;
-		}
-		if (width != height)
-			FooLogger.errorLog("MapGrid: width != height (" + width + ", "
-					+ height + ")");
-		map_area = new Dimension(width, height);
-		this.tileGrid = new Tile[(int) map_area.getWidth()][(int) map_area
-				.getHeight()];
-		map_size = width * height;
 	}
 
 	private boolean tileInRange(int x, int y) {
@@ -77,79 +136,6 @@ class MapGrid {
 		return s;
 	}
 
-	public boolean FromString(String MapGridString) {
-		if (MapGridString != null)// && MapGridString.length() !=
-									// map_area.getHeight() *
-									// (map_area.getWidth()+1))
-		{
-			long length = MapGridString.length();
-
-			if (length < this.map_size) {
-				if (length < 25)
-					return false;
-				if (!resize((int) Math.sqrt((double) length)))
-					return false;
-			}
-			Scanner sc = new Scanner(MapGridString);
-			return fromScanner(sc);
-		}
-		return false;
-	}
-
-	public boolean FromFile(String filename) {
-		if (filename == null)
-			return false;
-		File infile = new File(filename);
-		long length = infile.length();
-
-		if (length < this.map_size) {
-			if (length < 25)
-				return false;
-			if (!resize((int) Math.sqrt((double) length)))
-				return false;
-
-		}
-
-		Scanner inScanner;
-		try {
-			inScanner = new Scanner(infile);
-		} catch (FileNotFoundException e) {
-			FooLogger.errorLog("MapGrid:FromFile FileNotFoundException");
-			FooLogger.errorLog(e.getMessage());
-			return false;
-		}
-
-		return fromScanner(inScanner);
-	}
-
-	private boolean resize(int width) {
-		if (width < 5)
-			return false;
-		map_area = new Dimension(width, width);
-		map_size = width * width;
-		tileGrid = new Tile[(int) map_area.getWidth()][(int) map_area
-				.getHeight()];
-		return true;
-		
-	}
-
-	public boolean fromScanner(Scanner inScanner) {
-		for (int y = 0; y < map_area.getHeight(); ++y) {
-			if (!inScanner.hasNextLine())
-				return false;
-
-			String currentLine = inScanner.nextLine();
-
-			if (currentLine.length() < map_area.getWidth())
-				return false;
-
-			for (int x = 0; x < map_area.getWidth(); ++x) {
-				this.tileGrid[x][y] = new Tile(currentLine.charAt(x));
-			}
-		}
-		return true;
-	}
-
 	public int TileCharToInt(char c) {
 		for (int i = 0; i < MapGridConstants.CHAR_TILES.length; ++i) {
 			if (MapGridConstants.CHAR_TILES[i] == c)
@@ -161,8 +147,10 @@ class MapGrid {
 		if ((MapGridConstants.WATER_TILE <= i && i < MapGridConstants.LAST_TILE)
 				&& tileInRange(x, y)) {
 			Tile oldTile = this.tileGrid[x][y];
-			if (oldTile.isReplaceable()) {
-				this.tileGrid[x][y] = new Tile(i);// , oldTile.GetTileInt());
+			if (oldTile.isReplaceable() && oldTile.getTileInt() != i) {
+				this.tileGrid[x][y] = new Tile(i);
+				if (this.tileGrid[x][y].hasVariations())
+					setVariations(x, y);
 				return true;
 			}
 		}
@@ -170,6 +158,44 @@ class MapGrid {
 		return false;
 	}
 
+	private void setVariations(int x, int y) {
+		// Set the graphic variation for this and the neighboring
+		// tiles
+		for (int xv = x - 1; xv < x + 2; xv++) {
+			for (int yv = y - 1; yv < y + 2; yv++) {
+				setVariation(xv, yv);
+			}
+		}
+
+	}
+	private void setVariation(int x, int y) {
+		// First, make sure the coordinates are valid
+		if (((x < 0 || x >= MapGridConstants.MAP_WIDTH) || (y < 0 || y >= MapGridConstants.MAP_HEIGHT)))
+			return;
+
+		int variation = 0;
+		switch (this.tileGrid[x][y].getTileInt()) {
+			case MapGridConstants.ROAD_TILE :
+				if (y > 0)
+					if (getTileInt(x, y - 1) == MapGridConstants.ROAD_TILE)
+						variation += 1;
+				if (x < MapGridConstants.MAP_WIDTH - 1)
+					if (getTileInt(x + 1, y) == MapGridConstants.ROAD_TILE)
+						variation += 2;
+				if (y < MapGridConstants.MAP_HEIGHT - 1)
+					if (getTileInt(x, y + 1) == MapGridConstants.ROAD_TILE)
+						variation += 4;
+				if (x > 0)
+					if (getTileInt(x - 1, y) == MapGridConstants.ROAD_TILE)
+						variation += 8;
+				break;
+			default :
+				variation = 0;
+
+		}
+
+		this.tileGrid[x][y].variation = variation;
+	}
 	public int[][] getResidentialMatrix() {
 		int[][] matrix = new int[this.map_area.width][this.map_area.height];
 		for (int y = 0; y < this.map_area.height; ++y)

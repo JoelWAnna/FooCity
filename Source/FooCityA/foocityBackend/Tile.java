@@ -7,6 +7,7 @@ class Tile {
 	private char tileChar;
 	protected int tileInt;
 	protected boolean replaceable;
+	private boolean has_variations;
 
 	protected Tile(char tileChar) {
 		for (int i = 0; i < MapGridConstants.CHAR_TILES.length; i++) {
@@ -39,7 +40,11 @@ class Tile {
 		replaceable = true;
 		this.resetMetrics();
 		employed = true;
+		has_variations = false;
 		switch (tileInt) {
+			case MapGridConstants.ROAD_TILE :
+				has_variations = true;
+				break;
 			case MapGridConstants.WATER_TILE :
 				replaceable = false;
 				break;
@@ -59,6 +64,10 @@ class Tile {
 
 	public int getTileInt() {
 		return tileInt;
+	}
+
+	public boolean hasVariations() {
+		return has_variations;
 	}
 
 }

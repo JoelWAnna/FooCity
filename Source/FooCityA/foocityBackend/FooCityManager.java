@@ -82,24 +82,16 @@ public class FooCityManager {
 
 	public boolean NewGame(String map_name) {
 		if (current_map == null) {
-			current_map = new MapGrid();
-			if (current_map.FromFile(map_name)) {
-				startGame();
-				return true;
-			}
-			current_map = null;
+			current_map = MapGrid.FromFile(map_name);
+			return startGame();
 		}
 		return false;
 	}
 
 	public boolean NewGeneratedGame(String map_string) {
 		if (current_map == null) {
-			current_map = new MapGrid();
-			if (current_map.FromString(map_string)) {
-				startGame();
-				return true;
-			}
-			current_map = null;
+			current_map = MapGrid.FromString(map_string);
+			return startGame();
 		}
 		return false;
 	}
@@ -111,10 +103,14 @@ public class FooCityManager {
 		availableFunds = 0;
 	}
 
-	private void startGame() {
-		availableFunds = FooCityManager.STARTING_FUNDS;
-		propagateMetrics();
-		job_manager = new JobManager();
+	private boolean startGame() {
+		if (current_map != null) {
+			availableFunds = FooCityManager.STARTING_FUNDS;
+			propagateMetrics();
+			job_manager = new JobManager();
+			return true;
+		}
+		return false;
 	}
 
 	public int getCurrentTurn() {
@@ -241,49 +237,11 @@ public class FooCityManager {
 			if (price <= this.availableFunds) {
 				if (current_map.setTile(x, y, tile_to_place)) {
 					this.availableFunds -= price;
-					// Set the graphic variation for this and the neighboring
-					// tiles
-					for (int xv = x - 1; xv < x + 2; xv++) {
-						for (int yv = y - 1; yv < y + 2; yv++) {
-							setVariation(xv, yv);
-						}
-					}
 					return true;
 				}
 			}
 		}
 		return false;
-	}
-
-	public void setVariation(int x, int y) {
-		// First, make sure the coordinates are valid
-		if ((current_map == null)
-				|| ((x < 0 || x >= MapGridConstants.MAP_WIDTH) || (y < 0 || y >= MapGridConstants.MAP_HEIGHT)))
-			return;
-
-		Tile tile = current_map.getTile(x, y);
-		int variation = 0;
-		switch (tile.getTileInt()) {
-			case MapGridConstants.ROAD_TILE :
-				if (y > 0)
-					if (getTileInt(x, y - 1) == MapGridConstants.ROAD_TILE)
-						variation += 1;
-				if (x < MapGridConstants.MAP_WIDTH - 1)
-					if (getTileInt(x + 1, y) == MapGridConstants.ROAD_TILE)
-						variation += 2;
-				if (y < MapGridConstants.MAP_HEIGHT - 1)
-					if (getTileInt(x, y + 1) == MapGridConstants.ROAD_TILE)
-						variation += 4;
-				if (x > 0)
-					if (getTileInt(x - 1, y) == MapGridConstants.ROAD_TILE)
-						variation += 8;
-				break;
-			default :
-				variation = 0;
-
-		}
-
-		tile.variation = variation;
 	}
 
 	public void propagateMetrics() {
@@ -431,7 +389,16 @@ public class FooCityManager {
 				if (bw != null) {
 					bw.write("FOOCITYMAGIC\n");
 					bw.write("CurrentTurn:" + turn + "\n");
-					bw.write("AvailableFunds:" + 100 + "\n");
+					bw.write("AvailableFunds:" + getAvailableFunds() + "\n");
+					bw.write("Water+:" + waterGenerated + "\n");
+					bw.write("Water-:" + waterConsumed + "\n");
+					bw.write("Power+:" + powerGenerated + "\n");
+					bw.write("Power-:" + powerConsumed + "\n");
+					bw.write("Jobs:" + jobs + "\n");
+					bw.write("Residents:" + residents + "\n");
+					bw.write("Income:" + income + "\n");
+					bw.write("Expenses:" + expenses + "\n");
+					bw.write("CashFlow:" + cashFlow + "\n");
 					bw.write("MapGrid:1\n");
 					bw.write("width:"
 							+ (int) current_map.getMapArea().getWidth() + "\n");
@@ -454,6 +421,7 @@ public class FooCityManager {
 
 	public boolean LoadGame(String savePath) {
 		boolean valid_save = true;
+		job_manager = new JobManager();
 		if (savePath != null) {
 			File save_file = new File(savePath);
 			Scanner sc;
@@ -515,8 +483,18 @@ public class FooCityManager {
 										valid_save = false;
 										break;
 									}
-									current_map = new MapGrid(width, height);
-									current_map.fromScanner(sc);
+									StringBuilder sb = new StringBuilder();
+									for (int y = 0; y < height; ++y) {
+										if (sc.hasNextLine())
+											sb.append(sc.nextLine() + "\n");
+										else {
+											valid_save = false;
+											break;
+										}
+											
+									}
+									current_map = MapGrid.FromString(sb.toString());
+									valid_save = current_map != null;
 									break;
 								default :
 							}
@@ -546,6 +524,101 @@ public class FooCityManager {
 						} catch (NumberFormatException e) {
 							FooLogger
 									.errorLog("LoadGame: NumberFormatException at AvailableFunds:");
+							FooLogger.errorLog(e.getMessage());
+							valid_save = false;
+						}
+					} else if (parsedline[0].equals("Water+")) {
+						try {
+							waterGenerated = Integer.parseInt(parsedline[1]);
+							if (waterGenerated < 0)
+								valid_save = false;
+						} catch (NumberFormatException e) {
+							FooLogger
+									.errorLog("LoadGame: NumberFormatException at Water+:");
+							FooLogger.errorLog(e.getMessage());
+							valid_save = false;
+						}
+					} else if (parsedline[0].equals("Water-")) {
+						try {
+							waterConsumed = Integer.parseInt(parsedline[1]);
+							if (waterConsumed < 0)
+								valid_save = false;
+						} catch (NumberFormatException e) {
+							FooLogger
+									.errorLog("LoadGame: NumberFormatException at Water-:");
+							FooLogger.errorLog(e.getMessage());
+							valid_save = false;
+						}
+					} else if (parsedline[0].equals("Power+")) {
+						try {
+							powerGenerated = Integer.parseInt(parsedline[1]);
+							if (powerGenerated < 0)
+								valid_save = false;
+						} catch (NumberFormatException e) {
+							FooLogger
+									.errorLog("LoadGame: NumberFormatException at Power+:");
+							FooLogger.errorLog(e.getMessage());
+							valid_save = false;
+						}
+					} else if (parsedline[0].equals("Power-")) {
+						try {
+							powerConsumed = Integer.parseInt(parsedline[1]);
+							if (powerConsumed < 0)
+								valid_save = false;
+						} catch (NumberFormatException e) {
+							FooLogger
+									.errorLog("LoadGame: NumberFormatException at Power-:");
+							FooLogger.errorLog(e.getMessage());
+							valid_save = false;
+						}
+					} else if (parsedline[0].equals("Jobs")) {
+						try {
+							jobs = Integer.parseInt(parsedline[1]);
+							if (jobs < 0)
+								valid_save = false;
+						} catch (NumberFormatException e) {
+							FooLogger
+									.errorLog("LoadGame: NumberFormatException at Jobs:");
+							FooLogger.errorLog(e.getMessage());
+							valid_save = false;
+						}
+					} else if (parsedline[0].equals("Residents")) {
+						try {
+							residents = Integer.parseInt(parsedline[1]);
+							if (residents < 0)
+								valid_save = false;
+						} catch (NumberFormatException e) {
+							FooLogger
+									.errorLog("LoadGame: NumberFormatException at Residents:");
+							FooLogger.errorLog(e.getMessage());
+							valid_save = false;
+						}
+					} else if (parsedline[0].equals("Income")) {
+						try {
+							income = Integer.parseInt(parsedline[1]);
+							if (income < 0)
+								valid_save = false;
+						} catch (NumberFormatException e) {
+							FooLogger
+									.errorLog("LoadGame: NumberFormatException at Income:");
+							FooLogger.errorLog(e.getMessage());
+							valid_save = false;
+						}
+					} else if (parsedline[0].equals("Expenses")) {
+						try {
+							expenses = Integer.parseInt(parsedline[1]);
+						} catch (NumberFormatException e) {
+							FooLogger
+									.errorLog("LoadGame: NumberFormatException at Expenses:");
+							FooLogger.errorLog(e.getMessage());
+							valid_save = false;
+						}
+					} else if (parsedline[0].equals("CashFlow")) {
+						try {
+							cashFlow = Integer.parseInt(parsedline[1]);
+						} catch (NumberFormatException e) {
+							FooLogger
+									.errorLog("LoadGame: NumberFormatException at CashFlow:");
 							FooLogger.errorLog(e.getMessage());
 							valid_save = false;
 						}

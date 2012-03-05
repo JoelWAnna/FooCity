@@ -266,7 +266,6 @@ public class FooCityManagerTest extends TestCase {
 
 	@Test
 	public void testPlaceTile() {
-		MapGrid sample_map = new MapGrid(10, 10);
 		Assert.assertTrue(city_manager
 				.NewGeneratedGame("DDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\nDDDDDDDDDD\n"));
 		Assert.assertTrue(city_manager.MapGridLoaded());

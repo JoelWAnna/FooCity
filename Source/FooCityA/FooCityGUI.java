@@ -567,7 +567,7 @@ public class FooCityGUI implements FooCityGUIInterface {
 		}
 
 		private boolean saveGame() {
-			if (city_manager.getCurrentTurn() > 0) {
+			if (city_manager.MapGridLoaded()) {
 				JFileChooser fc = new JFileChooser();
 				fc.setCurrentDirectory(new java.io.File("./saves"));
 				fc.setDialogTitle("Save file as...");
@@ -579,7 +579,7 @@ public class FooCityGUI implements FooCityGUIInterface {
 
 					{
 						File save_file = fc.getSelectedFile();
-						if (save_file.getAbsolutePath().lastIndexOf(".fcs", 0) == -1)
+						if (save_file.getAbsolutePath().lastIndexOf(".fcs") == -1)
 							save_file = new File(save_file.getAbsolutePath()
 									+ ".fcs");
 						if (save_file.exists()) {

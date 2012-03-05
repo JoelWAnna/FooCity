@@ -15,6 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -168,6 +169,9 @@ public class GamePreviewWindow extends JDialog
 				city_manager = new FooCityManager();
 				boolean mapLoaded = city_manager.LoadGame(save_file
 						.getAbsolutePath());
+				if (!mapLoaded)
+					JOptionPane.showMessageDialog(this, "\"" + save_file
+							.getAbsolutePath() + "\"\n is not a valid FooCity save file", "Invalid save chosen", JOptionPane.ERROR_MESSAGE);
 				buttonOK.setEnabled(mapLoaded);
 			}
 			// Force a redraw of the window
