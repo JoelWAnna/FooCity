@@ -144,7 +144,8 @@ public class JobManager {
 		// Initialize Paths, 0 at origin, -1 elsewhere
 		for (int yDestination = 0; yDestination < yMax; ++yDestination) {
 			for (int xDestination = 0; xDestination < xMax; ++xDestination) {
-				if (yDestination == origin.y && xDestination == origin.x) {
+				if ((yDestination == origin.y && xDestination == origin.x)
+						&& (path_matrix[origin.x][origin.y] != NO_PATH)) {
 					found_matrix[xDestination][yDestination] = PATH_ORIGIN;
 				} else {
 					found_matrix[xDestination][yDestination] = NO_PATH;

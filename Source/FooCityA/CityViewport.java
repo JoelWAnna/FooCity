@@ -25,8 +25,10 @@ class CityViewport extends JPanel {
 	FooCityGUIInterface Interface;
 	private TileLoader tileLoader;
 	private Point cursor;
+	private Point selected_tile;
 	private Dimension map_area;
 	private Dimension preferred_size;
+
 	public CityViewport(FooCityGUIInterface i) {
 		super();
 		Interface = i;
@@ -43,15 +45,14 @@ class CityViewport extends JPanel {
 
 				@Override
 				public void mousePressed(MouseEvent e) {
-					if (Interface.getCityManager().getPlacingTile() == 0)
-						return;
-					Point p = e.getPoint();
-					int x = p.x / FooCityGUIConstants.TILE_WIDTH;
-					int y = p.y / FooCityGUIConstants.TILE_HEIGHT;
+					selected_tile = e.getPoint();
+					selected_tile.x /= FooCityGUIConstants.TILE_WIDTH;
+					selected_tile.y /= FooCityGUIConstants.TILE_HEIGHT;
 					// System.out.print(p + " " + x + " " + y);
-					if (Interface.getCityManager().placeTile(x, y)) {
-						Interface.updateDisplay();
-					}
+					if (Interface.getCityManager().getPlacingTile() != 0)
+						Interface.getCityManager().placeTile(selected_tile);
+					Interface.updateSelectedTile(selected_tile);
+					Interface.updateDisplay();
 				}
 
 				@Override
@@ -137,6 +138,15 @@ class CityViewport extends JPanel {
 			}
 			g.drawLine(r.x, yCoord, r.x + (int) map_area.getWidth()
 					* FooCityGUIConstants.TILE_WIDTH, yCoord);
+
+			if (selected_tile != null) {
+				g.setColor(Color.WHITE);
+				g.drawRect(selected_tile.x * FooCityGUIConstants.TILE_WIDTH,
+						selected_tile.y * FooCityGUIConstants.TILE_HEIGHT,
+						FooCityGUIConstants.TILE_WIDTH,
+						FooCityGUIConstants.TILE_HEIGHT);
+				g.setColor(Color.BLACK);
+			}
 		}
 
 		int mouse_tile = city_manager.getPlacingTile();
@@ -174,6 +184,7 @@ class MiniMapPanel extends JPanel {
 	FooCityGUIInterface Interface;
 	private Dimension map_area;
 	private int scale;
+
 	public MiniMapPanel(FooCityGUIInterface i, int _scale) {
 		super();
 		Interface = i;

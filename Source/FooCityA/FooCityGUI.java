@@ -8,6 +8,8 @@ import java.awt.Component;
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -21,6 +23,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Scanner;
 
@@ -76,6 +79,7 @@ public class FooCityGUI implements FooCityGUIInterface {
 	private final Action NewGame = new MainMenuAction();
 	private final Action Tile = new PlaceTileAction();
 	private JLabel currentFunds;
+	private SelectedTilePanel selected_tile_panel;
 	private JTextArea selectedDescription;
 	private JLabel selectedCost;
 
@@ -91,6 +95,7 @@ public class FooCityGUI implements FooCityGUIInterface {
 	private final String grassTile = "Grass Tile";
 	private final String dirtTile = "Dirt Tile";
 	private final String forrestTile = "Forrest Tile";
+	private JLabel selectedTileText;
 	/*
 	 * private final String residentialTile = "Residential Tile"; private final
 	 * String commercialTile = "Commercial Tile"; private final String
@@ -109,6 +114,7 @@ public class FooCityGUI implements FooCityGUIInterface {
 	 * Runnable() { public void run() { try { window = new FooCityGUI(); } catch
 	 * (Exception e) { e.printStackTrace(); } } }); }
 	 */
+	private JPanel selectedTilePanel;
 
 	/**
 	 * Create the application.
@@ -165,12 +171,13 @@ public class FooCityGUI implements FooCityGUIInterface {
 		} else if (tileType == -1)// MapGridConstants.BULLDOZER)
 		{
 
-		} else {
-			selectedCost.setText("");
-			selectedDescription.setText("");
+		} else { selectedCost.setText(""); selectedDescription.setText(""); }
 		}
-	}
 
+	@Override
+	public void updateSelectedTile(Point p) {
+		selected_tile_panel.updateSelectedTile(p.x, p.y);
+	}
 	/**
 	 * Initialize the contents of the frame.
 	 */
@@ -354,6 +361,8 @@ public class FooCityGUI implements FooCityGUIInterface {
 		box.add(minimap_panel);
 
 		Box bottomBox = Box.createVerticalBox();
+		selected_tile_panel = new SelectedTilePanel(this);	
+		
 		currentFunds = new JLabel("Current Funds: "
 				+ city_manager.getAvailableFunds());
 		nextTurn = new JButton("Next Turn");
@@ -367,6 +376,8 @@ public class FooCityGUI implements FooCityGUIInterface {
 			}
 
 		});
+		bottomBox.add(selected_tile_panel);
+		
 		bottomBox.add(currentFunds);
 		bottomBox.add(nextTurn);
 
@@ -744,6 +755,8 @@ interface FooCityGUIInterface {
 	public void updateDisplay();
 
 	public FooCityManager getCityManager();
+
+	void updateSelectedTile(Point p);
 }
 
 class FooCityScrollPane extends JScrollPane {
@@ -775,5 +788,51 @@ class FooCityScrollPane extends JScrollPane {
 				}
 			});
 		}
+	}
+}
+
+class SelectedTilePanel extends JPanel {
+	private FooCityGUIInterface _interface;
+	private Point selectedTile;
+	private JLabel selectedTileText;
+	private TileLoader t;
+	SelectedTilePanel(FooCityGUIInterface i) {
+		super();
+		if (i != null)
+		{
+			this._interface = i;
+		}
+
+		t = new TileLoader();
+		selectedTileText = new JLabel ("Selected Tile: ");
+		this.add(selectedTileText);
+	}
+	
+	@Override
+	public Dimension getPreferredSize() {
+		return new Dimension(200, 50);
+	}
+	public void updateSelectedTile(int x, int y) {
+		selectedTileText.setText("Selected Tile: (" + x + ", " + y + ")");
+		
+		int crime = _interface.getCityManager().getTileMetrics(x, y, MapGridConstants.METRIC_CRIME);
+		int happiness = _interface.getCityManager().getTileMetrics(x, y, MapGridConstants.METRIC_HAPPINESS);
+		int pollution = _interface.getCityManager().getTileMetrics(x, y, MapGridConstants.METRIC_POLLUTION);
+		
+		selectedTile = new Point(x,y);
+		repaint();
+	}
+	@Override
+	public void paint (Graphics g) {
+		super.paint(g);
+		if (selectedTile != null)
+		{
+			int tileType = _interface.getCityManager().getTileInt(selectedTile.x, selectedTile.y);
+			BufferedImage tile = t.getTile(tileType);
+			if (tile != null){
+				g.drawImage(tile, 0, 18, null);
+			}
+		}
+		
 	}
 }

@@ -1,5 +1,6 @@
 package foocityBackend;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -229,6 +230,10 @@ public class FooCityManager {
 
 	public int getPlacingTile() {
 		return tile_to_place;
+	}
+
+	public boolean placeTile(Point p) {
+		return placeTile(p.x, p.y);
 	}
 
 	public boolean placeTile(int x, int y) {

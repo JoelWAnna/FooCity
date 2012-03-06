@@ -3,17 +3,80 @@
 // Developers: Joel Anna and David Wiza
 //
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.UnsupportedLookAndFeelException;
 
 public class MainMenu extends JPanel implements ActionListener {
 
 	protected JButton buttonNewGame, buttonLoadGame;
 	static protected JFrame frame;
 
-	public MainMenu() {
+	public void setLaf() {
+		// from http://docs.oracle.com/javase/6/docs/technotes/guides/jweb/otherFeatures/nimbus_laf.html
+		try {
+			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+				System.out.println(info.getName());
+				if ("Metal".equals(info.getName())) {
+					UIManager.setLookAndFeel(info.getClassName());
+					break;
+				}
+			}
+		} catch (UnsupportedLookAndFeelException e) {
+			// handle exception
+		} catch (ClassNotFoundException e) {
+			// handle exception
+		} catch (InstantiationException e) {
+			// handle exception
+		} catch (IllegalAccessException e) {
+			// handle exception
+		}
+	}
+	@Override
+	public Dimension getPreferredSize() {
+		return new Dimension(384, 384 + 32);
+	}
+	@Override
+	public void paint(Graphics g) {
+		BufferedImage i = null;
+		if (i == null) {
+			try {
+				i = ImageIO.read(new File("./images/MainMenu.png"));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 
+			}
+		}
+		super.paint(g);
+
+		if (i != null)
+			g.drawImage(i, 0, 32, null);
+		String[] fonts = getToolkit().getFontList();
+
+		int font_size = 30;
+		g.setColor(Color.BLACK);
+		g.setFont(new Font(fonts[0], Font.BOLD, font_size));
+		g.drawString("Welcome To Foo City", 50, 384 / 2 + 16);
+	}
+
+	public MainMenu() {
+		setLaf();
 		// Create buttons
 		buttonNewGame = new JButton("New Game");
 		buttonNewGame.addActionListener(this);
@@ -46,6 +109,7 @@ public class MainMenu extends JPanel implements ActionListener {
 		// Display the window in the center of the screen
 		frame.pack();
 		frame.setLocationRelativeTo(null);
+		frame.repaint();
 		frame.setVisible(true);
 	}
 
