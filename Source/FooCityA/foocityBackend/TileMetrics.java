@@ -70,7 +70,7 @@ public class TileMetrics {
 			case MapGridConstants.DIRT_TILE :
 				description = "Undeveloped dirt.  When a tile is bulldozed, it reverts to this.";
 				price = 10;
-				metricsContributed[MapGridConstants.METRIC_HAPPINESS] = 2;
+				metricsContributed[MapGridConstants.METRIC_HAPPINESS] = 0;
 				jobs = 0;
 				metricsContributed[MapGridConstants.METRIC_POLLUTION] = 0;
 				metricsContributed[MapGridConstants.METRIC_CRIME] = 0;
@@ -154,7 +154,7 @@ public class TileMetrics {
 			case MapGridConstants.GAS_TILE :
 				description = "Somewhat clean source of power and a moderate cost.";
 				price = 3500;
-				metricsContributed[MapGridConstants.METRIC_HAPPINESS] = -2;
+				metricsContributed[MapGridConstants.METRIC_HAPPINESS] = -4;
 				jobs = 50;
 				metricsContributed[MapGridConstants.METRIC_POLLUTION] = 3;
 				metricsContributed[MapGridConstants.METRIC_CRIME] = 0;

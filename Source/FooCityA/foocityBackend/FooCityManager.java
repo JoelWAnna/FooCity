@@ -377,6 +377,25 @@ public class FooCityManager {
 				}
 			}
 		}
+		
+		// Don't let crime or pollution be less than zero
+		// Subtract crime and pollution from happiness
+		for (int y = 0; y < map_height; y++) {
+			for (int x = 0; x < map_width; x++) {
+				int c = getTileMetrics(x, y, MapGridConstants.METRIC_CRIME);
+				int p = getTileMetrics(x, y, MapGridConstants.METRIC_POLLUTION);
+				if (c < 0) {
+					current_map.updateMetrics(x, y, MapGridConstants.METRIC_CRIME, -c);
+					c = 0;
+				}
+				if (p < 0) {
+					current_map.updateMetrics(x, y, MapGridConstants.METRIC_POLLUTION, -p);
+					p = 0;
+				}
+				current_map.updateMetrics(x, y, MapGridConstants.METRIC_HAPPINESS, -(c + p));
+			}
+
+		}
 	}
 
 	public boolean SaveGame(String savePath) {

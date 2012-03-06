@@ -389,4 +389,55 @@ public class FooCityManagerTest extends TestCase {
 		city_manager.advanceTurn();
 		Assert.assertEquals(100, city_manager.getJobs());
 	}
+	
+	@Test
+	public void testMetrics() {
+		Assert.assertTrue(city_manager
+				.NewGeneratedGame("DDDDDDDDDDDDDDDDDDDD\n"
+						+ "DDDDDDDDDDDDDDDDDDDD\n" + "DDDDDDDDDDDDDDDDDDDD\n"
+						+ "DDDDDDDDDDDDDDDDDDDD\n" + "DDDDDDDDDDDDDDDDDDDD\n"
+						+ "DDDDDDDDDDDDDDDDDDDD\n" + "DDDDDDDDDDDDDDDDDDDD\n"
+						+ "DDDDDDDDDDDDDDDDDDDD\n" + "DDDDDDDDDDDDDDDDDDDD\n"
+						+ "DDDDDDDDDDDDDDDDDDDD\n" + "DDDDDDDDDDDDDDDDDDDD\n"
+						+ "DDDDDDDDDDDDDDDDDDDD\n" + "DDDDDDDDDDDDDDDDDDDD\n"
+						+ "DDDDDDDDDDDDDDDDDDDD\n" + "DDDDDDDDDDDDDDDDDDDD\n"
+						+ "DDDDDDDDDDDDDDDDDDDD\n" + "DDDDDDDDDDDDDDDDDDDD\n"
+						+ "DDDDDDDDDDDDDDDDDDDD\n" + "DDDDDDDDDDDDDDDDDDDD\n"
+						+ "DDDDDDDDDDDDDDDDDDDD\n"));
+		Assert.assertTrue(city_manager.setPlacingTile(MapGridConstants.GAS_TILE));
+		Assert.assertTrue(city_manager.placeTile(2, 2));
+		city_manager.propagateMetrics();
+		FooLogger.printMetric(city_manager, MapGridConstants.METRIC_HAPPINESS);
+		Assert.assertTrue(city_manager.getTileMetrics(0, 2, MapGridConstants.METRIC_POLLUTION) == 1);
+		Assert.assertTrue(city_manager.getTileMetrics(1, 2, MapGridConstants.METRIC_POLLUTION) == 2);
+		Assert.assertTrue(city_manager.getTileMetrics(2, 2, MapGridConstants.METRIC_POLLUTION) == 3);
+		Assert.assertTrue(city_manager.getTileMetrics(3, 2, MapGridConstants.METRIC_POLLUTION) == 2);
+		Assert.assertTrue(city_manager.getTileMetrics(4, 2, MapGridConstants.METRIC_POLLUTION) == 1);
+		Assert.assertTrue(city_manager.getTileMetrics(1, 1, MapGridConstants.METRIC_POLLUTION) == 1);
+		Assert.assertTrue(city_manager.getTileMetrics(2, 1, MapGridConstants.METRIC_POLLUTION) == 2);
+		Assert.assertTrue(city_manager.getTileMetrics(3, 1, MapGridConstants.METRIC_POLLUTION) == 1);
+		Assert.assertTrue(city_manager.getTileMetrics(2, 0, MapGridConstants.METRIC_POLLUTION) == 1);
+		Assert.assertTrue(city_manager.getTileMetrics(1, 3, MapGridConstants.METRIC_POLLUTION) == 1);
+		Assert.assertTrue(city_manager.getTileMetrics(2, 3, MapGridConstants.METRIC_POLLUTION) == 2);
+		Assert.assertTrue(city_manager.getTileMetrics(3, 3, MapGridConstants.METRIC_POLLUTION) == 1);
+		Assert.assertTrue(city_manager.getTileMetrics(2, 4, MapGridConstants.METRIC_POLLUTION) == 1);
+		Assert.assertTrue(city_manager.getTileMetrics(2, 2, MapGridConstants.METRIC_HAPPINESS) == -7);
+		Assert.assertTrue(city_manager.setPlacingTile(MapGridConstants.INDUSTRIAL_TILE));
+		Assert.assertTrue(city_manager.placeTile(5, 5));
+		city_manager.propagateMetrics();
+		Assert.assertTrue(city_manager.getTileMetrics(5, 5, MapGridConstants.METRIC_CRIME) == 7);
+		Assert.assertTrue(city_manager.getTileMetrics(5, 6, MapGridConstants.METRIC_CRIME) == 6);
+		Assert.assertTrue(city_manager.getTileMetrics(5, 7, MapGridConstants.METRIC_CRIME) == 5);
+		Assert.assertTrue(city_manager.getTileMetrics(5, 8, MapGridConstants.METRIC_CRIME) == 4);
+		Assert.assertTrue(city_manager.getTileMetrics(5, 9, MapGridConstants.METRIC_CRIME) == 3);
+		Assert.assertTrue(city_manager.getTileMetrics(5, 10, MapGridConstants.METRIC_CRIME) == 2);
+		Assert.assertTrue(city_manager.getTileMetrics(5, 11, MapGridConstants.METRIC_CRIME) == 1);
+		Assert.assertTrue(city_manager.getTileMetrics(5, 12, MapGridConstants.METRIC_CRIME) == 0);
+		Assert.assertTrue(city_manager.setPlacingTile(MapGridConstants.POLICE_TILE));
+		Assert.assertTrue(city_manager.placeTile(5, 6));
+		city_manager.propagateMetrics();
+		Assert.assertTrue(city_manager.getTileMetrics(5, 5, MapGridConstants.METRIC_CRIME) == 0);
+		Assert.assertTrue(city_manager.getTileMetrics(5, 6, MapGridConstants.METRIC_CRIME) == 0);
+	}
+		
 }

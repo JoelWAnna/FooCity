@@ -1,6 +1,15 @@
 FOOCITYMAGIC
 CurrentTurn:0
-AvailableFunds:100
+AvailableFunds:10000
+Water+:0
+Water-:0
+Power+:0
+Power-:0
+Jobs:0
+Residents:0
+Income:0
+Expenses:0
+CashFlow:0
 MapGrid:1
 width:128
 height:128
