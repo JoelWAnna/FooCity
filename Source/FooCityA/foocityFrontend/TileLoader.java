@@ -48,7 +48,9 @@ class TileLoader {
 
 	public BufferedImage getTile(int i) {
 		switch (i) {
-			case (MapGridConstants.ROAD_TILE) :
+			case MapGridConstants.BULLDOZE_TILE:
+				return tiles[MapGridConstants.DIRT_TILE];
+			case MapGridConstants.ROAD_TILE :
 				return road;
 			default :
 				if (!m_valid && (i < 0 || i > tiles.length))

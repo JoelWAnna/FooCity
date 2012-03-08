@@ -34,9 +34,9 @@ public class FooLogger {
 	public static void printMetric(FooCityManager map, int metric){
 		for (int y = 0; y < map.getMapArea().getHeight(); y++) {
 			for (int x = 0; x < map.getMapArea().getWidth(); x++){
-				System.out.print(Integer.toString(map.getTileMetrics(x, y, metric)) + " ");
+				infoLog(Integer.toString(map.getTileMetrics(x, y, metric)) + " ");
 			}
-			System.out.print("\n");
+			infoLog("\n");
 		}
 	}
 }

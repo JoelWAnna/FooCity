@@ -233,14 +233,12 @@ public class FooCityManager {
 	}
 
 	public boolean setPlacingTile(int i) {
-		if (i >= MapGridConstants.WATER_TILE && i < MapGridConstants.LAST_TILE) {
+		if (i == MapGridConstants.BULLDOZE_TILE || (i >= MapGridConstants.WATER_TILE && i < MapGridConstants.LAST_TILE)) {
 			this.tile_to_place = i;
 			return true;
-		} else if (i == -1) {
-			this.tile_to_place = -1;
-			return true;
 		}
-		tile_to_place = 0;
+
+		tile_to_place = MapGridConstants.NO_TILE;
 		return false;
 	}
 
@@ -253,7 +251,8 @@ public class FooCityManager {
 	}
 
 	public boolean placeTile(int x, int y) {
-		if (current_map != null && tile_to_place > 0) {
+		if (current_map != null && tile_to_place != MapGridConstants.NO_TILE) {
+			
 			int price = TileMetrics.GetTileMetrics(tile_to_place).getPrice();
 			if (price <= this.availableFunds) {
 				if (current_map.setTile(x, y, tile_to_place)) {
@@ -261,15 +260,7 @@ public class FooCityManager {
 					return true;
 				}
 			}
-		} else if (current_map != null && tile_to_place == -1) {
-			int price = 10;
-			if (price <= this.availableFunds) {
-				if (current_map.setTile(x, y, MapGridConstants.DIRT_TILE)){
-					this.availableFunds -= price;
-					return true;
-				}
-			}
-		}
+		} 
 		return false;
 	}
 

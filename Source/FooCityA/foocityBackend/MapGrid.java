@@ -145,13 +145,22 @@ class MapGrid {
 	}
 	public boolean setTile(int x, int y, int i) {
 		if ((MapGridConstants.WATER_TILE <= i && i < MapGridConstants.LAST_TILE)
-				&& tileInRange(x, y) || i == -1){
+				&& tileInRange(x, y) || i == MapGridConstants.BULLDOZE_TILE){
 			Tile oldTile = this.tileGrid[x][y];
-			if (oldTile.isReplaceable() && oldTile.getTileInt() != i) {
+			
+			if (i == MapGridConstants.BULLDOZE_TILE) {
+				
+				if (oldTile.getTileInt() > MapGridConstants.FORREST_TILE) {
+					this.tileGrid[x][y] = new Tile(MapGridConstants.DIRT_TILE);
+					setVariations(x, y);
+					return true;
+				}
+			}
+			else if (oldTile.isReplaceable() && oldTile.getTileInt() != i && oldTile.getTileInt() <=  MapGridConstants.FORREST_TILE) {
 				this.tileGrid[x][y] = new Tile(i);
 				//if (this.tileGrid[x][y].hasVariations())
-					setVariations(x, y);
-				return true;
+				setVariations(x, y);
+			return true;
 			}
 		}
 

@@ -151,7 +151,7 @@ class CityViewport extends JPanel {
 		}
 
 		int mouse_tile = city_manager.getPlacingTile();
-		if (cursor != null && mouse_tile > 0) {
+		if (cursor != null && mouse_tile != 0) {
 			BufferedImage mImage = null;
 			try {
 				mImage = tileLoader.getTile(mouse_tile).getSubimage(0, 0,

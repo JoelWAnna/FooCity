@@ -169,11 +169,11 @@ public class FooCityGUI implements FooCityGUIInterface {
 				selectedCost.setForeground(Color.red);
 			else
 				selectedCost.setForeground(Color.black);
-		} else if (tileType == -1)// MapGridConstants.BULLDOZER)
-		{
-
-		} else { selectedCost.setText(" "); selectedDescription.setText(" "); }
+		} else {
+			selectedCost.setText(" ");
+			selectedDescription.setText(" ");
 		}
+	}
 
 	@Override
 	public void updateSelectedTile(Point p) {
@@ -301,7 +301,7 @@ public class FooCityGUI implements FooCityGUIInterface {
 
 		buttonBulldoze = new JToggleButton("Bulldoze");
 		buttonBulldoze.addActionListener(Tile);
-		buttonBulldoze.setActionCommand(Integer.toString(-1));
+		buttonBulldoze.setActionCommand(Integer.toString(MapGridConstants.BULLDOZE_TILE));
 		buttonGridPanel.add(buttonBulldoze);
 
 		/*

@@ -15,9 +15,10 @@ public class TileMetrics {
 		if (tiles == null)
 			init();
 		if (MapGridConstants.WATER_TILE <= tileType
-				&& tileType < MapGridConstants.LAST_TILE) {
+				&& tileType < MapGridConstants.LAST_TILE)
 			return tiles[tileType];
-		}
+		if (MapGridConstants.BULLDOZE_TILE == tileType)
+			return tiles[0];
 		return null;
 	}
 
@@ -25,6 +26,7 @@ public class TileMetrics {
 		if (tiles == null) {
 			FooLogger.errorLog("Creating Tile Metrics");
 			tiles = new TileMetrics[MapGridConstants.LAST_TILE];
+			tiles[0] = new TileMetrics(MapGridConstants.BULLDOZE_TILE);
 			for (int i = MapGridConstants.WATER_TILE; i < MapGridConstants.LAST_TILE; ++i) {
 				tiles[i] = new TileMetrics(i);
 			}
@@ -34,6 +36,17 @@ public class TileMetrics {
 	private TileMetrics(int tileType) {
 		metricsContributed = new int[MapGridConstants.METRIC_LAST];
 		switch (tileType) {
+			case MapGridConstants.BULLDOZE_TILE :
+				description = "Bulldozer";
+				price = 10;
+				metricsContributed[MapGridConstants.METRIC_HAPPINESS] = 0;
+				jobs = 0;
+				metricsContributed[MapGridConstants.METRIC_POLLUTION] = 0;
+				metricsContributed[MapGridConstants.METRIC_CRIME] = 0;
+				powerConsumed = 0;
+				waterConsumed = 0;
+				monthlyCost = 0;
+				break;
 			case MapGridConstants.RESIDENTIAL_TILE :
 				description = "Provides housing for residents.";
 				price = 250;
