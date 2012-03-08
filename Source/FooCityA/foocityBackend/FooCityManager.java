@@ -26,6 +26,9 @@ import javax.swing.JLabel;
  */
 public class FooCityManager {
 	public static final int STARTING_FUNDS = 20000;
+	public static final int FLAG_WIN = 1;
+	public static final int FLAG_LOSE = -1;
+	public static final int FLAG_MIDGAME = 0;
 	private int availableFunds;
 	private MapGrid current_map;
 	private int tile_to_place;
@@ -119,10 +122,13 @@ public class FooCityManager {
 		return turn;
 	}
 
-	public void advanceTurn() {
+	private int checkWinLose() {
+		return FooCityManager.FLAG_MIDGAME;
+	}
+	public int advanceTurn() {
 		long timeBegun = System.nanoTime();
 		if (current_map == null)
-			return;
+			return FooCityManager.FLAG_MIDGAME;
 		// Advance the turn
 		this.turn++;
 		// Propagate the metrics
@@ -218,6 +224,7 @@ public class FooCityManager {
 		FooLogger.infoLog("advanceTurn took "
 				+ Long.toString((System.nanoTime() - timeBegun) / 1000000)
 				+ " ms\n");
+		return checkWinLose();
 	}
 	
 	public boolean checkForLoss(){
@@ -725,4 +732,5 @@ public class FooCityManager {
 
 		return sb.toString();
 	}
+
 }

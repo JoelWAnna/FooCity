@@ -1,3 +1,4 @@
+package foocityFrontend;
 // Project FooCity-group2
 // CS300
 // Developers: Joel Anna and David Wiza
@@ -19,6 +20,7 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import terraingenerator.Generate;
 import foocityBackend.FooCityManager;
 
 public class GamePreviewWindow extends JDialog
@@ -204,5 +206,9 @@ public class GamePreviewWindow extends JDialog
 	@Override
 	public FooCityManager getCityManager() {
 		return city_manager;
+	}
+
+	@Override
+	public void updateSelectedTile(Point p) {
 	}
 }

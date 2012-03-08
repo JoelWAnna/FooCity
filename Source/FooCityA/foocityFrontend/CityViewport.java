@@ -1,3 +1,4 @@
+package foocityFrontend;
 // Project FooCity-group2
 // CS300
 // Developers: Joel Anna and David Wiza

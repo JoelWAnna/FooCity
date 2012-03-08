@@ -1,3 +1,4 @@
+package foocityFrontend;
 // Project FooCity-group2
 // CS300
 // Developers: Joel Anna and David Wiza
@@ -9,7 +10,6 @@ import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -114,7 +114,7 @@ public class FooCityGUI implements FooCityGUIInterface {
 	 * Runnable() { public void run() { try { window = new FooCityGUI(); } catch
 	 * (Exception e) { e.printStackTrace(); } } }); }
 	 */
-	private JPanel selectedTilePanel;
+
 	private JLabel currentTurn;
 
 	/**
@@ -373,7 +373,16 @@ public class FooCityGUI implements FooCityGUIInterface {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				city_manager.advanceTurn();
+				
+				switch (city_manager.advanceTurn())
+				{
+				case FooCityManager.FLAG_WIN:
+					break;
+				case FooCityManager.FLAG_LOSE:
+					break;
+				case FooCityManager.FLAG_MIDGAME:
+					break;
+				}
 				showEndOfTurnReport();
 				updateDisplay();
 			}

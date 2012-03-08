@@ -8,6 +8,8 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
+import terraingenerator.Generate;
+
 /**
  * FooCityManagerTest Unit Tests for FooCityManager Class
  * 
@@ -116,7 +118,7 @@ public class FooCityManagerTest extends TestCase {
 				city_manager.NewGeneratedGame("invalidstring"));
 
 		Assert.assertTrue("Should load a generated map", city_manager
-				.NewGeneratedGame("DDDDD\nDDDDD\nDDDDD\nDDDDD\nDDDDD\n"));
+				.NewGeneratedGame(Generate.generate()));
 
 		Assert.assertTrue("Map should be loaded", city_manager.MapGridLoaded());
 		Assert.assertEquals("FundsAvailable Should = "
