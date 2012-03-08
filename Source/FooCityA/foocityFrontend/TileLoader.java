@@ -26,7 +26,7 @@ class TileLoader {
 		m_valid = true;
 
 		TileSet = "images/" + "SolidColors/";
-		for (int i = 1; i < MapGridConstants.LAST_TILE; ++i) {
+		for (int i = 0; i < MapGridConstants.LAST_TILE; ++i) {
 			try {
 				tiles[i] = ImageIO.read(new File(TileSet + tileNames[i]
 						+ ".png"));
@@ -49,7 +49,7 @@ class TileLoader {
 	public BufferedImage getTile(int i) {
 		switch (i) {
 			case MapGridConstants.BULLDOZE_TILE:
-				return tiles[MapGridConstants.DIRT_TILE];
+				return tiles[0];
 			case MapGridConstants.ROAD_TILE :
 				return road;
 			default :
@@ -62,6 +62,7 @@ class TileLoader {
 
 	private void initStringNames() {
 		tileNames = new String[MapGridConstants.LAST_TILE];
+		tileNames[0] = "bulldozer";
 		tileNames[MapGridConstants.WATER_TILE] = "water";
 		tileNames[MapGridConstants.BEACH_TILE] = "beach";
 		tileNames[MapGridConstants.GRASS_TILE] = "grass";

@@ -154,7 +154,9 @@ class CityViewport extends JPanel {
 		if (cursor != null && mouse_tile != 0) {
 			BufferedImage mImage = null;
 			try {
-				mImage = tileLoader.getTile(mouse_tile).getSubimage(0, 0,
+				mImage = tileLoader.getTile(mouse_tile);
+				if (mImage != null)
+					mImage = mImage.getSubimage(0, 0,
 						FooCityGUIConstants.TILE_WIDTH,
 						FooCityGUIConstants.TILE_HEIGHT);
 			} catch (RasterFormatException e) {
