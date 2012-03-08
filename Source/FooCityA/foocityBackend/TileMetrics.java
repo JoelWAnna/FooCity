@@ -43,7 +43,7 @@ public class TileMetrics {
 				metricsContributed[MapGridConstants.METRIC_CRIME] = 1;
 				powerConsumed = 30;
 				waterConsumed = 15;
-				monthlyCost = -10;
+				monthlyCost = -20;
 				break;
 			case MapGridConstants.INDUSTRIAL_TILE :
 				description = "Provides more jobs per dollar for residents than Commercial, but causes more crime, pollution, and unhappiness.";
@@ -54,7 +54,7 @@ public class TileMetrics {
 				metricsContributed[MapGridConstants.METRIC_CRIME] = 7;
 				powerConsumed = 75;
 				waterConsumed = 35;
-				monthlyCost = -20;
+				monthlyCost = -40;
 				break;
 			case MapGridConstants.COMMERCIAL_TILE :
 				description = "Provides jobs for residents.  More expensive per job than Industrial, but causes less crime and pollution.";
@@ -65,7 +65,7 @@ public class TileMetrics {
 				metricsContributed[MapGridConstants.METRIC_CRIME] = 3;
 				powerConsumed = 35;
 				waterConsumed = 25;
-				monthlyCost = -15;
+				monthlyCost = -30;
 				break;
 			case MapGridConstants.DIRT_TILE :
 				description = "Undeveloped dirt.  When a tile is bulldozed, it reverts to this.";
@@ -127,7 +127,7 @@ public class TileMetrics {
 				metricsContributed[MapGridConstants.METRIC_CRIME] = 0;
 				powerConsumed = 35;
 				waterConsumed = -2500;
-				monthlyCost = 50;
+				monthlyCost = 40;
 				break;
 			case MapGridConstants.POLICE_TILE :
 				description = "Lowers crime in the area.";
@@ -138,7 +138,7 @@ public class TileMetrics {
 				metricsContributed[MapGridConstants.METRIC_CRIME] = -10;
 				powerConsumed = 15;
 				waterConsumed = 10;
-				monthlyCost = 50;
+				monthlyCost = 40;
 				break;
 			case MapGridConstants.SOLAR_TILE :
 				description = "An expensive, but clean source of electricity.";
@@ -149,7 +149,7 @@ public class TileMetrics {
 				metricsContributed[MapGridConstants.METRIC_CRIME] = 0;
 				powerConsumed = -1000;
 				waterConsumed = 0;
-				monthlyCost = 125;
+				monthlyCost = 100;
 				break;
 			case MapGridConstants.GAS_TILE :
 				description = "Somewhat clean source of power and a moderate cost.";
@@ -160,7 +160,7 @@ public class TileMetrics {
 				metricsContributed[MapGridConstants.METRIC_CRIME] = 0;
 				powerConsumed = -5000;
 				waterConsumed = 25;
-				monthlyCost = 175;
+				monthlyCost = 150;
 				break;
 			case MapGridConstants.COAL_TILE :
 				description = "A cheap source of electricity, but produces horrible smog.";
@@ -171,7 +171,7 @@ public class TileMetrics {
 				metricsContributed[MapGridConstants.METRIC_CRIME] = 0;
 				powerConsumed = -5000;
 				waterConsumed = 25;
-				monthlyCost = 200;
+				monthlyCost = 150;
 				break;
 			case MapGridConstants.WIND_TILE :
 				description = "A clean source of power, but residents don't like the sight of them.";
@@ -182,7 +182,7 @@ public class TileMetrics {
 				metricsContributed[MapGridConstants.METRIC_CRIME] = 0;
 				powerConsumed = -1000;
 				waterConsumed = 0;
-				monthlyCost = 125;
+				monthlyCost = 100;
 				break;
 			case MapGridConstants.BEACH_TILE :
 				price = 0;
@@ -202,7 +202,7 @@ public class TileMetrics {
 				metricsContributed[MapGridConstants.METRIC_CRIME] = 0;
 				powerConsumed = 0;
 				waterConsumed = 0;
-				monthlyCost = 5;
+				monthlyCost = 3;
 				break;
 		}
 	}

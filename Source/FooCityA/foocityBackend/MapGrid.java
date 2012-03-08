@@ -145,11 +145,11 @@ class MapGrid {
 	}
 	public boolean setTile(int x, int y, int i) {
 		if ((MapGridConstants.WATER_TILE <= i && i < MapGridConstants.LAST_TILE)
-				&& tileInRange(x, y)) {
+				&& tileInRange(x, y) || i == -1){
 			Tile oldTile = this.tileGrid[x][y];
 			if (oldTile.isReplaceable() && oldTile.getTileInt() != i) {
 				this.tileGrid[x][y] = new Tile(i);
-				if (this.tileGrid[x][y].hasVariations())
+				//if (this.tileGrid[x][y].hasVariations())
 					setVariations(x, y);
 				return true;
 			}

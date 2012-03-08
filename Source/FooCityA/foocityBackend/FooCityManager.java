@@ -25,7 +25,7 @@ import javax.swing.JLabel;
  * 
  */
 public class FooCityManager {
-	public static final int STARTING_FUNDS = 10000;
+	public static final int STARTING_FUNDS = 20000;
 	private int availableFunds;
 	private MapGrid current_map;
 	private int tile_to_place;
@@ -36,6 +36,7 @@ public class FooCityManager {
 	private int cashFlow = 0;
 	private int jobs = 0, residents = 0;
 	private JobManager job_manager;
+	private int turnsLosing;
 
 	public FooCityManager() {
 		current_map = null;
@@ -218,10 +219,18 @@ public class FooCityManager {
 				+ Long.toString((System.nanoTime() - timeBegun) / 1000000)
 				+ " ms\n");
 	}
+	
+	public boolean checkForLoss(){
+		return false;
+		
+	}
 
 	public boolean setPlacingTile(int i) {
 		if (i >= MapGridConstants.WATER_TILE && i < MapGridConstants.LAST_TILE) {
 			this.tile_to_place = i;
+			return true;
+		} else if (i == -1) {
+			this.tile_to_place = -1;
 			return true;
 		}
 		tile_to_place = 0;
@@ -241,6 +250,14 @@ public class FooCityManager {
 			int price = TileMetrics.GetTileMetrics(tile_to_place).getPrice();
 			if (price <= this.availableFunds) {
 				if (current_map.setTile(x, y, tile_to_place)) {
+					this.availableFunds -= price;
+					return true;
+				}
+			}
+		} else if (current_map != null && tile_to_place == -1) {
+			int price = 10;
+			if (price <= this.availableFunds) {
+				if (current_map.setTile(x, y, MapGridConstants.DIRT_TILE)){
 					this.availableFunds -= price;
 					return true;
 				}

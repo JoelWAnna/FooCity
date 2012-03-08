@@ -115,6 +115,7 @@ public class FooCityGUI implements FooCityGUIInterface {
 	 * (Exception e) { e.printStackTrace(); } } }); }
 	 */
 	private JPanel selectedTilePanel;
+	private JLabel currentTurn;
 
 	/**
 	 * Create the application.
@@ -152,8 +153,8 @@ public class FooCityGUI implements FooCityGUIInterface {
 		minimap_panel.repaint();
 		this.currentFunds.setText("Current Funds: "
 				+ Integer.toString(city_manager.getAvailableFunds()));
-		// city_manager.propagateMetrics(); //This should not be called by the
-		// GUI
+		this.currentTurn.setText("Current Turn: "
+				+ Integer.toString(city_manager.getCurrentTurn()));
 		updateTileDescription(city_manager.getPlacingTile());
 	}
 
@@ -171,7 +172,7 @@ public class FooCityGUI implements FooCityGUIInterface {
 		} else if (tileType == -1)// MapGridConstants.BULLDOZER)
 		{
 
-		} else { selectedCost.setText(""); selectedDescription.setText(""); }
+		} else { selectedCost.setText(" "); selectedDescription.setText(" "); }
 		}
 
 	@Override
@@ -365,6 +366,8 @@ public class FooCityGUI implements FooCityGUIInterface {
 		
 		currentFunds = new JLabel("Current Funds: "
 				+ city_manager.getAvailableFunds());
+		currentTurn = new JLabel("Current Turn: "
+				+ city_manager.getCurrentTurn());
 		nextTurn = new JButton("Next Turn");
 		nextTurn.addActionListener(new ActionListener() {
 
@@ -378,8 +381,14 @@ public class FooCityGUI implements FooCityGUIInterface {
 		});
 		bottomBox.add(selected_tile_panel);
 		
-		bottomBox.add(currentFunds);
-		bottomBox.add(nextTurn);
+		Box buttonBox = Box.createHorizontalBox();
+		buttonBox.add(nextTurn);
+		
+		Box statusBox = Box.createVerticalBox();
+		statusBox.add(currentFunds);
+		statusBox.add(currentTurn);
+		buttonBox.add(statusBox);
+		bottomBox.add(buttonBox);
 
 		toolPanel.add(box, BorderLayout.PAGE_START);
 		toolPanel.add(bottomBox, BorderLayout.PAGE_END);
