@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.Scanner;
 
 // Project FooCity-group2
@@ -38,6 +39,7 @@ public class FooCityManager {
 	private int jobs = 0, residents = 0;
 	private JobManager job_manager;
 	private int turnsLosing;
+	public LinkedList<Report> reports = new LinkedList<Report>();
 
 	public FooCityManager() {
 		current_map = null;
@@ -104,6 +106,7 @@ public class FooCityManager {
 		job_manager = null;
 		turn = 0;
 		availableFunds = 0;
+		reports.clear();
 	}
 
 	private boolean startGame() {
@@ -111,6 +114,7 @@ public class FooCityManager {
 			availableFunds = FooCityManager.STARTING_FUNDS;
 			propagateMetrics();
 			job_manager = new JobManager();
+			reports.clear();
 			return true;
 		}
 		return false;
@@ -219,15 +223,14 @@ public class FooCityManager {
 		cashFlow = (int) (income - expenses);
 		this.availableFunds += cashFlow;
 		this.findJobs();
+		Report report = new Report(waterConsumed, waterGenerated, powerConsumed, powerGenerated, jobs, residents, income, cashFlow,
+				this.availableFunds, cashFlow, turn);
+		reports.addFirst(report);
+
 		FooLogger.infoLog("advanceTurn took "
 				+ Long.toString((System.nanoTime() - timeBegun) / 1000000)
 				+ " ms\n");
 		return checkWinLose();
-	}
-	
-	public boolean checkForLoss(){
-		return false;
-		
 	}
 
 	public boolean setPlacingTile(int i) {
@@ -686,40 +689,6 @@ public class FooCityManager {
 		return jobs;
 	}
 
-	public String getEndOfTurnReport() {
-		final String PLACEHOLDER = " \n";
-		StringBuilder sb = new StringBuilder();
-
-		sb.append("End of Turn Report for Turn: \n");
-		sb.append(Integer.toString(turn) + "\n");
-		sb.append(PLACEHOLDER);
-
-		sb.append(PLACEHOLDER);
-		sb.append("Produced\n");
-		sb.append("Consumed\n");
-		sb.append("Water\n");
-		sb.append(Float.toString(waterGenerated) + "\n");
-		sb.append(Float.toString(waterConsumed) + "\n");
-		sb.append("Electricity" + "\n");
-		sb.append(Float.toString(powerGenerated) + "\n");
-		sb.append(Float.toString(powerConsumed) + "\n");
-		sb.append("Jobs" + "\n");
-		sb.append(Float.toString(jobs) + "\n");
-		sb.append(Float.toString(residents) + "\n");
-		sb.append(PLACEHOLDER);
-		sb.append("Tax income: " + "\n");
-		sb.append(Integer.toString(income) + "\n");
-		sb.append(PLACEHOLDER);
-		sb.append("Upkeep expenses: " + "\n");
-		sb.append(Integer.toString(expenses) + "\n");
-		sb.append(PLACEHOLDER);
-		sb.append("Cash Flow: " + "\n");
-		sb.append("$" + Integer.toString(cashFlow) + "\n");
-		sb.append(PLACEHOLDER);
-		sb.append("Available Funds:" + "\n");
-		sb.append("$" + Integer.toString(getAvailableFunds()) + "\n");
-
-		return sb.toString();
-	}
+	
 
 }

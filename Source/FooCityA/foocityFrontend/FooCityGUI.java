@@ -302,26 +302,8 @@ public class FooCityGUI implements FooCityGUIInterface {
 	}
 
 	private void showEndOfTurnReport() {
-		JDialog reportDialog = new JDialog(frame, "End of Turn Report");
-		reportDialog.setModalityType(ModalityType.DOCUMENT_MODAL);
-
-		JPanel topPanel = new JPanel();
-		GridLayout gridLayout = new GridLayout(0, 3);
-		gridLayout.setHgap(15);
-		gridLayout.setVgap(5);
-		topPanel.setLayout(gridLayout);
-		Scanner reportScanner = new Scanner(city_manager.getEndOfTurnReport());
-
-		while (reportScanner.hasNextLine()) {
-			topPanel.add(new JLabel(reportScanner.nextLine()));
-		}
-
-		reportDialog.add(topPanel);
-
-		reportDialog.pack();
-		reportDialog.setLocationRelativeTo(null);
-		reportDialog.setVisible(true);
-
+		ReportGUI reportGUI = new ReportGUI(this.frame);
+		reportGUI.showReport(city_manager.reports.getFirst());
 	}
 
 	private void initializeMenuBar() {
