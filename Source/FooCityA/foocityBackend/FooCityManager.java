@@ -8,8 +8,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 
-import javax.swing.JLabel;
-
 // Project FooCity-group2
 // CS300
 // Developers: Joel Anna and David Wiza

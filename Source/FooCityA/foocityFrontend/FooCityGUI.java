@@ -116,6 +116,7 @@ public class FooCityGUI implements FooCityGUIInterface {
 	 */
 
 	private JLabel currentTurn;
+	private JPanel buttonGridPanel;
 
 	/**
 	 * Create the application.
@@ -195,122 +196,8 @@ public class FooCityGUI implements FooCityGUIInterface {
 
 		map_panel = new CityViewport(this);
 		scrollPane = new FooCityScrollPane(map_panel, this);
-
-		// toolPanel contains the entire left toolbar, including minimap.
-		toolPanel = new JPanel(new BorderLayout());
-		// Create a panel to hold the buttons using a grid 3 columns wide
-		// (rows get added automatically by Java as needed)
-		GridLayout buttonGridLayout = new GridLayout(0, 3);
-		JPanel buttonGridPanel = new JPanel();
-		buttonGridPanel.setLayout(buttonGridLayout);
-		Box box = Box.createVerticalBox();
-		toolPanel.setBounds(0, 0, FooCityGUIConstants.SIDEBAR_WIDTH,
-				FooCityGUIConstants.WINDOW_HEIGHT - 38);
-		minimap_panel = new MiniMapPanel(this, 2);
-		minimap_panel.repaint();
-
-		buttonResidential = new JToggleButton("R");
-		buttonResidential.addActionListener(Tile);
-		buttonResidential.setActionCommand(Integer
-				.toString(MapGridConstants.RESIDENTIAL_TILE));
-		buttonGridPanel.add(buttonResidential);
-
-		buttonCommercial = new JToggleButton("C");
-		buttonCommercial.addActionListener(Tile);
-		buttonCommercial.setActionCommand(Integer
-				.toString(MapGridConstants.COMMERCIAL_TILE));
-		buttonGridPanel.add(buttonCommercial);
-
-		buttonIndustrial = new JToggleButton("I");
-		buttonIndustrial.addActionListener(Tile);
-		buttonIndustrial.setActionCommand(Integer
-				.toString(MapGridConstants.INDUSTRIAL_TILE));
-		buttonGridPanel.add(buttonIndustrial);
-
-		buttonRoad = new JToggleButton("Road");
-		buttonRoad.addActionListener(Tile);
-		buttonRoad.setActionCommand(Integer
-				.toString(MapGridConstants.ROAD_TILE));
-		buttonGridPanel.add(buttonRoad);
-
-		buttonPark = new JToggleButton("Park");
-		buttonPark.addActionListener(Tile);
-		buttonPark.setActionCommand(Integer
-				.toString(MapGridConstants.PARK_TILE));
-		buttonGridPanel.add(buttonPark);
-
-		buttonSewage = new JToggleButton("Sewage");
-		buttonSewage.addActionListener(Tile);
-		buttonSewage.setActionCommand(Integer
-				.toString(MapGridConstants.SEWAGE_TILE));
-		buttonGridPanel.add(buttonSewage);
-
-		buttonPolice = new JToggleButton("Police");
-		buttonPolice.addActionListener(Tile);
-		buttonPolice.setActionCommand(Integer
-				.toString(MapGridConstants.POLICE_TILE));
-		buttonGridPanel.add(buttonPolice);
-
-		buttonSolar = new JToggleButton("Solar");
-		buttonSolar.addActionListener(Tile);
-		buttonSolar.setActionCommand(Integer
-				.toString(MapGridConstants.SOLAR_TILE));
-		buttonGridPanel.add(buttonSolar);
-
-		buttonGas = new JToggleButton("Gas");
-		buttonGas.addActionListener(Tile);
-		buttonGas.setActionCommand(Integer.toString(MapGridConstants.GAS_TILE));
-		buttonGridPanel.add(buttonGas);
-
-		buttonCoal = new JToggleButton("Coal");
-		buttonCoal.addActionListener(Tile);
-		buttonCoal.setActionCommand(Integer
-				.toString(MapGridConstants.COAL_TILE));
-		buttonGridPanel.add(buttonCoal);
-
-		buttonWindFarm = new JToggleButton("Wind");
-		buttonWindFarm.addActionListener(Tile);
-		buttonWindFarm.setActionCommand(Integer
-				.toString(MapGridConstants.WIND_TILE));
-		buttonGridPanel.add(buttonWindFarm);
-
-		buttonDirt = new JToggleButton("Dirt");
-		buttonDirt.addActionListener(Tile);
-		buttonDirt.setActionCommand(Integer
-				.toString(MapGridConstants.DIRT_TILE));
-		buttonGridPanel.add(buttonDirt);
-
-		/*
-		 * buttonWater = new JButton("Water");
-		 * buttonWater.addActionListener(Tile);
-		 * buttonWater.setActionCommand(waterTile);
-		 * buttonGridPanel.add(buttonWater);
-		 */
-
-		buttonGrass = new JToggleButton("Grass");
-		buttonGrass.addActionListener(Tile);
-		buttonGrass.setActionCommand(Integer
-				.toString(MapGridConstants.GRASS_TILE));
-		buttonGridPanel.add(buttonGrass);
-
-		buttonForrest = new JToggleButton("Forrest");
-		buttonForrest.addActionListener(Tile);
-		buttonForrest.setActionCommand(Integer
-				.toString(MapGridConstants.FORREST_TILE));
-		buttonGridPanel.add(buttonForrest);
-
-		buttonBulldoze = new JToggleButton("Bulldoze");
-		buttonBulldoze.addActionListener(Tile);
-		buttonBulldoze.setActionCommand(Integer.toString(MapGridConstants.BULLDOZE_TILE));
-		buttonGridPanel.add(buttonBulldoze);
-
-		/*
-		 * buttonBeach = new JButton("Beach");
-		 * buttonBeach.addActionListener(Tile);
-		 * buttonBeach.setActionCommand(beachTile);
-		 * buttonGridPanel.add(buttonBeach);
-		 */
-
+		createToolPanel();
+	
 		String[] viewModes = {"Normal", "Pollution", "Crime", "Happiness"};
 		JComboBox miniMapViewList = new JComboBox(viewModes);
 		miniMapViewList.addActionListener(new ActionListener() {
@@ -351,6 +238,7 @@ public class FooCityGUI implements FooCityGUIInterface {
 		selectedDescription.setLineWrap(true);
 		selectedDescription.setWrapStyleWord(true);
 
+		Box box = Box.createVerticalBox();
 		// box.add(Box.createHorizontalGlue());
 		box.add(buttonGridPanel);
 		// box.add(Box.createHorizontalGlue());
@@ -490,6 +378,122 @@ public class FooCityGUI implements FooCityGUIInterface {
 		forrestTile_menuItem.addActionListener(Tile);
 		forrestTile_menuItem.setActionCommand(forrestTile);
 		mnBuild.add(forrestTile_menuItem);
+	}
+
+	private void createToolPanel() {
+		// toolPanel contains the entire left toolbar, including minimap.
+		toolPanel = new JPanel(new BorderLayout());
+		// Create a panel to hold the buttons using a grid 3 columns wide
+		// (rows get added automatically by Java as needed)
+		GridLayout buttonGridLayout = new GridLayout(0, 3);
+		buttonGridPanel = new JPanel();
+		buttonGridPanel.setLayout(buttonGridLayout);
+		toolPanel.setBounds(0, 0, FooCityGUIConstants.SIDEBAR_WIDTH,
+				FooCityGUIConstants.WINDOW_HEIGHT - 38);
+		minimap_panel = new MiniMapPanel(this, 2);
+		minimap_panel.repaint();
+
+		buttonResidential = new JToggleButton("Residential");
+		buttonResidential.addActionListener(Tile);
+		buttonResidential.setActionCommand(Integer
+				.toString(MapGridConstants.RESIDENTIAL_TILE));
+		buttonGridPanel.add(buttonResidential);
+
+		buttonCommercial = new JToggleButton("Commercial");
+		buttonCommercial.addActionListener(Tile);
+		buttonCommercial.setActionCommand(Integer
+				.toString(MapGridConstants.COMMERCIAL_TILE));
+		buttonGridPanel.add(buttonCommercial);
+
+		buttonIndustrial = new JToggleButton("Industrial");
+		buttonIndustrial.addActionListener(Tile);
+		buttonIndustrial.setActionCommand(Integer
+				.toString(MapGridConstants.INDUSTRIAL_TILE));
+		buttonGridPanel.add(buttonIndustrial);
+
+		buttonRoad = new JToggleButton("Road");
+		buttonRoad.addActionListener(Tile);
+		buttonRoad.setActionCommand(Integer
+				.toString(MapGridConstants.ROAD_TILE));
+		buttonGridPanel.add(buttonRoad);
+
+		buttonPark = new JToggleButton("Park");
+		buttonPark.addActionListener(Tile);
+		buttonPark.setActionCommand(Integer
+				.toString(MapGridConstants.PARK_TILE));
+		buttonGridPanel.add(buttonPark);
+
+		buttonSewage = new JToggleButton("Sewage");
+		buttonSewage.addActionListener(Tile);
+		buttonSewage.setActionCommand(Integer
+				.toString(MapGridConstants.SEWAGE_TILE));
+		buttonGridPanel.add(buttonSewage);
+
+		buttonPolice = new JToggleButton("Police");
+		buttonPolice.addActionListener(Tile);
+		buttonPolice.setActionCommand(Integer
+				.toString(MapGridConstants.POLICE_TILE));
+		buttonGridPanel.add(buttonPolice);
+
+		buttonSolar = new JToggleButton("Solar");
+		buttonSolar.addActionListener(Tile);
+		buttonSolar.setActionCommand(Integer
+				.toString(MapGridConstants.SOLAR_TILE));
+		buttonGridPanel.add(buttonSolar);
+
+		buttonGas = new JToggleButton("Gas");
+		buttonGas.addActionListener(Tile);
+		buttonGas.setActionCommand(Integer.toString(MapGridConstants.GAS_TILE));
+		buttonGridPanel.add(buttonGas);
+
+		buttonCoal = new JToggleButton("Coal");
+		buttonCoal.addActionListener(Tile);
+		buttonCoal.setActionCommand(Integer
+				.toString(MapGridConstants.COAL_TILE));
+		buttonGridPanel.add(buttonCoal);
+
+		buttonWindFarm = new JToggleButton("Wind");
+		buttonWindFarm.addActionListener(Tile);
+		buttonWindFarm.setActionCommand(Integer
+				.toString(MapGridConstants.WIND_TILE));
+		buttonGridPanel.add(buttonWindFarm);
+
+		buttonDirt = new JToggleButton("Dirt");
+		buttonDirt.addActionListener(Tile);
+		buttonDirt.setActionCommand(Integer
+				.toString(MapGridConstants.DIRT_TILE));
+		buttonGridPanel.add(buttonDirt);
+
+		/*
+		 * buttonWater = new JButton("Water");
+		 * buttonWater.addActionListener(Tile);
+		 * buttonWater.setActionCommand(waterTile);
+		 * buttonGridPanel.add(buttonWater);
+		 */
+
+		buttonGrass = new JToggleButton("Grass");
+		buttonGrass.addActionListener(Tile);
+		buttonGrass.setActionCommand(Integer
+				.toString(MapGridConstants.GRASS_TILE));
+		buttonGridPanel.add(buttonGrass);
+
+		buttonForrest = new JToggleButton("Forrest");
+		buttonForrest.addActionListener(Tile);
+		buttonForrest.setActionCommand(Integer
+				.toString(MapGridConstants.FORREST_TILE));
+		buttonGridPanel.add(buttonForrest);
+
+		buttonBulldoze = new JToggleButton("Bulldoze");
+		buttonBulldoze.addActionListener(Tile);
+		buttonBulldoze.setActionCommand(Integer.toString(MapGridConstants.BULLDOZE_TILE));
+		buttonGridPanel.add(buttonBulldoze);
+
+		/*
+		 * buttonBeach = new JButton("Beach");
+		 * buttonBeach.addActionListener(Tile);
+		 * buttonBeach.setActionCommand(beachTile);
+		 * buttonGridPanel.add(buttonBeach);
+		 */
 	}
 
 	@Override
