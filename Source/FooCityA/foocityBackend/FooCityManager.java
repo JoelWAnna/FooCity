@@ -131,8 +131,7 @@ public class FooCityManager {
 		long timeBegun = System.nanoTime();
 		if (current_map == null)
 			return FooCityManager.FLAG_MIDGAME;
-		// Advance the turn
-		this.turn++;
+
 		// Propagate the metrics
 		this.propagateMetrics();
 
@@ -193,7 +192,7 @@ public class FooCityManager {
 		// The formula in each case is basically:
 		// budget = budget * factor
 		// Where factor = Provided / Needed (capped to a value of 1)
-		// (Just make sure we're not going to divide by zero!)
+		// (Just make sure we're not going to divide by zero!) 
 
 		if (waterConsumed > 0) {
 			factor = (float) waterGenerated / waterConsumed;
@@ -223,13 +222,15 @@ public class FooCityManager {
 		cashFlow = (int) (income - expenses);
 		this.availableFunds += cashFlow;
 		this.findJobs();
-		Report report = new Report(waterConsumed, waterGenerated, powerConsumed, powerGenerated, jobs, residents, income, cashFlow,
+		Report report = new Report(waterConsumed, waterGenerated, powerConsumed, powerGenerated, jobs, residents, income, expenses,
 				this.availableFunds, cashFlow, turn);
-		reports.addFirst(report);
+		reports.addLast(report);
 
 		FooLogger.infoLog("advanceTurn took "
 				+ Long.toString((System.nanoTime() - timeBegun) / 1000000)
 				+ " ms\n");
+		// Advance the turn
+		this.turn++;
 		return checkWinLose();
 	}
 

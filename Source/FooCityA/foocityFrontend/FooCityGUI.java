@@ -302,8 +302,8 @@ public class FooCityGUI implements FooCityGUIInterface {
 	}
 
 	private void showEndOfTurnReport() {
-		ReportGUI reportGUI = new ReportGUI(this.frame);
-		reportGUI.showReport(city_manager.reports.getFirst());
+		ReportGUI reportGUI = new ReportGUI(this.frame, city_manager.reports, city_manager.getCurrentTurn());
+		reportGUI.showReport(city_manager.reports.getLast());
 	}
 
 	private void initializeMenuBar() {
@@ -337,29 +337,28 @@ public class FooCityGUI implements FooCityGUIInterface {
 				.toString(FooCityGUIConstants.QUIT));
 		file_menu.add(menuItem_Quit);
 
-		JMenu mnBuild = new JMenu("Build");
-		menuBar.add(mnBuild);
-
-		JMenuItem waterTile_menuItem = new JMenuItem("Place " + waterTile);
-		waterTile_menuItem.addActionListener(Tile);
-		waterTile_menuItem.setActionCommand(waterTile);
-		mnBuild.add(waterTile_menuItem);
-		JMenuItem beachTile_menuItem = new JMenuItem("Place " + beachTile);
-		beachTile_menuItem.addActionListener(Tile);
-		beachTile_menuItem.setActionCommand(beachTile);
-		mnBuild.add(beachTile_menuItem);
-		JMenuItem grassTile_menuItem = new JMenuItem("Place " + grassTile);
-		grassTile_menuItem.addActionListener(Tile);
-		grassTile_menuItem.setActionCommand(grassTile);
-		mnBuild.add(grassTile_menuItem);
-		JMenuItem dirtTile_menuItem = new JMenuItem("Place " + dirtTile);
-		dirtTile_menuItem.addActionListener(Tile);
-		dirtTile_menuItem.setActionCommand(dirtTile);
-		mnBuild.add(dirtTile_menuItem);
-		JMenuItem forrestTile_menuItem = new JMenuItem("Place " + forrestTile);
-		forrestTile_menuItem.addActionListener(Tile);
-		forrestTile_menuItem.setActionCommand(forrestTile);
-		mnBuild.add(forrestTile_menuItem);
+		JMenu mnReports = new JMenu("Reports");
+		menuBar.add(mnReports);
+		
+		JMenuItem menuItem_ShowLastReport = new JMenuItem("Show last report");
+		menuItem_ShowLastReport.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				showEndOfTurnReport();
+			}
+			
+		});
+		mnReports.add(menuItem_ShowLastReport);
+		
+		JMenuItem menuItem_ShowGraph = new JMenuItem("View graphs");
+		menuItem_ShowGraph.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				new GraphGUI(frame, city_manager.reports, city_manager.getCurrentTurn());
+			}
+			
+		});
+		mnReports.add(menuItem_ShowGraph);
 	}
 
 	private void createToolPanel() {

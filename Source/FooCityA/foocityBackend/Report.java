@@ -14,7 +14,7 @@ public class Report {
 	private int expenses;
 	private int turn;
 	
-	public Report(int waterC, int waterG, int powerC, int powerG, int j, int r, int i, int cf, int af, int exp, int t){
+	public Report(int waterC, int waterG, int powerC, int powerG, int j, int r, int i, int exp, int af, int cf, int t){
 		this.waterConsumed = waterC;
 		this.waterGenerated = waterG;
 		this.powerGenerated = powerG;
@@ -22,9 +22,9 @@ public class Report {
 		this.jobs = j;
 		this.residents = r;
 		this.income = i;
-		this.cashFlow = cf;
-		this.availableFunds = af;
 		this.expenses = exp;
+		this.availableFunds = af;
+		this.cashFlow = cf;
 		this.turn = t;
 	}
 	
@@ -62,6 +62,50 @@ public class Report {
 		sb.append("$" + Integer.toString(availableFunds) + "\n");
 
 		return sb.toString();
+	}
+	
+	public int getTurn(){
+		return turn;
+	}
+
+	public int getWaterConsumed() {
+		return waterConsumed;
+	}
+
+	public int getWaterGenerated() {
+		return waterGenerated;
+	}
+
+	public int getPowerConsumed() {
+		return powerConsumed;
+	}
+
+	public int getPowerGenerated() {
+		return powerGenerated;
+	}
+
+	public int getJobs() {
+		return jobs;
+	}
+
+	public int getResidents() {
+		return residents;
+	}
+
+	public int getIncome() {
+		return income;
+	}
+
+	public int getCashFlow() {
+		return cashFlow;
+	}
+
+	public int getAvailableFunds() {
+		return availableFunds;
+	}
+
+	public int getExpenses() {
+		return expenses;
 	}
 	
 }
