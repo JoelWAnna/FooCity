@@ -57,7 +57,7 @@ public class MainMenu extends JPanel implements ActionListener {
 		BufferedImage i = null;
 		if (i == null) {
 			try {
-				i = ImageIO.read(new File("./images/MainMenu.png"));
+				i = ImageIO.read(ClassLoader.getSystemResource("./images/MainMenu.png"));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

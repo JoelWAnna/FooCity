@@ -5,10 +5,10 @@
     <target name="create_run_jar">
         <jar destfile="FooCityGroup2.jar" filesetmanifest="mergewithoutmain">
             <manifest>
-                <attribute name="Main-Class" value="MainMenu"/>
+                <attribute name="Main-Class" value="foocityFrontend.MainMenu"/>
                 <attribute name="Class-Path" value="."/>
             </manifest>
-            <fileset dir="D:/Documents/Desktop/wi2012cs300-group2/Source/FooCityA/bin"/>
+            <fileset dir="./bin"/>
         </jar>
     </target>
 </project>

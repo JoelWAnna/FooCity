@@ -25,22 +25,14 @@ class TileLoader {
 		tiles = new BufferedImage[MapGridConstants.LAST_TILE];
 		m_valid = true;
 
-		TileSet = "images/" + "SolidColors/";
+		TileSet = "images/" + "default/";
 		for (int i = 0; i < MapGridConstants.LAST_TILE; ++i) {
+			String resource_name = TileSet + tileNames[i] + ".png";
 			try {
-				tiles[i] = ImageIO.read(new File(TileSet + tileNames[i]
-						+ ".png"));
-			} catch (Exception e) {
-				System.out.println(TileSet + tileNames[i] + ".png");
-				// m_valid = false;
+				tiles[i] = ImageIO.read(ClassLoader.getSystemResource(resource_name));
+			} catch (IOException e) {
+				System.out.println("Error resource '"+resource_name+"' not found");
 			}
-		}
-
-		try {
-			road = ImageIO.read(new File("images/road.png"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 
 		m_valid = true;
@@ -50,8 +42,6 @@ class TileLoader {
 		switch (i) {
 			case MapGridConstants.BULLDOZE_TILE:
 				return tiles[0];
-			case MapGridConstants.ROAD_TILE :
-				return road;
 			default :
 				if (!m_valid && (i < 0 || i > tiles.length))
 					return null;
