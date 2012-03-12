@@ -125,6 +125,8 @@ public class FooCityManager {
 	}
 
 	private int checkWinLose() {
+		if (this.availableFunds < 0 && this.cashFlow < 0)
+				return FooCityManager.FLAG_LOSE;
 		return FooCityManager.FLAG_MIDGAME;
 	}
 	public int advanceTurn() {

@@ -29,6 +29,7 @@ class CityViewport extends JPanel {
 	private Point selected_tile;
 	private Dimension map_area;
 	private Dimension preferred_size;
+	private boolean showgrid;
 
 	public CityViewport(FooCityGUIInterface i) {
 		super();
@@ -134,11 +135,11 @@ class CityViewport extends JPanel {
 				if (bI != null)
 					g.drawImage(bI, xCoord, yCoord, null);
 
-				g.drawLine(xCoord, yCoord, xCoord, yCoord
-						+ FooCityGUIConstants.TILE_HEIGHT);
+				if (showgrid)
+					g.drawLine(xCoord, yCoord, xCoord, yCoord + FooCityGUIConstants.TILE_HEIGHT);
 			}
-			g.drawLine(r.x, yCoord, r.x + (int) map_area.getWidth()
-					* FooCityGUIConstants.TILE_WIDTH, yCoord);
+			if (showgrid)
+				g.drawLine(r.x, yCoord, r.x + (int) map_area.getWidth()	* FooCityGUIConstants.TILE_WIDTH, yCoord);
 
 			if (selected_tile != null) {
 				g.setColor(Color.WHITE);
@@ -180,6 +181,9 @@ class CityViewport extends JPanel {
 		repaint();
 	}
 
+	public void enableGrid(boolean enable) {
+		this.showgrid = enable;
+	}
 }
 
 class MiniMapPanel extends JPanel {

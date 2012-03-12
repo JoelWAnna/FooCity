@@ -6,7 +6,6 @@ package foocityFrontend;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -25,15 +24,14 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.Scanner;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -82,30 +80,16 @@ public class FooCityGUI implements FooCityGUIInterface {
 	private SelectedTilePanel selected_tile_panel;
 	private JTextArea selectedDescription;
 	private JLabel selectedCost;
+	private JLabel currentTurn;
+	private JPanel buttonGridPanel;
 
 	private JButton nextTurn;
 	private JToggleButton buttonResidential, buttonCommercial,
 			buttonIndustrial, buttonPark, buttonSewage, buttonPolice,
 			buttonSolar, buttonRoad, buttonGas, buttonCoal, buttonWindFarm,
 			buttonDirt, buttonForrest, buttonGrass, buttonBulldoze;
-	// buttonWater, buttonBeach;
+			// buttonWater, buttonBeach;
 
-	private final String waterTile = "Water Tile";
-	private final String beachTile = "Beach Tile";
-	private final String grassTile = "Grass Tile";
-	private final String dirtTile = "Dirt Tile";
-	private final String forrestTile = "Forrest Tile";
-	private JLabel selectedTileText;
-	/*
-	 * private final String residentialTile = "Residential Tile"; private final
-	 * String commercialTile = "Commercial Tile"; private final String
-	 * industrialTile = "Industrial Tile"; private final String parkTile =
-	 * "Park Tile"; private final String sewageTile = "Sewage Tile"; private
-	 * final String policeTile = "Police Tile"; private final String solarTile =
-	 * "Solar Tile"; private final String gasTile = "Gas Tile"; private final
-	 * String coalTile = "Coal Tile"; private final String windTile =
-	 * "Wind Tile"; private final String roadTile = "Road Tile";
-	 */
 	/**
 	 * Launch the application.
 	 */
@@ -115,20 +99,19 @@ public class FooCityGUI implements FooCityGUIInterface {
 	 * (Exception e) { e.printStackTrace(); } } }); }
 	 */
 
-	private JLabel currentTurn;
-	private JPanel buttonGridPanel;
 
 	/**
 	 * Create the application.
 	 */
 	public FooCityGUI() {
-		city_manager = new FooCityManager();
-		initialize();
+		this(new FooCityManager());
 	}
 
 	public FooCityGUI(FooCityManager city_manager2) {
 		city_manager = city_manager2;
 		initialize();
+		if (!city_manager.MapGridLoaded())
+			enableButtons(false);
 	}
 
 	@Override
@@ -157,6 +140,7 @@ public class FooCityGUI implements FooCityGUIInterface {
 		this.currentTurn.setText("Current Turn: "
 				+ Integer.toString(city_manager.getCurrentTurn()));
 		updateTileDescription(city_manager.getPlacingTile());
+		enableButtons(city_manager.MapGridLoaded());
 	}
 
 	private void updateTileDescription(int tileType) {
@@ -180,6 +164,7 @@ public class FooCityGUI implements FooCityGUIInterface {
 	public void updateSelectedTile(Point p) {
 		selected_tile_panel.updateSelectedTile(p.x, p.y);
 	}
+
 	/**
 	 * Initialize the contents of the frame.
 	 */
@@ -267,16 +252,19 @@ public class FooCityGUI implements FooCityGUIInterface {
 				case FooCityManager.FLAG_WIN:
 					break;
 				case FooCityManager.FLAG_LOSE:
+					JOptionPane.showMessageDialog(frame, "Sorry you lose");
+					city_manager.Quit();
 					break;
 				case FooCityManager.FLAG_MIDGAME:
+					showEndOfTurnReport();
 					break;
 				}
-				showEndOfTurnReport();
 				updateDisplay();
 			}
 
 		});
-		bottomBox.add(selected_tile_panel);
+
+		box.add(selected_tile_panel);
 		
 		Box buttonBox = Box.createHorizontalBox();
 		buttonBox.add(nextTurn);
@@ -286,9 +274,9 @@ public class FooCityGUI implements FooCityGUIInterface {
 		statusBox.add(currentTurn);
 		buttonBox.add(statusBox);
 		bottomBox.add(buttonBox);
-
+		box.add(bottomBox);
 		toolPanel.add(box, BorderLayout.PAGE_START);
-		toolPanel.add(bottomBox, BorderLayout.PAGE_END);
+		
 
 		frame.getContentPane().add(toolPanel);
 		frame.getContentPane().add(scrollPane);
@@ -336,7 +324,22 @@ public class FooCityGUI implements FooCityGUIInterface {
 		menuItem_Quit.setActionCommand(Integer
 				.toString(FooCityGUIConstants.QUIT));
 		file_menu.add(menuItem_Quit);
+		JMenu View = new JMenu("View");
+		menuBar.add(View);
+		JCheckBoxMenuItem gridLines = new JCheckBoxMenuItem("Show MapGrid");
+		
+		gridLines.addActionListener( new ActionListener() {
 
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				boolean selected = ((JCheckBoxMenuItem) e.getSource()).isSelected();
+				((JCheckBoxMenuItem)e.getSource()).setSelected(selected);
+				map_panel.enableGrid(selected);
+				updateDisplay();
+			}
+			
+		});
+		View.add(gridLines);
 		JMenu mnReports = new JMenu("Reports");
 		menuBar.add(mnReports);
 		
@@ -626,21 +629,7 @@ public class FooCityGUI implements FooCityGUIInterface {
 		public void actionPerformed(ActionEvent e) {
 			JToggleButton buttonPressed = (JToggleButton) e.getSource();
 			boolean selected = buttonPressed.isSelected();
-			buttonResidential.setSelected(false);
-			buttonCommercial.setSelected(false);
-			buttonIndustrial.setSelected(false);
-			buttonPark.setSelected(false);
-			buttonSewage.setSelected(false);
-			buttonPolice.setSelected(false);
-			buttonSolar.setSelected(false);
-			buttonRoad.setSelected(false);
-			buttonGas.setSelected(false);
-			buttonCoal.setSelected(false);
-			buttonWindFarm.setSelected(false);
-			buttonDirt.setSelected(false);
-			buttonForrest.setSelected(false);
-			buttonGrass.setSelected(false);
-			buttonBulldoze.setSelected(false);
+			deselectButtons();
 			buttonPressed.setSelected(selected);
 			scrollPane.grabFocus();
 			int placingTile = Integer.parseInt(e.getActionCommand());
@@ -651,6 +640,49 @@ public class FooCityGUI implements FooCityGUIInterface {
 			updateTileDescription(placingTile);
 			return;
 		}
+	}
+
+	private void enableButtons(boolean enable)
+	{
+		if (buttonResidential.isEnabled() != enable)
+		{
+			buttonResidential.setEnabled(enable);
+			buttonCommercial.setEnabled(enable);
+			buttonIndustrial.setEnabled(enable);
+			buttonPark.setEnabled(enable);
+			buttonSewage.setEnabled(enable);
+			buttonPolice.setEnabled(enable);
+			buttonSolar.setEnabled(enable);
+			buttonRoad.setEnabled(enable);
+			buttonGas.setEnabled(enable);
+			buttonCoal.setEnabled(enable);
+			buttonWindFarm.setEnabled(enable);
+			buttonDirt.setEnabled(enable);
+			buttonForrest.setEnabled(enable);
+			buttonGrass.setEnabled(enable);
+			buttonBulldoze.setEnabled(enable);
+			nextTurn.setEnabled(enable);
+			if (!enable)
+				deselectButtons();
+		}
+	}
+
+	private void deselectButtons() {
+		buttonResidential.setSelected(false);
+		buttonCommercial.setSelected(false);
+		buttonIndustrial.setSelected(false);
+		buttonPark.setSelected(false);
+		buttonSewage.setSelected(false);
+		buttonPolice.setSelected(false);
+		buttonSolar.setSelected(false);
+		buttonRoad.setSelected(false);
+		buttonGas.setSelected(false);
+		buttonCoal.setSelected(false);
+		buttonWindFarm.setSelected(false);
+		buttonDirt.setSelected(false);
+		buttonForrest.setSelected(false);
+		buttonGrass.setSelected(false);
+		buttonBulldoze.setSelected(false);
 	}
 
 	private class keyDispatcher extends KeyAdapter {
