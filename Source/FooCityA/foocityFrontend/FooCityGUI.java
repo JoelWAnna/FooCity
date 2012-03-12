@@ -777,6 +777,11 @@ public class FooCityGUI implements FooCityGUIInterface {
 	}
 
 	private void showEndOfTurnReport() {
+		if (city_manager.getCurrentTurn() == 0){
+			JOptionPane.showMessageDialog(frame, "End of turn reports cannot be shown on the first turn");
+			return;
+		}
+
 		ReportGUI reportGUI = new ReportGUI(this.frame, city_manager.reports,
 				city_manager.getCurrentTurn());
 		reportGUI.showReport(city_manager.reports.getLast());
