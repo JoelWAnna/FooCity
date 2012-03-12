@@ -3,7 +3,8 @@ package foocityBackend;
 class Tile {
 	public int metricsActual[];
 	public boolean employed;
-	public int variation;
+	private int variation;
+
 	private char tileChar;
 	protected int tileInt;
 	protected boolean replaceable;
@@ -35,6 +36,16 @@ class Tile {
 		metricsActual[MapGridConstants.METRIC_CRIME] = 0;
 		metricsActual[MapGridConstants.METRIC_HAPPINESS] = 0;
 	}
+	
+	private static boolean hasPermanentVariations(int tileType) {
+		return tileType != MapGridConstants.ROAD_TILE;
+	}
+
+	private static boolean isNaturalTile(int tileType) {
+		if (tileType >= MapGridConstants.WATER_TILE && tileType <= MapGridConstants.FORREST_TILE)
+			return true;
+		return false;
+	}
 
 	private void setValues() {
 		replaceable = true;
@@ -52,6 +63,11 @@ class Tile {
 				replaceable = false;
 				break;
 		}
+		
+		if (isNaturalTile(tileInt) || tileInt == MapGridConstants.RESIDENTIAL_TILE) {
+			has_variations = true;
+			variation = ((int)(Math.random()*16));
+		}
 	}
 
 	public boolean isReplaceable() {
@@ -68,6 +84,15 @@ class Tile {
 
 	public boolean hasVariations() {
 		return has_variations;
+	}
+	
+	public void setVariation(int variation) {
+		if (!hasPermanentVariations(tileInt))
+			this.variation = variation;
+	}
+
+	public int getVariation() {
+		return this.variation;
 	}
 
 }

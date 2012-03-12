@@ -177,6 +177,7 @@ class MapGrid {
 		}
 
 	}
+
 	private void setVariation(int x, int y) {
 		// First, make sure the coordinates are valid
 		if (((x < 0 || x >= MapGridConstants.MAP_WIDTH) || (y < 0 || y >= MapGridConstants.MAP_HEIGHT)))
@@ -203,8 +204,9 @@ class MapGrid {
 
 		}
 
-		this.tileGrid[x][y].variation = variation;
+		this.tileGrid[x][y].setVariation(variation);
 	}
+
 	public int[][] getResidentialMatrix() {
 		int[][] matrix = new int[this.map_area.width][this.map_area.height];
 		for (int y = 0; y < this.map_area.height; ++y)

@@ -1,8 +1,8 @@
 package foocityFrontend;
 
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
-import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 
@@ -12,7 +12,6 @@ import javax.swing.JPanel;
 
 import foocityBackend.MapGridConstants;
 import foocityBackend.TileMetrics;
-import java.awt.FlowLayout;
 
 
 class SelectedTilePanel extends JPanel {
@@ -27,7 +26,6 @@ class SelectedTilePanel extends JPanel {
 	private JLabel tile_power;
 	private JLabel tile_water;
 	private JPanel graphicPanel;
-	private JLabel label;
 	SelectedTilePanel(FooCityGUIInterface i) {
 		super();
 		if (i != null)
@@ -50,7 +48,8 @@ class SelectedTilePanel extends JPanel {
 				if (selectedTile != null)
 				{
 					int tileType = _interface.getCityManager().getTileInt(selectedTile.x, selectedTile.y);
-					tile = t.getTile(tileType).getSubimage(0, 0, FooCityGUIConstants.TILE_WIDTH, FooCityGUIConstants.TILE_HEIGHT);
+					int variation = _interface.getCityManager().getTileVariation(selectedTile.x, selectedTile.y);
+					tile = t.getTile(tileType).getSubimage(variation*FooCityGUIConstants.TILE_WIDTH, 0, FooCityGUIConstants.TILE_WIDTH, FooCityGUIConstants.TILE_HEIGHT);
 
 				}
 				

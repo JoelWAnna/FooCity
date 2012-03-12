@@ -64,7 +64,7 @@ public class FooCityManager {
 		if (current_map != null) {
 			Tile currentTile = current_map.getTile(x, y);
 			if (currentTile != null) {
-				return currentTile.variation;
+				return currentTile.getVariation();
 			}
 		}
 		return 0;
@@ -106,6 +106,7 @@ public class FooCityManager {
 		job_manager = null;
 		turn = 0;
 		availableFunds = 0;
+		tile_to_place = MapGridConstants.NO_TILE;
 		reports.clear();
 	}
 
