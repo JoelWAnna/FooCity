@@ -33,6 +33,9 @@ class TileLoader {
 			} catch (IOException e) {
 				System.out.println("Error resource '"+resource_name+"' not found");
 			}
+			catch (IllegalArgumentException e) {
+				System.out.println("Error resource '"+resource_name+"' not found");
+			}
 		}
 
 		m_valid = true;

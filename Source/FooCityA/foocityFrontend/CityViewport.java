@@ -85,6 +85,11 @@ class CityViewport extends JPanel {
 		if (city_manager == null)
 			return;
 
+		if (!city_manager.MapGridLoaded()) {
+			selected_tile = null;
+			return;
+		}
+
 		map_area = city_manager.getMapArea();
 		if (map_area == null)
 			return;
@@ -92,8 +97,6 @@ class CityViewport extends JPanel {
 				* FooCityGUIConstants.TILE_WIDTH, (int) map_area.getHeight()
 				* FooCityGUIConstants.TILE_HEIGHT);
 
-		if (!city_manager.MapGridLoaded())
-			return;
 		Rectangle r = this.getVisibleRect();
 		g.clearRect(r.x, r.y, r.width, r.height);
 
