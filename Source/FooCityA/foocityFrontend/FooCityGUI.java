@@ -57,12 +57,12 @@ class FooCityGUIConstants {
 	public static final int WINDOW_HEIGHT = 700;
 	public static final int WINDOW_WIDTH = 800;
 	public static final int SIDEBAR_WIDTH = 257;
+	public static final int STATUSBAR_HEIGHT = 36;
 
 	public static final int NEW_GAME = 0;
 	public static final int SAVE_GAME = 1;
 	public static final int LOAD_GAME = 2;
 	public static final int QUIT = 3;
-	public static final int STATUSBAR_HEIGHT = 36;
 }
 
 public class FooCityGUI implements FooCityGUIInterface {
@@ -72,29 +72,34 @@ public class FooCityGUI implements FooCityGUIInterface {
 
 	private JMenuBar menuBar;
 
-	private JPanel side_panel;
+	// Items for the tool panel
+	private JPanel tool_panel;
 	private JPanel button_grid_panel;
+	private JToggleButton buttonResidential, buttonCommercial,
+			buttonIndustrial, buttonPark, buttonSewage, buttonPolice,
+			buttonSolar, buttonRoad, buttonGas, buttonCoal, buttonWindFarm,
+			buttonDirt, buttonForrest, buttonGrass, buttonBulldoze;
+			// buttonWater, buttonBeach;
 	private JLabel placing_tile_cost;
 	private JTextArea placing_tile_description;
+	private JComboBox miniMapViewList;
 	private MiniMapPanel minimap_panel;
 
 	private JButton nextTurn;
 	private JLabel currentTurn;
 	private JLabel currentFunds;
-
-	private FooCityScrollPane scrollPane;
+	// End items for the tool panel
+	
+	// Main Map area
+	private FooCityScrollPane scroll_pane;
 	private CityViewport map_panel;
 
+	// status bar
 	private SelectedTilePanel selected_tile_panel;
-
-	private JToggleButton buttonResidential, buttonCommercial,
-			buttonIndustrial, buttonPark, buttonSewage, buttonPolice,
-			buttonSolar, buttonRoad, buttonGas, buttonCoal, buttonWindFarm,
-			buttonDirt, buttonForrest, buttonGrass, buttonBulldoze;
-	// buttonWater, buttonBeach;
 
 	private final Action MainMenu = new MainMenuAction();
 	private final Action Tile = new PlaceTileAction();
+
 	private FooCityManager city_manager;
 
 	/**
@@ -106,11 +111,11 @@ public class FooCityGUI implements FooCityGUIInterface {
 	 * (Exception e) { e.printStackTrace(); } } }); }
 	 */
 
-
 	/**
 	 * Create the application.
+	 * 
 	 * @wbp.parser.constructor
-	 */	
+	 */
 	public FooCityGUI() {
 		this(new FooCityManager());
 	}
@@ -125,9 +130,9 @@ public class FooCityGUI implements FooCityGUIInterface {
 	@Override
 	public void updateDisplayCenter(Point center) {
 		Rectangle rect = getViewRect();
-		scrollPane.getHorizontalScrollBar().setValue(
+		scroll_pane.getHorizontalScrollBar().setValue(
 				center.x * FooCityGUIConstants.TILE_HEIGHT - (rect.width / 2));
-		scrollPane.getVerticalScrollBar().setValue(
+		scroll_pane.getVerticalScrollBar().setValue(
 				center.y * FooCityGUIConstants.TILE_WIDTH - (rect.height / 2));
 		updateDisplay();
 	}
@@ -135,7 +140,7 @@ public class FooCityGUI implements FooCityGUIInterface {
 	@Override
 	public void updateDisplay(Point NEpoint) {
 
-		scrollPane.getViewport().setViewPosition(NEpoint);
+		scroll_pane.getViewport().setViewPosition(NEpoint);
 		updateDisplay();
 	}
 
@@ -148,7 +153,7 @@ public class FooCityGUI implements FooCityGUIInterface {
 		this.currentTurn.setText("Current Turn: "
 				+ Integer.toString(city_manager.getCurrentTurn()));
 		updateTileDescription(city_manager.getPlacingTile());
-		
+
 		enableButtons(city_manager.MapGridLoaded());
 		if (!city_manager.MapGridLoaded())
 			selected_tile_panel.clearSelectedTile();
@@ -189,131 +194,23 @@ public class FooCityGUI implements FooCityGUIInterface {
 		frame.setTitle("FooCity V0.1");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(null);
-
-		map_panel = new CityViewport(this);
-		scrollPane = new FooCityScrollPane(map_panel, this);
-		scrollPane.setBounds(0, 0, 0, 0);
-		createToolPanel();
-	
-		String[] viewModes = {"Normal", "Pollution", "Crime", "Happiness"};
-		JComboBox miniMapViewList = new JComboBox(viewModes);
-		miniMapViewList.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Object source = e.getSource();
-				// check type, uses <?> instead of String because we are only
-				// interested in
-				// the index and eliminates the warning of an unchecked
-				// conversion
-				if (source instanceof JComboBox) {
-					JComboBox cb = (JComboBox) source;
-					minimap_panel.setViewMode(cb.getSelectedIndex());
-					scrollPane.grabFocus();
-				}
-			}
-
-		});
-		miniMapViewList.setSelectedIndex(0);
-
-		placing_tile_cost = new JLabel(" ");
-		placing_tile_cost.setHorizontalAlignment(JLabel.LEFT);
-		placing_tile_cost.setVerticalAlignment(JLabel.TOP);
-		placing_tile_cost.setMaximumSize(new Dimension(256, 15));
-		placing_tile_cost.setAlignmentX(Component.CENTER_ALIGNMENT);
-		placing_tile_cost.setFont(new Font("Dialog", 1, 16));
-
-		placing_tile_description = new JTextArea(" ");
-		placing_tile_description.setMaximumSize(new Dimension(256, 80));
-		placing_tile_description.setPreferredSize(new Dimension(256, 80));
-		placing_tile_description.setAlignmentX(Component.CENTER_ALIGNMENT);
-		placing_tile_description.setBorder(BorderFactory.createEtchedBorder());
-		placing_tile_description.setEditable(false);
-		placing_tile_description.setCursor(null);
-		placing_tile_description.setOpaque(false);
-		placing_tile_description.setFocusable(false);
-		placing_tile_description.setLineWrap(true);
-		placing_tile_description.setWrapStyleWord(true);
-
-		Box side_panel_north = Box.createVerticalBox();
-		// side_panel.add(Box.createHorizontalGlue());
-		side_panel_north.add(button_grid_panel);
-		// side_panel.add(Box.createHorizontalGlue());
-		side_panel_north.add(placing_tile_cost);
-		// side_panel.add(Box.createHorizontalGlue());
-		side_panel_north.add(placing_tile_description);
-		// side_panel.add(Box.createHorizontalGlue());
-		side_panel_north.add(miniMapViewList);
-		side_panel_north.add(minimap_panel);
-
 		
 
-		
-		currentFunds = new JLabel("Current Funds: "
-				+ city_manager.getAvailableFunds());
-		currentTurn = new JLabel("Current Turn: "
-				+ city_manager.getCurrentTurn());
-
-
-		nextTurn = new JButton("Next Turn");
-		nextTurn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				advanceTurn();
-			}
-		});
-
-		Box statusBox = Box.createVerticalBox();
-		statusBox.add(currentFunds);
-		statusBox.add(currentTurn);
-
-		JPanel advance_turn_panel = new JPanel();
-		advance_turn_panel.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 0));	
-		advance_turn_panel.add(nextTurn);
-		advance_turn_panel.add(statusBox);
-		
-		JPanel side_panel_south = new JPanel();
-		side_panel_south.setBorder(new TitledBorder(""));
-		side_panel_south.add(advance_turn_panel);
-
-		side_panel.add(side_panel_south, BorderLayout.SOUTH);
-		side_panel.add(side_panel_north, BorderLayout.NORTH);
-		
-		frame.getContentPane().add(side_panel);
-		frame.getContentPane().add(scrollPane);
-
-		selected_tile_panel = new SelectedTilePanel(this);	
-		selected_tile_panel.setBounds(0, 0, 0, 0);
-		frame.getContentPane().add(selected_tile_panel);
-		//ResizePanes();
-		scrollPane.grabFocus();
 		initializeMenuBar();
+		initializeToolPanel();
+		map_panel = new CityViewport(this);
+		scroll_pane = new FooCityScrollPane(map_panel, this);
+		selected_tile_panel = new SelectedTilePanel(this);
+
+		frame.getContentPane().add(tool_panel);
+		frame.getContentPane().add(scroll_pane);
+		frame.getContentPane().add(selected_tile_panel);
+		// ResizePanes();
+		scroll_pane.grabFocus();
 
 		AddKeyListeners();
 		city_manager.propagateMetrics();
 
-	}
-
-	protected void advanceTurn() {
-		switch (city_manager.advanceTurn())
-		{
-		case FooCityManager.FLAG_WIN:
-			break;
-		case FooCityManager.FLAG_LOSE:
-			JOptionPane.showMessageDialog(frame, "Sorry you lose");
-			city_manager.Quit();
-			break;
-		case FooCityManager.FLAG_MIDGAME:
-			showEndOfTurnReport();
-			break;
-		}
-		updateDisplay();
-		
-	}
-
-	private void showEndOfTurnReport() {
-		ReportGUI reportGUI = new ReportGUI(this.frame, city_manager.reports, city_manager.getCurrentTurn());
-		reportGUI.showReport(city_manager.reports.getLast());
 	}
 
 	private void initializeMenuBar() {
@@ -349,54 +246,102 @@ public class FooCityGUI implements FooCityGUIInterface {
 		JMenu View = new JMenu("View");
 		menuBar.add(View);
 		JCheckBoxMenuItem gridLines = new JCheckBoxMenuItem("Show MapGrid");
-		
-		gridLines.addActionListener( new ActionListener() {
+
+		gridLines.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				boolean selected = ((JCheckBoxMenuItem) e.getSource()).isSelected();
-				((JCheckBoxMenuItem)e.getSource()).setSelected(selected);
+				boolean selected = ((JCheckBoxMenuItem) e.getSource())
+						.isSelected();
+				((JCheckBoxMenuItem) e.getSource()).setSelected(selected);
 				map_panel.enableGrid(selected);
 				updateDisplay();
 			}
-			
+
 		});
 		View.add(gridLines);
 		JMenu mnReports = new JMenu("Reports");
 		menuBar.add(mnReports);
-		
+
 		JMenuItem menuItem_ShowLastReport = new JMenuItem("Show last report");
-		menuItem_ShowLastReport.addActionListener(new ActionListener(){
+		menuItem_ShowLastReport.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				showEndOfTurnReport();
 			}
-			
+
 		});
 		mnReports.add(menuItem_ShowLastReport);
-		
+
 		JMenuItem menuItem_ShowGraph = new JMenuItem("View graphs");
-		menuItem_ShowGraph.addActionListener(new ActionListener(){
+		menuItem_ShowGraph.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				new GraphGUI(frame, city_manager.reports, city_manager.getCurrentTurn());
+				new GraphGUI(frame, city_manager.reports, city_manager
+						.getCurrentTurn());
 			}
-			
+
 		});
 		mnReports.add(menuItem_ShowGraph);
 	}
 
-	private void createToolPanel() {
+	private void initializeToolPanel() {
 		// toolPanel contains the entire left toolbar, including minimap.
-		side_panel = new JPanel(new BorderLayout());
-		side_panel.setBounds(0, 0, 257, 630);
+		tool_panel = new JPanel(new BorderLayout());
+		createTileButtons();
+		createPlacingTileDescription();
+		createMiniMap();
+
+		Box side_panel_north = Box.createVerticalBox();
+		// side_panel.add(Box.createHorizontalGlue());
+		side_panel_north.add(button_grid_panel);
+		// side_panel.add(Box.createHorizontalGlue());
+		side_panel_north.add(placing_tile_cost);
+		// side_panel.add(Box.createHorizontalGlue());
+		side_panel_north.add(placing_tile_description);
+		// side_panel.add(Box.createHorizontalGlue());
+		side_panel_north.add(miniMapViewList);
+		side_panel_north.add(minimap_panel);
+
+		currentFunds = new JLabel("Current Funds: "
+				+ city_manager.getAvailableFunds());
+		currentTurn = new JLabel("Current Turn: "
+				+ city_manager.getCurrentTurn());
+
+		nextTurn = new JButton("Next Turn");
+		nextTurn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				advanceTurn();
+			}
+		});
+
+		Box statusBox = Box.createVerticalBox();
+		statusBox.add(currentFunds);
+		statusBox.add(currentTurn);
+
+		JPanel advance_turn_panel = new JPanel();
+		advance_turn_panel.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 0));
+		advance_turn_panel.add(nextTurn);
+		advance_turn_panel.add(statusBox);
+
+		JPanel side_panel_south = new JPanel();
+		side_panel_south.setBorder(new TitledBorder(""));
+		side_panel_south.add(advance_turn_panel);
+
+		// add in this order to have the z order correct for next turn always being on top of the minimap panel
+		tool_panel.add(side_panel_south, BorderLayout.SOUTH);
+		tool_panel.add(side_panel_north, BorderLayout.NORTH);
+		
+	}
+
+	private void createTileButtons() {
+		
 		// Create a panel to hold the buttons using a grid 3 columns wide
 		// (rows get added automatically by Java as needed)
 		GridLayout buttonGridLayout = new GridLayout(0, 3);
 		button_grid_panel = new JPanel();
 		button_grid_panel.setLayout(buttonGridLayout);
-		minimap_panel = new MiniMapPanel(this, 2);
-		minimap_panel.repaint();
 
 		buttonResidential = new JToggleButton("Residential");
 		buttonResidential.addActionListener(Tile);
@@ -490,7 +435,8 @@ public class FooCityGUI implements FooCityGUIInterface {
 
 		buttonBulldoze = new JToggleButton("Bulldoze");
 		buttonBulldoze.addActionListener(Tile);
-		buttonBulldoze.setActionCommand(Integer.toString(MapGridConstants.BULLDOZE_TILE));
+		buttonBulldoze.setActionCommand(Integer
+				.toString(MapGridConstants.BULLDOZE_TILE));
 		button_grid_panel.add(buttonBulldoze);
 
 		/*
@@ -501,6 +447,55 @@ public class FooCityGUI implements FooCityGUIInterface {
 		 */
 	}
 
+	private void createPlacingTileDescription() {
+		placing_tile_cost = new JLabel(" ");
+		placing_tile_cost.setHorizontalAlignment(JLabel.LEFT);
+		placing_tile_cost.setVerticalAlignment(JLabel.TOP);
+		placing_tile_cost.setMaximumSize(new Dimension(256, 15));
+		placing_tile_cost.setAlignmentX(Component.CENTER_ALIGNMENT);
+		placing_tile_cost.setFont(new Font("Dialog", 1, 16));
+
+		placing_tile_description = new JTextArea(" ");
+		placing_tile_description.setMaximumSize(new Dimension(256, 80));
+		placing_tile_description.setPreferredSize(new Dimension(256, 80));
+		placing_tile_description.setAlignmentX(Component.CENTER_ALIGNMENT);
+		placing_tile_description.setBorder(BorderFactory.createEtchedBorder());
+		placing_tile_description.setEditable(false);
+		placing_tile_description.setCursor(null);
+		placing_tile_description.setOpaque(false);
+		placing_tile_description.setFocusable(false);
+		placing_tile_description.setLineWrap(true);
+		placing_tile_description.setWrapStyleWord(true);
+	}
+
+	private void createMiniMap() {
+		minimap_panel = new MiniMapPanel(this, 2);
+		minimap_panel.repaint();
+
+		String[] viewModes = { "Normal", "Pollution", "Crime", "Happiness" };
+		miniMapViewList = new JComboBox(viewModes);
+		miniMapViewList.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Object source = e.getSource();
+				// check type, uses <?> instead of String because we are only
+				// interested in
+				// the index and eliminates the warning of an unchecked
+				// conversion
+				if (source instanceof JComboBox) {
+					JComboBox cb = (JComboBox) source;
+					if (minimap_panel != null)
+					minimap_panel.setViewMode(cb.getSelectedIndex());
+					if (scroll_pane != null)
+						scroll_pane.grabFocus();
+				}
+			}
+
+		});
+		miniMapViewList.setSelectedIndex(0);
+	}
+	
 	@Override
 	public FooCityManager getCityManager() {
 		return city_manager;
@@ -508,12 +503,12 @@ public class FooCityGUI implements FooCityGUIInterface {
 
 	@Override
 	public Rectangle getViewRect() {
-		return (Rectangle) scrollPane.getViewport().getVisibleRect().clone();
+		return (Rectangle) scroll_pane.getViewport().getVisibleRect().clone();
 	}
 
 	@Override
 	public Point getViewPoint() {
-		return (Point) scrollPane.getViewport().getViewPosition().clone();
+		return (Point) scroll_pane.getViewport().getViewPosition().clone();
 	}
 
 	public boolean setCityManager(FooCityManager city_manager2) {
@@ -601,7 +596,7 @@ public class FooCityGUI implements FooCityGUIInterface {
 					}
 					System.exit(0);
 			}
-			scrollPane.grabFocus();
+			scroll_pane.grabFocus();
 		}
 
 		private boolean saveGame() {
@@ -652,7 +647,7 @@ public class FooCityGUI implements FooCityGUIInterface {
 			boolean selected = buttonPressed.isSelected();
 			deselectButtons();
 			buttonPressed.setSelected(selected);
-			scrollPane.grabFocus();
+			scroll_pane.grabFocus();
 			int placingTile = Integer.parseInt(e.getActionCommand());
 			if (!selected)
 				placingTile = 0;
@@ -706,19 +701,19 @@ public class FooCityGUI implements FooCityGUIInterface {
 		buttonBulldoze.setSelected(false);
 	}
 
-	private class keyDispatcher extends KeyAdapter {
+	private class FooKeyAdapter extends KeyAdapter {
 		@Override
 		public void keyPressed(KeyEvent e) {
 			super.keyPressed(e);
-			if (e.getID() == KeyEvent.KEY_PRESSED && scrollPane.hasFocus()
+			if (e.getID() == KeyEvent.KEY_PRESSED && scroll_pane.hasFocus()
 					&& city_manager != null) {
 				Dimension map_area = city_manager.getMapArea();
 				if (map_area == null)
 					return;
 				char c = e.getKeyChar();
-				Point p = (Point) scrollPane.getViewport().getViewPosition()
+				Point p = (Point) scroll_pane.getViewport().getViewPosition()
 						.clone();
-				Rectangle r = (Rectangle) scrollPane.getViewport()
+				Rectangle r = (Rectangle) scroll_pane.getViewport()
 						.getVisibleRect().clone();
 
 				int x = p.x;
@@ -765,8 +760,30 @@ public class FooCityGUI implements FooCityGUIInterface {
 		}
 	}
 
+	protected void advanceTurn() {
+		switch (city_manager.advanceTurn()) {
+		case FooCityManager.FLAG_WIN:
+			break;
+		case FooCityManager.FLAG_LOSE:
+			JOptionPane.showMessageDialog(frame, "Sorry you lose");
+			city_manager.Quit();
+			break;
+		case FooCityManager.FLAG_MIDGAME:
+			showEndOfTurnReport();
+			break;
+		}
+		updateDisplay();
+
+	}
+
+	private void showEndOfTurnReport() {
+		ReportGUI reportGUI = new ReportGUI(this.frame, city_manager.reports,
+				city_manager.getCurrentTurn());
+		reportGUI.showReport(city_manager.reports.getLast());
+	}
+
 	private void AddKeyListeners() {
-		scrollPane.addKeyListener(new keyDispatcher());
+		scroll_pane.addKeyListener(new FooKeyAdapter());
 	}
 
 	private void AddResizeListener() {
@@ -791,11 +808,13 @@ public class FooCityGUI implements FooCityGUIInterface {
 		r.y = 0;
 		r.width -= FooCityGUIConstants.SIDEBAR_WIDTH + 15;
 		r.height -= 60 + FooCityGUIConstants.STATUSBAR_HEIGHT;
-		scrollPane.setBounds(r);
-		scrollPane.revalidate();
-		side_panel.setBounds(0, 0, FooCityGUIConstants.SIDEBAR_WIDTH, r.height);
-		side_panel.revalidate();
-		selected_tile_panel.setBounds(0, r.height, r.width+FooCityGUIConstants.SIDEBAR_WIDTH, FooCityGUIConstants.STATUSBAR_HEIGHT);
+		scroll_pane.setBounds(r);
+		scroll_pane.revalidate();
+		tool_panel.setBounds(0, 0, FooCityGUIConstants.SIDEBAR_WIDTH, r.height);
+		tool_panel.revalidate();
+		selected_tile_panel.setBounds(0, r.height, r.width
+				+ FooCityGUIConstants.SIDEBAR_WIDTH,
+				FooCityGUIConstants.STATUSBAR_HEIGHT);
 		selected_tile_panel.revalidate();
 	}
 }
