@@ -339,7 +339,7 @@ public class FooCityManagerTest extends TestCase {
 		Assert.assertTrue(city_manager.placeTile(1, 1));
 		// Assert.assertTrue(city_manager.placeTile(2,0));
 		city_manager.advanceTurn();
-		Assert.assertEquals(103, city_manager.getJobs());
+		Assert.assertEquals(105, city_manager.getJobs());
 	}
 
 	public void testJobFinder2() {

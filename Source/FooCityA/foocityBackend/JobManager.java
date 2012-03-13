@@ -2,7 +2,7 @@ package foocityBackend;
 
 import java.awt.Dimension;
 import java.awt.Point;
-import java.util.Stack;
+import java.util.LinkedList;
 
 /**
  * JobManager Pathfinder class for locating jobs for residents
@@ -55,7 +55,7 @@ public class JobManager {
 		int jobsFound = 0;
 
 		// Stack for storing available job locations
-		Stack<Point> found = new Stack<Point>();
+		LinkedList<Point> found = new LinkedList<Point>();
 
 		// Traverse through residential_matrix looking for residents
 		for (int ySource = 0; ySource < map_area.height; ++ySource)
@@ -83,7 +83,7 @@ public class JobManager {
 						}
 					}
 
-					while (found.size() > 0) {
+					while (found.size() > 0 && residential_matrix[xSource][ySource] > 0) {
 						// Divide residents between all available jobs
 						// TODO: this should be fixed to relook if all residents
 						// do not find jobs
@@ -111,6 +111,9 @@ public class JobManager {
 						job_matrix[location.x][location.y] -= jobs_to_place;
 						residential_matrix[xSource][ySource] -= jobs_to_place;
 						jobsFound += jobs_to_place;
+						
+						if (job_matrix[location.x][location.y] > 0)
+							found.addLast(location);
 					}
 				}
 			}
