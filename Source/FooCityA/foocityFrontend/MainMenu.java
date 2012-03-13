@@ -32,7 +32,6 @@ public class MainMenu extends JPanel implements ActionListener {
 		// from http://docs.oracle.com/javase/6/docs/technotes/guides/jweb/otherFeatures/nimbus_laf.html
 		try {
 			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-				System.out.println(info.getName());
 				if ("Metal".equals(info.getName())) {
 					UIManager.setLookAndFeel(info.getClassName());
 					break;
@@ -57,7 +56,7 @@ public class MainMenu extends JPanel implements ActionListener {
 		BufferedImage i = null;
 		if (i == null) {
 			try {
-				i = ImageIO.read(ClassLoader.getSystemResource("./images/MainMenu.png"));
+				i = ImageIO.read(ClassLoader.getSystemResource("images/MainMenu.png"));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

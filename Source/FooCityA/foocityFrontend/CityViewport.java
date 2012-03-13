@@ -21,6 +21,7 @@ import javax.swing.JPanel;
 
 import foocityBackend.FooCityManager;
 import foocityBackend.MapGridConstants;
+import foocityBackend.Tile;
 
 class CityViewport extends JPanel {
 	FooCityGUIInterface Interface;
@@ -44,17 +45,9 @@ class CityViewport extends JPanel {
 
 		if (Interface != null) {
 			addMouseListener(new MouseAdapter() {
-
 				@Override
 				public void mousePressed(MouseEvent e) {
-					selected_tile = e.getPoint();
-					selected_tile.x /= FooCityGUIConstants.TILE_WIDTH;
-					selected_tile.y /= FooCityGUIConstants.TILE_HEIGHT;
-					// System.out.print(p + " " + x + " " + y);
-					if (Interface.getCityManager().getPlacingTile() != 0)
-						Interface.getCityManager().placeTile(selected_tile);
-					Interface.updateSelectedTile(selected_tile);
-					Interface.updateDisplay();
+					placeTile(e.getPoint(), true);
 				}
 
 				@Override
@@ -67,8 +60,26 @@ class CityViewport extends JPanel {
 				public void mouseMoved(MouseEvent arg0) {
 					setMousePoint(arg0.getPoint());
 				}
+				
+				@Override
+				public void mouseDragged(MouseEvent arg0) {
+					int tileType = Interface.getCityManager().getPlacingTile();
+					placeTile(arg0.getPoint(), (Tile.isNaturalTile(tileType) || tileType == MapGridConstants.ROAD_TILE));
+				}
 			});
 		}
+	}
+
+	protected void placeTile(Point point, boolean place) {
+	selected_tile = point;
+	selected_tile.x /= FooCityGUIConstants.TILE_WIDTH;
+	selected_tile.y /= FooCityGUIConstants.TILE_HEIGHT;
+	// System.out.print(p + " " + x + " " + y);
+	if (place && Interface.getCityManager().getPlacingTile() != 0)
+		Interface.getCityManager().placeTile(selected_tile);
+	Interface.updateSelectedTile(selected_tile);
+	Interface.updateDisplay();
+		
 	}
 
 	public Dimension getPreferredSize() {

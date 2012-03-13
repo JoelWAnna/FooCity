@@ -149,17 +149,17 @@ class SelectedTilePanel extends JPanel {
 				int power = tm.getPowerConsumed();
 				if (power < 0)
 					tile_power.setText(
-							String.format("Power+: %1$3d", power));
+							String.format("Power+: %1$3d", -power));
 				else
 					tile_power.setText(
-							String.format("Power-: %1$3d", -power));
+							String.format("Power-: %1$3d", power));
 				int water = tm.getWaterConsumed();
 				if (water < 0)
 					tile_water.setText(
-							String.format("Water+: %1$3d", water));
+							String.format("Water+: %1$3d", -water));
 				else
 					tile_water.setText(
-							String.format("Water-: %1$3d", -water));
+							String.format("Water-: %1$3d", water));
 			}
 		} else {
 			tile_coordinates.setText("");

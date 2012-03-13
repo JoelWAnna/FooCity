@@ -773,7 +773,7 @@ public class FooCityGUI implements FooCityGUIInterface {
 			break;
 		}
 		updateDisplay();
-
+		scroll_pane.grabFocus();
 	}
 
 	private void showEndOfTurnReport() {

@@ -1,6 +1,6 @@
 package foocityBackend;
 
-class Tile {
+public class Tile {
 	public int metricsActual[];
 	public boolean employed;
 	private int variation;
@@ -41,7 +41,7 @@ class Tile {
 		return tileType != MapGridConstants.ROAD_TILE;
 	}
 
-	private static boolean isNaturalTile(int tileType) {
+	public static boolean isNaturalTile(int tileType) {
 		if (tileType >= MapGridConstants.WATER_TILE && tileType <= MapGridConstants.FORREST_TILE)
 			return true;
 		return false;
