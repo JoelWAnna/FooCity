@@ -40,6 +40,7 @@ public class FooCityManager {
 	private JobManager job_manager;
 	private int turnsLosing;
 	public LinkedList<Report> reports = new LinkedList<Report>();
+	private TaxRates tax_rates;
 
 	public FooCityManager() {
 		current_map = null;
@@ -116,6 +117,7 @@ public class FooCityManager {
 			propagateMetrics();
 			job_manager = new JobManager();
 			reports.clear();
+			tax_rates = new TaxRates(5, 5, 5, 5, 5);
 			return true;
 		}
 		return false;
@@ -177,7 +179,17 @@ public class FooCityManager {
 					jobs += tile_metrics.getJobs();
 				else
 					residents -= tile_metrics.getJobs();
-
+				if (tile_metrics.hasBusinessTax())
+					income += tile_metrics.getPrice()/4 * tax_rates.getBusiness_tax()/100;
+				if (tile_metrics.hasIncomeTax())
+					income += tile_metrics.getPrice()/4 * tax_rates.getIncome_tax()/100;
+				if (tile_metrics.hasOccupationTax())
+					income += tile_metrics.getPrice()/4 * tax_rates.getOccupation_tax()/100;
+				if (tile_metrics.hasPropertyTax())
+					income += tile_metrics.getPrice()/4 * tax_rates.getProperty_tax()/100;
+				if (tile_metrics.hasSalesTax())
+					income += tile_metrics.getPrice()/4 * tax_rates.getSales_tax()/100;
+				
 				// If the residents are employed (Or the job location has a
 				// resident nearby)
 				// Then add it to the budget
@@ -691,6 +703,10 @@ public class FooCityManager {
 	public int getJobs() {
 		// TODO Auto-generated method stub
 		return jobs;
+	}
+
+	public TaxRates getTaxRates() {
+		return tax_rates;
 	}
 
 	

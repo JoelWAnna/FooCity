@@ -8,6 +8,7 @@ public class TileMetrics {
 	private int jobs;
 	private int powerConsumed;
 	private int waterConsumed;
+	private int tile_type;
 
 	private static TileMetrics tiles[];
 
@@ -33,7 +34,67 @@ public class TileMetrics {
 		}
 	}
 
+	public boolean hasBusinessTax() {
+		switch (tile_type)
+		{
+		case MapGridConstants.COMMERCIAL_TILE:
+		case MapGridConstants.INDUSTRIAL_TILE:
+			return true;
+		default:
+			return false;
+		}
+	}
+
+	public boolean hasIncomeTax() {
+		switch (tile_type)
+		{
+		case MapGridConstants.RESIDENTIAL_TILE:
+			return true;
+		default:
+			return false;
+		}
+	}
+	
+	public boolean hasOccupationTax() {
+		switch (tile_type)
+		{
+		case MapGridConstants.RESIDENTIAL_TILE:
+			return true;
+		default:
+			return false;
+		}
+	}
+	
+	public boolean hasPropertyTax() {
+		switch (tile_type)
+		{
+		case MapGridConstants.COMMERCIAL_TILE:
+		case MapGridConstants.INDUSTRIAL_TILE:
+		case MapGridConstants.SOLAR_TILE:
+		case MapGridConstants.COAL_TILE:
+		case MapGridConstants.GAS_TILE:
+		case MapGridConstants.SEWAGE_TILE:
+		case MapGridConstants.WIND_TILE:
+		case MapGridConstants.RESIDENTIAL_TILE:
+		case MapGridConstants.POLICE_TILE:
+			return true;
+		default:
+			return false;
+		}
+	}
+	
+	public boolean hasSalesTax() {
+		switch (tile_type)
+		{
+		case MapGridConstants.COMMERCIAL_TILE:
+			return true;
+		default:
+			return false;
+		}
+	}
+	
 	private TileMetrics(int tileType) {
+		tile_type = tileType;
 		metricsContributed = new int[MapGridConstants.METRIC_LAST];
 		switch (tileType) {
 			case MapGridConstants.BULLDOZE_TILE :

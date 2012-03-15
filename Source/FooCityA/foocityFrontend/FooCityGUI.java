@@ -7,6 +7,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -260,6 +261,14 @@ public class FooCityGUI implements FooCityGUIInterface {
 
 		});
 		View.add(gridLines);
+		JMenuItem Taxrate = new JMenuItem("Adjust Taxrate");
+		Taxrate.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				TaxPanel.ShowTaxPanel(window);
+			}
+		});
+		View.add(Taxrate);
 		JMenu mnReports = new JMenu("Reports");
 		menuBar.add(mnReports);
 

@@ -8,7 +8,7 @@
                 <attribute name="Main-Class" value="foocityFrontend.MainMenu"/>
                 <attribute name="Class-Path" value="."/>
             </manifest>
-            <fileset dir="./bin"/>
+            <fileset dir="./bin" excludes="**/*Test*"/>
         </jar>
     </target>
 </project>
