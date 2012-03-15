@@ -64,7 +64,7 @@ public class Tile {
 				break;
 		}
 		
-		if (isNaturalTile(tileInt) || tileInt == MapGridConstants.RESIDENTIAL_TILE) {
+		if (isNaturalTile(tileInt) || tileInt == MapGridConstants.RESIDENTIAL_TILE || tileInt == MapGridConstants.COMMERCIAL_TILE) {
 			has_variations = true;
 			variation = ((int)(Math.random()*16));
 		}
