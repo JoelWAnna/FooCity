@@ -136,7 +136,7 @@ class MapGrid {
 		return s;
 	}
 
-	public int TileCharToInt(char c) {
+	public static int TileCharToInt(char c) {
 		for (int i = 0; i < MapGridConstants.CHAR_TILES.length; ++i) {
 			if (MapGridConstants.CHAR_TILES[i] == c)
 				return i;
