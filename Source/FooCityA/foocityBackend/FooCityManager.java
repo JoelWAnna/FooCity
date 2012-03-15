@@ -455,6 +455,9 @@ public class FooCityManager {
 					bw.write("Income:" + income + "\n");
 					bw.write("Expenses:" + expenses + "\n");
 					bw.write("CashFlow:" + cashFlow + "\n");
+					for (Report report : reports){
+						bw.write("Report: " + report.getReportStringOneLine() + "\n");
+					}
 					bw.write("MapGrid:1\n");
 					bw.write("width:"
 							+ (int) current_map.getMapArea().getWidth() + "\n");
@@ -478,6 +481,7 @@ public class FooCityManager {
 	public boolean LoadGame(String savePath) {
 		boolean valid_save = true;
 		job_manager = new JobManager();
+		reports.clear();
 		if (savePath != null) {
 			File save_file = new File(savePath);
 			Scanner sc;
@@ -500,13 +504,13 @@ public class FooCityManager {
 						break;
 
 					String[] parsedline = line2.split(":");
-					if (parsedline.length != 2) {
+					/*if (parsedline.length < 2) {
 						FooLogger
-								.errorLog("LoadGame: parsedline length != 2 \""
+								.errorLog("LoadGame: parsedline length < 2 \""
 										+ parsedline.length + "\"\n");
 						valid_save = false;
 						break;
-					}
+					}*/
 
 					FooLogger.infoLog("LoadGame: " + parsedline[0]);
 
@@ -678,6 +682,28 @@ public class FooCityManager {
 							FooLogger.errorLog(e.getMessage());
 							valid_save = false;
 						}
+					} else if (parsedline[0].equals("Report")){
+						try {
+							int waterConsumed = Integer.parseInt(parsedline[1]);
+							int waterGenerated = Integer.parseInt(parsedline[2]);
+							int powerConsumed = Integer.parseInt(parsedline[3]);
+							int powerGenerated = Integer.parseInt(parsedline[4]);
+							int jobs = Integer.parseInt(parsedline[5]);
+							int residents = Integer.parseInt(parsedline[6]);
+							int income = Integer.parseInt(parsedline[7]);
+							int expenses = Integer.parseInt(parsedline[8]);
+							int availableFunds = Integer.parseInt(parsedline[9]);
+							int cashFlow = Integer.parseInt(parsedline[10]);
+							int turn = Integer.parseInt(parsedline[11]);
+							Report report = new Report(waterConsumed, waterGenerated, powerGenerated, powerConsumed,
+									jobs, residents, income, expenses, availableFunds, cashFlow, turn);
+							reports.addLast(report);
+						} catch (NumberFormatException e) {
+							FooLogger
+								.errorLog("LoadGame: NumberFormatException at Report:");
+							FooLogger.errorLog(e.getMessage());
+							valid_save = false;
+				}
 					}
 				}
 

@@ -28,6 +28,13 @@ public class Report {
 		this.turn = t;
 	}
 	
+	public String getReportStringOneLine(){
+		return Integer.toString(waterConsumed) + " " + Integer.toString(waterGenerated) + " " + Integer.toString(powerGenerated)
+			+ " " + Integer.toString(powerConsumed) + " " + Integer.toString(jobs) + " " + Integer.toString(residents)
+			+ " " + Integer.toString(income) + " " + Integer.toString(expenses) + " " +  Integer.toString(availableFunds)
+			+ " " + Integer.toString(cashFlow) + " " + Integer.toString(turn);
+	}
+	
 	public String getReportString() {
 		final String PLACEHOLDER = " \n";
 		StringBuilder sb = new StringBuilder();
