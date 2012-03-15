@@ -72,6 +72,8 @@ class MapGrid {
 			valid = fromScanner(inscanner);
 			if (!valid)
 				tileGrid = null;
+			else
+				setAllVariations();
 		}
 
 	}
@@ -167,6 +169,14 @@ class MapGrid {
 		return false;
 	}
 
+	private void setAllVariations(){
+		for (int x = 0; x < MapGridConstants.MAP_WIDTH; x++){
+			for (int y = 0; y < MapGridConstants.MAP_HEIGHT; y++){
+				setVariation(x, y);
+			}
+		}
+	}
+	
 	private void setVariations(int x, int y) {
 		// Set the graphic variation for this and the neighboring
 		// tiles
