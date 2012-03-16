@@ -58,7 +58,8 @@ public class TileMetrics {
 	public boolean hasOccupationTax() {
 		switch (tile_type)
 		{
-		case MapGridConstants.RESIDENTIAL_TILE:
+		case MapGridConstants.COMMERCIAL_TILE:
+		case MapGridConstants.INDUSTRIAL_TILE:
 			return true;
 		default:
 			return false;
@@ -70,13 +71,7 @@ public class TileMetrics {
 		{
 		case MapGridConstants.COMMERCIAL_TILE:
 		case MapGridConstants.INDUSTRIAL_TILE:
-		case MapGridConstants.SOLAR_TILE:
-		case MapGridConstants.COAL_TILE:
-		case MapGridConstants.GAS_TILE:
-		case MapGridConstants.SEWAGE_TILE:
-		case MapGridConstants.WIND_TILE:
 		case MapGridConstants.RESIDENTIAL_TILE:
-		case MapGridConstants.POLICE_TILE:
 			return true;
 		default:
 			return false;
@@ -139,7 +134,7 @@ public class TileMetrics {
 				metricsContributed[MapGridConstants.METRIC_CRIME] = 3;
 				powerConsumed = 35;
 				waterConsumed = 25;
-				monthlyCost = -30;
+				monthlyCost = -100;
 				break;
 			case MapGridConstants.DIRT_TILE :
 				description = "Undeveloped dirt.  When a tile is bulldozed, it reverts to this.";

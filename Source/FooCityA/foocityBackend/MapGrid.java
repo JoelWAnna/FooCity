@@ -137,6 +137,15 @@ class MapGrid {
 		}
 		return s;
 	}
+	public String toStringResidents(){
+		String s = "";
+		for (int y = 0; y < map_area.getHeight(); ++y) {
+			for (int x = 0; x < map_area.getWidth(); ++x)
+				s += tileGrid[x][y].residents + " ";
+			s += "\n";
+		}
+		return s;
+	}
 
 	public static int TileCharToInt(char c) {
 		for (int i = 0; i < MapGridConstants.CHAR_TILES.length; ++i) {
@@ -221,11 +230,13 @@ class MapGrid {
 		int[][] matrix = new int[this.map_area.width][this.map_area.height];
 		for (int y = 0; y < this.map_area.height; ++y)
 			for (int x = 0; x < this.map_area.width; ++x)
-				matrix[x][y] = TileMetrics.GetTileMetrics(
+				/*matrix[x][y] = TileMetrics.GetTileMetrics(
 						tileGrid[x][y].getTileInt()).getJobs() < 0
 						? -TileMetrics.GetTileMetrics(
 								tileGrid[x][y].getTileInt()).getJobs()
-						: 0;
+						: 0;*/
+				if (tileGrid[x][y].getTileInt() == MapGridConstants.RESIDENTIAL_TILE)
+					matrix[x][y] = tileGrid[x][y].residents;
 		return matrix;
 	}
 
@@ -233,11 +244,13 @@ class MapGrid {
 		int[][] matrix = new int[this.map_area.width][this.map_area.height];
 		for (int y = 0; y < this.map_area.height; ++y)
 			for (int x = 0; x < this.map_area.width; ++x) {
-				matrix[x][y] = (TileMetrics.GetTileMetrics(
+				/*matrix[x][y] = (TileMetrics.GetTileMetrics(
 						tileGrid[x][y].getTileInt()).getJobs() > 0)
 						? TileMetrics.GetTileMetrics(
 								tileGrid[x][y].getTileInt()).getJobs()
-						: 0;
+						: 0;*/
+				if (tileGrid[x][y].getTileInt() != MapGridConstants.RESIDENTIAL_TILE)
+					matrix[x][y] = TileMetrics.GetTileMetrics(tileGrid[x][y].getTileInt()).getJobs();
 			}
 		return matrix;
 	}

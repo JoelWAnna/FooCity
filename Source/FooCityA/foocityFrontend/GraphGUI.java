@@ -314,9 +314,9 @@ public class GraphGUI {
 			for (int x = start; x < currentTurn; x++){
 
 				currentPoint1 = new Point(((x - start) * CANVAS_WIDTH) / (currentTurn - start - 1),
-						CANVAS_HEIGHT - (reportArray[x].getJobs() * CANVAS_HEIGHT) / max);
-				currentPoint2 = new Point(((x - start) * CANVAS_WIDTH) / (currentTurn - start - 1),
 						CANVAS_HEIGHT - (reportArray[x].getResidents() * CANVAS_HEIGHT) / max);
+				currentPoint2 = new Point(((x - start) * CANVAS_WIDTH) / (currentTurn - start - 1),
+						CANVAS_HEIGHT - (reportArray[x].getJobs() * CANVAS_HEIGHT) / max);
 				
 				g.setColor(Color.green);
 				if (lastPoint1 != null)

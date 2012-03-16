@@ -37,10 +37,17 @@ public class FooCityManager {
 	private int income = 0, expenses = 0;
 	private int cashFlow = 0;
 	private int jobs = 0, residents = 0;
+	private int totalPollution;
+	private int totalHappiness;
+	private int commercialJobs;
+	private int industrialJobs;
+	private int unemployement;
 	private JobManager job_manager;
 	private int turnsLosing;
 	public LinkedList<Report> reports = new LinkedList<Report>();
 	private TaxRates tax_rates;
+	private int unemployment;
+	private int happyResidents;
 
 	public FooCityManager() {
 		current_map = null;
@@ -139,6 +146,10 @@ public class FooCityManager {
 
 		// Propagate the metrics
 		this.propagateMetrics();
+		// Update number of residents in each tile
+		this.updateResidents();
+		// Find jobs for residents
+		this.findJobs();
 
 		// Reset some variables
 		powerConsumed = 0;
@@ -147,9 +158,14 @@ public class FooCityManager {
 		waterGenerated = 0;
 		income = 0;
 		expenses = 0;
-		jobs = 0;
 		residents = 0;
+		happyResidents = 0;
+		int jobsAvailable = 0;
 		float factor;
+		int commercialBudget = 0;
+		int industrialBudget = 0;
+		int residentialBudget = 0;
+		int totalPropertyValue = 0;
 
 		// For each tile...
 		for (int y = 0; y < current_map.getMapArea().getHeight(); y++) {
@@ -174,40 +190,36 @@ public class FooCityManager {
 				else
 					waterGenerated -= tile_metrics.getWaterConsumed();
 
-				// Do a similar thing with residents versus jobs
-				if (tile_metrics.getJobs() > 0)
-					jobs += tile_metrics.getJobs();
-				else
-					residents -= tile_metrics.getJobs();
-				if (tile_metrics.hasBusinessTax())
-					income += tile_metrics.getPrice()/4 * tax_rates.getBusiness_tax()/100;
-				if (tile_metrics.hasIncomeTax())
-					income += tile_metrics.getPrice()/4 * tax_rates.getIncome_tax()/100;
-				if (tile_metrics.hasOccupationTax())
-					income += tile_metrics.getPrice()/4 * tax_rates.getOccupation_tax()/100;
-				if (tile_metrics.hasPropertyTax())
-					income += tile_metrics.getPrice()/4 * tax_rates.getProperty_tax()/100;
-				if (tile_metrics.hasSalesTax())
-					income += tile_metrics.getPrice()/4 * tax_rates.getSales_tax()/100;
+				// Add residents
+				residents += current_map.getTile(x, y).residents;
+				if (current_map.getTile(x,y).metricsActual[MapGridConstants.METRIC_HAPPINESS] > 0)
+					happyResidents += current_map.getTile(x, y).residents;
 				
-				// If the residents are employed (Or the job location has a
-				// resident nearby)
-				// Then add it to the budget
-				// if (tile_metrics.employed){
+				// Add jobs
+				if (tile_metrics.getJobs() > 0)
+					jobsAvailable += tile_metrics.getJobs();
+				
+				// Add income from commercial/industrial tiles
+				if (current_map.getTileInt(x, y) == MapGridConstants.COMMERCIAL_TILE)
+					commercialBudget -= tile_metrics.getMonthlyCost();
+				if (current_map.getTileInt(x, y) == MapGridConstants.INDUSTRIAL_TILE)
+					industrialBudget -= tile_metrics.getMonthlyCost();
+				
+				// Add maintenance costs
 				if (tile_metrics.getMonthlyCost() > 0)
 					expenses += tile_metrics.getMonthlyCost();
-				else
-					income -= tile_metrics.getMonthlyCost();
-				// }
+				
+				// Only count tiles that aren't natural
+				if (current_map.getTileInt(x, y) > MapGridConstants.FORREST_TILE)
+					totalPropertyValue += tile_metrics.getPrice();
 
 			}
 		}
-		// Now, we have to reduce the budget based on a lack of jobs, residents,
-		// water, or power
+		// Now, we have to reduce the budget if we are short on water/power
 		// The formula in each case is basically:
 		// budget = budget * factor
 		// Where factor = Provided / Needed (capped to a value of 1)
-		// (Just make sure we're not going to divide by zero!) 
+		// (Just make sure we're not going to divide by zero!)
 
 		if (waterConsumed > 0) {
 			factor = (float) waterGenerated / waterConsumed;
@@ -220,25 +232,27 @@ public class FooCityManager {
 			if (factor < 1)
 				income *= factor;
 		}
+		
+		// Calculate unemployment
+		if (residents > jobsAvailable && jobsAvailable > 0)
+			unemployment = (int)(100 * (1.0 - (((float)jobsAvailable) / ((float)residents))));
+		else
+			unemployment = 0;
+		
+		int managerRating = 100;
 
-		if (residents > 0) {
-			factor = (float) jobs / residents;
-			if (factor < 1)
-				income *= factor;
-		}
-
-		if (jobs > 0) {
-			factor = (float) residents / jobs;
-			if (factor < 1)
-				income *= factor;
-		}
+		int businessTax = (int) (tax_rates.getBusiness_tax() * 0.01 * (commercialBudget + industrialBudget));
+		int incomeTax = (int) (tax_rates.getIncome_tax() * 0.01 * (residents*2));
+		int occupationTax = (int) (tax_rates.getOccupation_tax() * 0.01 * (commercialBudget + industrialBudget));
+		int propertyTax = (int) (tax_rates.getProperty_tax() * 0.01 * (commercialBudget + industrialBudget + residents*2));
+		int salesTax = (int) (tax_rates.getSales_tax() * 0.01 * (commercialBudget));
+		income += incomeTax + occupationTax + propertyTax + businessTax + salesTax;
 
 		// We're done with the budget! Make the change.
 		cashFlow = (int) (income - expenses);
 		this.availableFunds += cashFlow;
-		this.findJobs();
-		Report report = new Report(waterConsumed, waterGenerated, powerConsumed, powerGenerated, jobs, residents, income, expenses,
-				this.availableFunds, cashFlow, turn);
+		Report report = new Report(waterConsumed, waterGenerated, powerConsumed, powerGenerated, jobsAvailable, residents, income, expenses,
+				availableFunds, cashFlow, turn,	happyResidents,	totalPollution, businessTax, incomeTax, occupationTax, propertyTax, salesTax, totalPropertyValue, unemployment, managerRating);
 		reports.addLast(report);
 
 		FooLogger.infoLog("advanceTurn took "
@@ -417,6 +431,9 @@ public class FooCityManager {
 		
 		// Don't let crime or pollution be less than zero
 		// Subtract crime and pollution from happiness
+		// Save our total happiness and pollution
+		totalPollution = 0;
+		totalHappiness = 0;
 		for (int y = 0; y < map_height; y++) {
 			for (int x = 0; x < map_width; x++) {
 				int c = getTileMetrics(x, y, MapGridConstants.METRIC_CRIME);
@@ -430,6 +447,10 @@ public class FooCityManager {
 					p = 0;
 				}
 				current_map.updateMetrics(x, y, MapGridConstants.METRIC_HAPPINESS, -(c + p));
+				totalPollution += p;
+				if (current_map.getTileInt(x, y) == MapGridConstants.RESIDENTIAL_TILE
+						&& current_map.getTile(x, y).metricsActual[MapGridConstants.METRIC_HAPPINESS] > 0)
+					happyResidents += current_map.getTile(x, y).residents;
 			}
 
 		}
@@ -468,7 +489,9 @@ public class FooCityManager {
 							+ (int) current_map.getMapArea().getWidth() + "\n");
 					bw.write("height:"
 							+ (int) current_map.getMapArea().getHeight() + "\n");
-					bw.write(current_map.toString() + "\n");
+					bw.write(current_map.toString());
+					bw.write("ResidentGrid:\n");
+					bw.write(current_map.toStringResidents() + "\n");
 					bw.close();
 					return true;
 				}
@@ -683,17 +706,36 @@ public class FooCityManager {
 							cashFlow = Integer.parseInt(parsedline[1]);
 						} catch (NumberFormatException e) {
 							FooLogger
-									.errorLog("LoadGame: NumberFormatException at CashFlow:");
+							.errorLog("LoadGame: NumberFormatException at CashFlow:");
+							FooLogger.errorLog(e.getMessage());
+							valid_save = false;
+						}
+					} else if (parsedline[0].equals("ResidentGrid")){
+						try {
+							if (current_map != null){
+								for (int y = 0; y < current_map.getMapArea().getHeight(); y++){
+									String[] resLine = sc.nextLine().split(" ");
+									for (int x = 0; x < current_map.getMapArea().getWidth(); x++){
+										current_map.getTile(x, y).residents = Integer.parseInt(resLine[x]);
+									}
+								}
+							} else {
+								FooLogger.errorLog("LoadGame: Tried to load resident grid before map grid");
+								valid_save = false;
+							}
+						} catch (NumberFormatException e) {
+							FooLogger
+							.errorLog("LoadGame: NumberFormatException at ResidentGrid:");
 							FooLogger.errorLog(e.getMessage());
 							valid_save = false;
 						}
 					} else if (parsedline[0].equals("Taxes")){
 						try {
-							int businessTax = Integer.parseInt(parsedline[1]);
-							int incomeTax = Integer.parseInt(parsedline[2]);
-							int occupationTax = Integer.parseInt(parsedline[3]);
-							int propertyTax = Integer.parseInt(parsedline[4]);
-							int salesTax = Integer.parseInt(parsedline[5]);
+							float businessTax = Float.parseFloat(parsedline[1]);
+							float incomeTax = Float.parseFloat(parsedline[2]);
+							float occupationTax = Float.parseFloat(parsedline[3]);
+							float propertyTax = Float.parseFloat(parsedline[4]);
+							float salesTax = Float.parseFloat(parsedline[5]);
 							tax_rates = new TaxRates(propertyTax, salesTax, businessTax, occupationTax, incomeTax);
 						} catch (NumberFormatException e) {
 							FooLogger
@@ -714,8 +756,20 @@ public class FooCityManager {
 							int availableFunds = Integer.parseInt(parsedline[9]);
 							int cashFlow = Integer.parseInt(parsedline[10]);
 							int turn = Integer.parseInt(parsedline[11]);
+							int happyResidents = Integer.parseInt(parsedline[12]);
+							int totalPollution = Integer.parseInt(parsedline[13]);
+							int incomeTax = Integer.parseInt(parsedline[14]);
+							int businessTax = Integer.parseInt(parsedline[15]);
+							int occupationTax = Integer.parseInt(parsedline[16]);
+							int propertyTax = Integer.parseInt(parsedline[17]);
+							int salesTax = Integer.parseInt(parsedline[18]);
+							int totalPropertyValue = Integer.parseInt(parsedline[19]);
+							int unemployment = Integer.parseInt(parsedline[20]);
+							int managerRating = Integer.parseInt(parsedline[21]);
 							Report report = new Report(waterConsumed, waterGenerated, powerGenerated, powerConsumed,
-									jobs, residents, income, expenses, availableFunds, cashFlow, turn);
+									jobs, residents, income, expenses, availableFunds, cashFlow, turn, happyResidents,
+									totalPollution, incomeTax, businessTax, occupationTax, propertyTax, salesTax,
+									totalPropertyValue, unemployment, managerRating);
 							reports.addLast(report);
 						} catch (NumberFormatException e) {
 							FooLogger
@@ -746,7 +800,6 @@ public class FooCityManager {
 	}
 
 	public int getJobs() {
-		// TODO Auto-generated method stub
 		return jobs;
 	}
 
@@ -754,6 +807,40 @@ public class FooCityManager {
 		return tax_rates;
 	}
 
+	private void updateResidents(){
+		for (int x = 0; x < MapGridConstants.MAP_WIDTH; x++){
+			for (int y = 0; y < MapGridConstants.MAP_HEIGHT; y++){
+				if (current_map.getTileInt(x, y) == MapGridConstants.RESIDENTIAL_TILE){
+					int happiness = current_map.getTile(x, y).metricsActual[MapGridConstants.METRIC_HAPPINESS];
+					/*
+					 * Happiness can range from around -300 in a horrible industrial area
+					 * to 670 in the middle of the ocean.  This formula is a "best guess" at
+					 * turning that happiness into a move-in/out rate, considering that we
+					 * should still allow residents to move in even if the happiness is slightly negative.
+					 * 
+					 * change = square root of (happiness + 200) - (tax * 10)
+					 * Note that change should be allowed to be negative if the happiness is negative
+					 * So we use the absolute value and then negate the square root
+					 */
+					int change = happiness + 200 - (int)(tax_rates.getIncome_tax() * 10);
+					if (change > 0)
+						change = (int) Math.sqrt(change);
+					else
+						change = (int) -Math.sqrt(Math.abs(change));
+					FooLogger.infoLog("Happiness: " + Integer.toString(happiness) + " Change: " + Integer.toString(change));
+					current_map.getTile(x, y).residents += change;
+					if (current_map.getTile(x, y).residents < 0)
+						current_map.getTile(x, y).residents = 0;
+					if (current_map.getTile(x, y).residents > -TileMetrics.GetTileMetrics(MapGridConstants.RESIDENTIAL_TILE).getJobs())
+						current_map.getTile(x, y).residents = -TileMetrics.GetTileMetrics(MapGridConstants.RESIDENTIAL_TILE).getJobs();
+				}
+					
+			}
+		}
+	}
 	
+	public Tile getTile(int x, int y){
+		return current_map.getTile(x, y);
+	}
 
 }

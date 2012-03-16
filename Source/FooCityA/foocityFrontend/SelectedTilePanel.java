@@ -23,6 +23,7 @@ class SelectedTilePanel extends JPanel {
 	private JLabel tile_crime;
 	private JLabel tile_monthlyCost;
 	private JLabel tile_jobs;
+	private JLabel tile_residents;
 	private JLabel tile_power;
 	private JLabel tile_water;
 	private JPanel graphicPanel;
@@ -144,7 +145,7 @@ class SelectedTilePanel extends JPanel {
 							String.format("Jobs: %1$3d", jobs));
 				else
 					tile_jobs.setText(
-							String.format("Residents: %1$3d", -jobs));
+							String.format("Residents: %1$3d/100", _interface.getCityManager().getTile(x, y).residents));
 				
 				int power = tm.getPowerConsumed();
 				if (power < 0)

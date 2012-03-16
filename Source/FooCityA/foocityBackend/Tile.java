@@ -4,6 +4,7 @@ public class Tile {
 	public int metricsActual[];
 	public boolean employed;
 	private int variation;
+	public int residents;
 
 	private char tileChar;
 	protected int tileInt;
@@ -48,6 +49,7 @@ public class Tile {
 	}
 
 	private void setValues() {
+		residents = 0;
 		replaceable = true;
 		this.resetMetrics();
 		employed = true;

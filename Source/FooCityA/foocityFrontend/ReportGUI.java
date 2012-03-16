@@ -20,7 +20,7 @@ public class ReportGUI {
 	
 	private JFrame parentFrame;
 	private JDialog reportDialog;
-	private JPanel topPanel;
+	private JPanel bottomPanel;
 	private LinkedList<Report> reports;
 	private int currentTurn;
 	
@@ -37,18 +37,18 @@ public class ReportGUI {
 		//Because we're not saving the window objects to re-use them, we need to destroy them
 		reportDialog.getContentPane().removeAll();
 		
-		topPanel = new JPanel();
-		GridLayout gridLayout = new GridLayout(0, 3);
+		bottomPanel = new JPanel();
+		GridLayout gridLayout = new GridLayout(0, 2);
 		gridLayout.setHgap(15);
-		gridLayout.setVgap(5);
-		topPanel.setLayout(gridLayout);
+		gridLayout.setVgap(0);
+		bottomPanel.setLayout(gridLayout);
 		Scanner reportScanner = new Scanner(report.getReportString());
 
 		while (reportScanner.hasNextLine()) {
-			topPanel.add(new JLabel(reportScanner.nextLine()));
+			bottomPanel.add(new JLabel(reportScanner.nextLine()));
 		}
 
-		reportDialog.add(topPanel);
+		reportDialog.add(bottomPanel);
 		
 		JButton buttonPrev = new JButton("Previous report");
 		JButton buttonNext = new JButton("Next report");
@@ -73,9 +73,9 @@ public class ReportGUI {
 		buttonNext.addActionListener(buttonListener);
 		buttonClose.addActionListener(buttonListener);
 		
-		topPanel.add(buttonPrev);
-		topPanel.add(buttonNext);
-		topPanel.add(buttonClose);
+		bottomPanel.add(buttonPrev);
+		bottomPanel.add(buttonNext);
+		bottomPanel.add(buttonClose);
 		
 		if (report.getTurn() == 0)
 			buttonPrev.setEnabled(false);
