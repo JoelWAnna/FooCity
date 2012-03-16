@@ -76,7 +76,7 @@ public class Report {
 				+ Integer.toString((int) (100.0 * (((float) happyResidents)/ ((float)residents)))) + "%)\n");
 		sb.append("Income tax: " + Integer.toString(incomeTax) + "\n");
 		
-		sb.append("Unhappy: " + Integer.toString(happyResidents) + " (" 
+		sb.append("Unhappy: " + Integer.toString(residents - happyResidents) + " (" 
 				+ Integer.toString(100 - (int) (100.0 * (((float) happyResidents)/ ((float)residents)))) + "%)\n");
 		sb.append("Occupation tax: " + Integer.toString(occupationTax) + "\n");
 		

@@ -48,6 +48,7 @@ public class FooCityManager {
 	private TaxRates tax_rates;
 	private int unemployment;
 	private int happyResidents;
+	private int managerRating;
 
 	public FooCityManager() {
 		current_map = null;
@@ -137,6 +138,8 @@ public class FooCityManager {
 	private int checkWinLose() {
 		if (this.availableFunds < 0 && this.cashFlow < 0)
 				return FooCityManager.FLAG_LOSE;
+		else if (this.availableFunds > 1000000 && this.managerRating > 90)
+			return FooCityManager.FLAG_WIN;
 		return FooCityManager.FLAG_MIDGAME;
 	}
 	public int advanceTurn() {
@@ -234,12 +237,12 @@ public class FooCityManager {
 		}
 		
 		// Calculate unemployment
-		if (residents > jobsAvailable && jobsAvailable > 0)
+		if (residents > jobsAvailable)
 			unemployment = (int)(100 * (1.0 - (((float)jobsAvailable) / ((float)residents))));
 		else
 			unemployment = 0;
 		
-		int managerRating = 100;
+
 
 		int businessTax = (int) (tax_rates.getBusiness_tax() * 0.01 * (commercialBudget + industrialBudget));
 		int incomeTax = (int) (tax_rates.getIncome_tax() * 0.01 * (residents*2));
@@ -250,6 +253,21 @@ public class FooCityManager {
 
 		// We're done with the budget! Make the change.
 		cashFlow = (int) (income - expenses);
+		
+		// happiness, unemployment, pollution, and cash flow affect the manager rating
+		// TODO: this needs to be tweaked
+		managerRating = (int)(100 * (float)happyResidents/(float)residents);
+		if (income > 0 && cashFlow < income)
+			managerRating += ((float)cashFlow/(float)income*50.0);
+		managerRating -= unemployment;
+		managerRating -= totalPollution/10000;
+		
+		if (managerRating < 0)
+			managerRating = 0;
+		else if (managerRating > 100)
+			managerRating = 100;
+		
+		
 		this.availableFunds += cashFlow;
 		Report report = new Report(waterConsumed, waterGenerated, powerConsumed, powerGenerated, jobsAvailable, residents, income, expenses,
 				availableFunds, cashFlow, turn,	happyResidents,	totalPollution, businessTax, incomeTax, occupationTax, propertyTax, salesTax, totalPropertyValue, unemployment, managerRating);

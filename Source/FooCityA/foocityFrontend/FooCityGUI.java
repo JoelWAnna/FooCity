@@ -772,6 +772,8 @@ public class FooCityGUI implements FooCityGUIInterface {
 	protected void advanceTurn() {
 		switch (city_manager.advanceTurn()) {
 		case FooCityManager.FLAG_WIN:
+			JOptionPane.showMessageDialog(frame, "Congratulations you win");
+			city_manager.Quit();
 			break;
 		case FooCityManager.FLAG_LOSE:
 			JOptionPane.showMessageDialog(frame, "Sorry you lose");

@@ -7,7 +7,7 @@ public class FooLogger {
 	public final static int INFO_LOG = 3;
 
 	// set MAX_ERROR to the level of logging that you would like to display
-	public final static int MAX_ERROR = INFO_LOG;
+	public final static int MAX_ERROR = RELEASE_LOG;
 
 	public static void releaseLog(String Message) {
 		Log(Message, RELEASE_LOG);
