@@ -456,8 +456,13 @@ public class FooCityManager {
 					bw.write("Expenses:" + expenses + "\n");
 					bw.write("CashFlow:" + cashFlow + "\n");
 					for (Report report : reports){
-						bw.write("Report: " + report.getReportStringOneLine() + "\n");
+						bw.write("Report:" + report.getReportStringOneLine() + "\n");
 					}
+					bw.write("Taxes:" + tax_rates.getBusiness_tax() + ":" 
+						+ tax_rates.getIncome_tax() + ":"
+						+ tax_rates.getOccupation_tax() + ":"
+						+ tax_rates.getProperty_tax() + ":"
+						+ tax_rates.getSales_tax() + "\n");
 					bw.write("MapGrid:1\n");
 					bw.write("width:"
 							+ (int) current_map.getMapArea().getWidth() + "\n");
@@ -682,6 +687,20 @@ public class FooCityManager {
 							FooLogger.errorLog(e.getMessage());
 							valid_save = false;
 						}
+					} else if (parsedline[0].equals("Taxes")){
+						try {
+							int businessTax = Integer.parseInt(parsedline[1]);
+							int incomeTax = Integer.parseInt(parsedline[2]);
+							int occupationTax = Integer.parseInt(parsedline[3]);
+							int propertyTax = Integer.parseInt(parsedline[4]);
+							int salesTax = Integer.parseInt(parsedline[5]);
+							tax_rates = new TaxRates(propertyTax, salesTax, businessTax, occupationTax, incomeTax);
+						} catch (NumberFormatException e) {
+							FooLogger
+								.errorLog("LoadGame: NumberFormatException at Taxes:");
+							FooLogger.errorLog(e.getMessage());
+							valid_save = false;
+						}
 					} else if (parsedline[0].equals("Report")){
 						try {
 							int waterConsumed = Integer.parseInt(parsedline[1]);
@@ -703,7 +722,7 @@ public class FooCityManager {
 								.errorLog("LoadGame: NumberFormatException at Report:");
 							FooLogger.errorLog(e.getMessage());
 							valid_save = false;
-				}
+						}
 					}
 				}
 
