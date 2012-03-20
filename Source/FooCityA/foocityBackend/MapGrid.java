@@ -179,8 +179,8 @@ class MapGrid {
 	}
 
 	private void setAllVariations(){
-		for (int x = 0; x < MapGridConstants.MAP_WIDTH; x++){
-			for (int y = 0; y < MapGridConstants.MAP_HEIGHT; y++){
+		for (int x = 0; x < this.map_area.getWidth(); x++){
+			for (int y = 0; y < this.map_area.getHeight(); y++){
 				setVariation(x, y);
 			}
 		}
